@@ -1,9 +1,13 @@
 import 'package:encore_shop/src/dashboard/dashboard_page.dart';
 import 'package:encore_shop/src/login/login_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:go_router/go_router.dart';
 
-void main() => runApp(const MyApp());
+Future<void> main() async {
+  await dotenv.load();
+  runApp(const EncoreShopApp());
+}
 
 /// The route configuration.
 final GoRouter _router = GoRouter(
@@ -26,9 +30,9 @@ final GoRouter _router = GoRouter(
 );
 
 /// The main app.
-class MyApp extends StatelessWidget {
-  /// Constructs a [MyApp]
-  const MyApp({super.key});
+class EncoreShopApp extends StatelessWidget {
+  /// Constructs a [EncoreShopApp]
+  const EncoreShopApp({super.key});
 
   @override
   Widget build(BuildContext context) {
