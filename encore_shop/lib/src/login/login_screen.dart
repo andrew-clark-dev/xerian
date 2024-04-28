@@ -92,10 +92,24 @@ class LoginScreen extends StatelessWidget {
     }
   }
 
-  Future<String?> _loginUser(LoginData data) {
+  Future<String?> _loginUser(LoginData data) async {
     debugPrint('Login info');
     debugPrint('Name: ${data.name}');
     debugPrint('Password: ${data.password}');
+
+    final cognitoUser = CognitoUser(data.name, userPool);
+    final authDetails = AuthenticationDetails(
+      username: data.name,
+      password: data.password,
+    );
+    CognitoUserSession session;
+    try {
+      session = (await cognitoUser.authenticateUser(authDetails))!;
+    } on CognitoClientException catch (e) {
+      // handle Wrong Username and Password and Cognito Client
+      return e.message;
+    }
+    debugPrint(session.getAccessToken().getJwtToken());
     return Future.delayed(loginTime).then((_) {
       return null;
     });
