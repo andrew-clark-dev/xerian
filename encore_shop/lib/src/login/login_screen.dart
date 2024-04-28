@@ -2,7 +2,6 @@ import 'package:amazon_cognito_identity_dart_2/cognito.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_login/flutter_login.dart';
-import 'package:flutter/scheduler.dart' show timeDilation;
 
 import 'package:go_router/go_router.dart';
 
@@ -17,23 +16,17 @@ class LoginScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FlutterLogin(
+      onSubmitAnimationCompleted: () {
+        context.go('/dashboard');
+      },
       onSignup: _signupUser,
       onConfirmSignup: _signupConfirm,
       onResendCode: _resendCode,
-      onLogin: (loginData) {
-        return _loginUser(loginData);
-      },
-      onRecoverPassword: (name) {
-        debugPrint('Recover password info');
-        debugPrint('Name: $name');
-        return _recoverPassword(name);
-        // Show new password dialog
-      },
-      onConfirmRecover: _signupConfirm,
+      onLogin: _loginUser,
+      onRecoverPassword: _recoverPassword,
+      onConfirmRecover: _recoverConfirm,
     );
   }
-
-  Duration get loginTime => Duration(milliseconds: timeDilation.ceil() * 2250);
 
   Future<String?> _signupUser(SignupData data) async {
     debugPrint('Signup info');
@@ -51,7 +44,7 @@ class LoginScreen extends StatelessWidget {
     try {
       // Sign up the user
       await userPool.signUp(data.name!, data.password!);
-      // Authentication successful, navigate to home screen
+      // Signup successful, move on to confirmation
       return null;
     } on CognitoClientException catch (e) {
       // Authentication failed, return error message
@@ -63,11 +56,11 @@ class LoginScreen extends StatelessWidget {
     debugPrint('Resend code');
     debugPrint('Name: ${data.name}');
     debugPrint('Password: ${data.password}');
-    debugPrint('AdditionalSignupData: ${data.additionalSignupData}');
+    final cognitoUser = CognitoUser(data.name, userPool);
     try {
       // Sign up the user
-//      await userPool.signUp(data.name!, data.password!);
-      // Authentication successful, navigate to home screen
+      await cognitoUser.resendConfirmationCode();
+      // Resend successful
       return null;
     } on CognitoClientException catch (e) {
       // Authentication failed, return error message
@@ -84,7 +77,7 @@ class LoginScreen extends StatelessWidget {
     try {
       // Confirm the signup with the provided confirmation code
       await cognitoUser.confirmRegistration(code);
-      // Authentication successful, navigate to home screen
+      // Confirm successful, navigate to home screen
       return null;
     } on CognitoClientException catch (e) {
       // Confirmation failed, return error message
@@ -105,19 +98,42 @@ class LoginScreen extends StatelessWidget {
     CognitoUserSession session;
     try {
       session = (await cognitoUser.authenticateUser(authDetails))!;
+      debugPrint(session.getAccessToken().getJwtToken());
+      // Authentication successful, navigate to home screen
+      return null;
     } on CognitoClientException catch (e) {
       // handle Wrong Username and Password and Cognito Client
       return e.message;
     }
-    debugPrint(session.getAccessToken().getJwtToken());
-    return Future.delayed(loginTime).then((_) {
-      return null;
-    });
   }
 
-  Future<String?> _recoverPassword(String name) {
-    return Future.delayed(loginTime).then((_) {
+  Future<String?> _recoverPassword(String name) async {
+    debugPrint('Recover password info');
+    debugPrint('Name: $name');
+    final cognitoUser = CognitoUser(name, userPool);
+    try {
+      await cognitoUser.forgotPassword();
       return null;
-    });
+    } on CognitoClientException catch (e) {
+      // handle Wrong Username and Password and Cognito Client
+      return e.message;
+    }
+  }
+
+  Future<String?> _recoverConfirm(String code, LoginData data) async {
+    debugPrint('Confirm info');
+    debugPrint('Name: ${data.name}');
+    debugPrint('Password: ${data.password}');
+    debugPrint('Code: $code');
+    final cognitoUser = CognitoUser(data.name, userPool);
+    try {
+      // Confirm the recovery with the provided confirmation code
+      await cognitoUser.confirmPassword(code, data.password);
+      // Confirm successful, navigate to home screen
+      return null;
+    } on CognitoClientException catch (e) {
+      // Confirmation failed, return error message
+      return e.message;
+    }
   }
 }
