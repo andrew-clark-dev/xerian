@@ -2,6 +2,14 @@ resource "aws_cognito_user_pool" "cognito_user_pool" {
   name                     = "${var.app}-user-pool-${var.stage}"
   username_attributes      = ["email"]
   auto_verified_attributes = ["email"]
+  password_policy {
+    minimum_length                   = 12
+    require_lowercase                = true
+    require_uppercase                = false
+    require_numbers                  = false
+    require_symbols                  = false
+    temporary_password_validity_days = 1
+  }
 }
 
 resource "aws_cognito_user_pool_client" "cognito_user_pool_client" {
