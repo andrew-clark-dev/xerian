@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:go_router/go_router.dart';
 
+import 'src/pages/account/account_view.dart';
+
 Future<void> main() async {
   await dotenv.load();
   runApp(const EncoreShopApp());
@@ -22,6 +24,14 @@ final GoRouter _router = GoRouter(
           path: 'dashboard',
           builder: (BuildContext context, GoRouterState state) {
             return const DashboardPage();
+          },
+        ),
+        GoRoute(
+          path: 'account',
+          builder: (BuildContext context, GoRouterState state) {
+            return const AccountView(
+              account: null,
+            );
           },
         ),
       ],

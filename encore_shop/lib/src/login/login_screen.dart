@@ -17,7 +17,7 @@ class LoginScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return FlutterLogin(
       onSubmitAnimationCompleted: () {
-        context.go('/dashboard');
+        context.go('/account');
       },
       onSignup: _signupUser,
       onConfirmSignup: _signupConfirm,
