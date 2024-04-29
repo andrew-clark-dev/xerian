@@ -25,3 +25,4 @@ resource "aws_cognito_user_pool_client" "cognito_user_pool_client" {
   callback_urls                        = ["https://xerian.com"]
   supported_identity_providers         = ["COGNITO"]
 }
+
