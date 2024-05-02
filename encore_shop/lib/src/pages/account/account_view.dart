@@ -1,10 +1,14 @@
 // ignore_for_file: prefer_interpolation_to_compose_strings
 
 import 'dart:convert';
-import 'dart:io';
 
+import 'package:amazon_cognito_identity_dart_2/cognito.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
+
+import 'package:aws_dynamodb_api/dynamodb-2012-08-10.dart';
+
+import 'package:encore_shop/src/login/authentication.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 import 'account.dart';
 
@@ -21,6 +25,8 @@ class AccountView extends StatefulWidget {
 }
 
 class _AccountsViewState extends State<AccountView> {
+  final Authentication auth = Authentication();
+
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _firstNameController = TextEditingController();
   final TextEditingController _lastNameController = TextEditingController();
@@ -77,6 +83,29 @@ class _AccountsViewState extends State<AccountView> {
         lastName: lastName,
         number: number,
       );
+
+      final userPool = CognitoUserPool(
+        '${(dotenv.env['POOL_ID'])}',
+        '${(dotenv.env['CLIENT_ID'])}',
+      );
+      final credentials = CognitoCredentials(
+          'eu-central-1:fdb58fd3-77d1-4ce4-9764-ac71712ad290', userPool);
+      await credentials
+          .getAwsCredentials(auth.session!.getIdToken().getJwtToken());
+
+      AwsClientCredentials awscred = AwsClientCredentials(
+          accessKey: credentials.accessKeyId!,
+          secretKey: credentials.secretAccessKey!,
+          sessionToken: credentials.sessionToken);
+
+      final service = DynamoDB(region: 'eu-central-1', credentials: awscred);
+
+      await service.putItem(tableName: 'xerian-account-entity-dev', item: {
+        'id': AttributeValue(s: newEntry.id),
+        'number': AttributeValue(n: newEntry.number.toString()),
+        'data': AttributeValue(s: jsonEncode(newEntry))
+      });
+
       // try {
       //   final cognitoPlugin =
       //       Amplify.Auth.getPlugin(AmplifyAuthCognito.pluginKey);
