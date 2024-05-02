@@ -1,4 +1,5 @@
 import 'package:amazon_cognito_identity_dart_2/cognito.dart';
+import 'package:encore_shop/src/login/authentication.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_login/flutter_login.dart';
@@ -12,6 +13,8 @@ class LoginScreen extends StatelessWidget {
     '${(dotenv.env['POOL_ID'])}',
     '${(dotenv.env['CLIENT_ID'])}',
   );
+
+  final Authentication auth = Authentication();
 
   @override
   Widget build(BuildContext context) {
@@ -98,8 +101,8 @@ class LoginScreen extends StatelessWidget {
     CognitoUserSession session;
     try {
       session = (await cognitoUser.authenticateUser(authDetails))!;
-      debugPrint(session.getAccessToken().getJwtToken());
-      // Authentication successful, navigate to home screen
+      auth.session = session;
+
       return null;
     } on CognitoClientException catch (e) {
       // handle Wrong Username and Password and Cognito Client
