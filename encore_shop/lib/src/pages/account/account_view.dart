@@ -2,14 +2,10 @@
 
 import 'dart:convert';
 
-import 'package:amazon_cognito_identity_dart_2/cognito.dart';
+import 'package:aws_dynamodb_api/dynamodb-2012-08-10.dart';
 import 'package:flutter/material.dart';
 
-import 'package:aws_dynamodb_api/dynamodb-2012-08-10.dart';
-
-import 'package:encore_shop/src/login/authentication.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-
+import '../../services/aws_services.dart';
 import 'account.dart';
 
 class AccountView extends StatefulWidget {
@@ -34,6 +30,8 @@ class _AccountsViewState extends State<AccountView> {
 
   bool get _isCreate => _account == null;
   Account? get _account => widget.account;
+
+  AWSServices aws = AWSServices();
 
   @override
   void initState() {
@@ -82,53 +80,22 @@ class _AccountsViewState extends State<AccountView> {
         number: number,
       );
 
-      final service = DynamoDB(
-          region: 'eu-central-1',
-          credentials: Authentication().clientCredentials);
-
-      await service.putItem(tableName: 'xerian-account-entity-dev', item: {
+      await aws.dynamoDB.putItem(tableName: 'xerian-account-entity-dev', item: {
         'id': AttributeValue(s: newEntry.id),
         'number': AttributeValue(n: newEntry.number.toString()),
         'data': AttributeValue(s: jsonEncode(newEntry))
       });
-
-      // try {
-      //   final cognitoPlugin =
-      //       Amplify.Auth.getPlugin(AmplifyAuthCognito.pluginKey);
-      //   final result = await cognitoPlugin.fetchAuthSession();
-      //   String apiUrl =
-      //       'https://jgy6ezt901.execute-api.eu-central-1.amazonaws.com/dev/account';
-      //   String? accessToken = result.credentialsResult.value.sessionToken;
-
-      //   final response = await http.post(
-      //     Uri.parse(apiUrl),
-      //     headers: {
-      //       HttpHeaders.contentTypeHeader: "application/json",
-      //       HttpHeaders.authorizationHeader: "Bearer $accessToken"
-      //     },
-      //     body: jsonEncode(newEntry),
-      //   );
-      //   print('response: ' + response.toString());
-      // } catch (e) {
-      //   print('exception: ' + e.toString());
-      // }
-      // final request = ModelMutations.create(newEntry);
-      // final response = await Amplify.API.mutate(request: request).response;
-      // safePrint('Create result: $response');
     } else {
       // Update account instead
       final updateAccount = _account!.copyWith(
         firstName: firstName,
         lastName: lastName.isNotEmpty ? lastName : null,
       );
-      // final request = ModelMutations.update(updateAccount);
-      // final response = await Amplify.API.mutate(request: request).response;
-      // safePrint('Update result: $response');
-    }
-
-    // Navigate back to homepage after create/update executes
-    if (mounted) {
-      //     context.pop();
+      await aws.dynamoDB.putItem(tableName: 'xerian-account-entity-dev', item: {
+        'id': AttributeValue(s: updateAccount.id),
+        'number': AttributeValue(n: updateAccount.number.toString()),
+        'data': AttributeValue(s: jsonEncode(updateAccount))
+      });
     }
   }
 
