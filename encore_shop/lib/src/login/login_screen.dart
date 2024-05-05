@@ -14,8 +14,6 @@ class LoginScreen extends StatelessWidget {
     '${(dotenv.env['CLIENT_ID'])}',
   );
 
-  final Authentication auth = Authentication();
-
   @override
   Widget build(BuildContext context) {
     return FlutterLogin(
@@ -93,16 +91,8 @@ class LoginScreen extends StatelessWidget {
     debugPrint('Name: ${data.name}');
     debugPrint('Password: ${data.password}');
 
-    final cognitoUser = CognitoUser(data.name, userPool);
-    final authDetails = AuthenticationDetails(
-      username: data.name,
-      password: data.password,
-    );
-    CognitoUserSession session;
     try {
-      session = (await cognitoUser.authenticateUser(authDetails))!;
-      auth.session = session;
-
+      Authentication.login(data.name, data.password);
       return null;
     } on CognitoClientException catch (e) {
       // handle Wrong Username and Password and Cognito Client

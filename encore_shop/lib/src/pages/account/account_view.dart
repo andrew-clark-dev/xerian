@@ -25,8 +25,6 @@ class AccountView extends StatefulWidget {
 }
 
 class _AccountsViewState extends State<AccountView> {
-  final Authentication auth = Authentication();
-
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _firstNameController = TextEditingController();
   final TextEditingController _lastNameController = TextEditingController();
@@ -84,21 +82,9 @@ class _AccountsViewState extends State<AccountView> {
         number: number,
       );
 
-      final userPool = CognitoUserPool(
-        '${(dotenv.env['POOL_ID'])}',
-        '${(dotenv.env['CLIENT_ID'])}',
-      );
-      final credentials = CognitoCredentials(
-          'eu-central-1:fdb58fd3-77d1-4ce4-9764-ac71712ad290', userPool);
-      await credentials
-          .getAwsCredentials(auth.session!.getIdToken().getJwtToken());
-
-      AwsClientCredentials awscred = AwsClientCredentials(
-          accessKey: credentials.accessKeyId!,
-          secretKey: credentials.secretAccessKey!,
-          sessionToken: credentials.sessionToken);
-
-      final service = DynamoDB(region: 'eu-central-1', credentials: awscred);
+      final service = DynamoDB(
+          region: 'eu-central-1',
+          credentials: Authentication().clientCredentials);
 
       await service.putItem(tableName: 'xerian-account-entity-dev', item: {
         'id': AttributeValue(s: newEntry.id),
