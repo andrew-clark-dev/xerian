@@ -1,3 +1,4 @@
+import 'package:encore_shop/src/pages/entity.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:uuid/uuid.dart';
 
@@ -9,7 +10,7 @@ part 'account.g.dart';
 Uuid uuid = const Uuid();
 
 @JsonSerializable()
-class Account {
+class Account implements NumberedEntity {
   Account(
       {String? id,
       required this.number,
@@ -20,7 +21,9 @@ class Account {
       this.address})
       : id = id ?? uuid.v1();
 
-  late String? id;
+  @override
+  late String id;
+  @override
   final int number;
   final String firstName;
   final String lastName;

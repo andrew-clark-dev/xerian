@@ -5,7 +5,7 @@ import 'dart:convert';
 import 'package:aws_dynamodb_api/dynamodb-2012-08-10.dart';
 import 'package:flutter/material.dart';
 
-import '../../services/aws_services.dart';
+import '../../services/repository.dart';
 import 'account.dart';
 
 class AccountView extends StatefulWidget {
@@ -31,7 +31,7 @@ class _AccountsViewState extends State<AccountView> {
   bool get _isCreate => _account == null;
   Account? get _account => widget.account;
 
-  AWSServices aws = AWSServices();
+  Repository repo = Repository("xerian-account-entity-dev");
 
   @override
   void initState() {
@@ -74,28 +74,20 @@ class _AccountsViewState extends State<AccountView> {
 
     if (_isCreate) {
       // Create a new account entry
-      final newEntry = Account(
+      final newAccount = Account(
         firstName: firstName,
         lastName: lastName,
         number: number,
       );
 
-      await aws.dynamoDB.putItem(tableName: 'xerian-account-entity-dev', item: {
-        'id': AttributeValue(s: newEntry.id),
-        'number': AttributeValue(n: newEntry.number.toString()),
-        'data': AttributeValue(s: jsonEncode(newEntry))
-      });
+      await repo.put(newAccount);
     } else {
       // Update account instead
       final updateAccount = _account!.copyWith(
         firstName: firstName,
         lastName: lastName.isNotEmpty ? lastName : null,
       );
-      await aws.dynamoDB.putItem(tableName: 'xerian-account-entity-dev', item: {
-        'id': AttributeValue(s: updateAccount.id),
-        'number': AttributeValue(n: updateAccount.number.toString()),
-        'data': AttributeValue(s: jsonEncode(updateAccount))
-      });
+      await repo.put(updateAccount);
     }
   }
 
