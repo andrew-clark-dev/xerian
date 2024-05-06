@@ -1,8 +1,4 @@
 // ignore_for_file: prefer_interpolation_to_compose_strings
-
-import 'dart:convert';
-
-import 'package:aws_dynamodb_api/dynamodb-2012-08-10.dart';
 import 'package:flutter/material.dart';
 
 import '../../services/repository.dart';
@@ -62,11 +58,7 @@ class _AccountsViewState extends State<AccountView> {
     super.dispose();
   }
 
-  Future<void> submitForm() async {
-    if (!_formKey.currentState!.validate()) {
-      return;
-    }
-
+  Future<void> _submitForm(ScaffoldMessengerState scaffoldMessenger) async {
     // If the form is valid, submit the data
     final firstName = _firstNameController.text;
     final lastName = _lastNameController.text;
@@ -81,6 +73,11 @@ class _AccountsViewState extends State<AccountView> {
       );
 
       await repo.put(newAccount);
+      scaffoldMessenger.showSnackBar(
+        const SnackBar(
+          content: Text('Account details stored successfully'),
+        ),
+      );
     } else {
       // Update account instead
       final updateAccount = _account!.copyWith(
@@ -149,8 +146,13 @@ class _AccountsViewState extends State<AccountView> {
                     ),
                     const SizedBox(height: 20),
                     ElevatedButton(
-                      onPressed: submitForm,
-                      child: Text(_titleText),
+                      onPressed: () {
+                        if (_formKey.currentState?.validate() ?? false) {
+                          // Form is valid, process the data
+                          _submitForm(ScaffoldMessenger.of(context));
+                        }
+                      },
+                      child: Text(_isCreate ? 'Submit' : 'Update'),
                     ),
                   ],
                 ),
