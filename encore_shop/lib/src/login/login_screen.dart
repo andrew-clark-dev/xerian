@@ -18,7 +18,7 @@ class LoginScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return FlutterLogin(
       onSubmitAnimationCompleted: () {
-        context.go('/account');
+        context.go('/accounts');
       },
       onSignup: _signupUser,
       onConfirmSignup: _signupConfirm,
@@ -26,22 +26,12 @@ class LoginScreen extends StatelessWidget {
       onLogin: _loginUser,
       onRecoverPassword: _recoverPassword,
       onConfirmRecover: _recoverConfirm,
+      savedEmail: dotenv.get('SAVED_EMAIL', fallback: null),
+      savedPassword: dotenv.get('SAVED_PASSWORD', fallback: null),
     );
   }
 
   Future<String?> _signupUser(SignupData data) async {
-    debugPrint('Signup info');
-    debugPrint('Name: ${data.name}');
-    debugPrint('Password: ${data.password}');
-    if (data.termsOfService.isNotEmpty) {
-      debugPrint('Terms of service: ');
-      for (final element in data.termsOfService) {
-        debugPrint(
-          ' - ${element.term.id}: ${element.accepted == true ? 'accepted' : 'rejected'}',
-        );
-      }
-    }
-
     try {
       // Sign up the user
       await userPool.signUp(data.name!, data.password!);
@@ -54,9 +44,6 @@ class LoginScreen extends StatelessWidget {
   }
 
   Future<String?> _resendCode(SignupData data) async {
-    debugPrint('Resend code');
-    debugPrint('Name: ${data.name}');
-    debugPrint('Password: ${data.password}');
     final cognitoUser = CognitoUser(data.name, userPool);
     try {
       // Sign up the user
@@ -70,10 +57,6 @@ class LoginScreen extends StatelessWidget {
   }
 
   Future<String?> _signupConfirm(String code, LoginData data) async {
-    debugPrint('Confirm info');
-    debugPrint('Name: ${data.name}');
-    debugPrint('Password: ${data.password}');
-    debugPrint('Code: $code');
     final cognitoUser = CognitoUser(data.name, userPool);
     try {
       // Confirm the signup with the provided confirmation code
@@ -87,10 +70,6 @@ class LoginScreen extends StatelessWidget {
   }
 
   Future<String?> _loginUser(LoginData data) async {
-    debugPrint('Login info');
-    debugPrint('Name: ${data.name}');
-    debugPrint('Password: ${data.password}');
-
     try {
       Authentication.login(data.name, data.password);
       return null;
@@ -101,8 +80,6 @@ class LoginScreen extends StatelessWidget {
   }
 
   Future<String?> _recoverPassword(String name) async {
-    debugPrint('Recover password info');
-    debugPrint('Name: $name');
     final cognitoUser = CognitoUser(name, userPool);
     try {
       await cognitoUser.forgotPassword();
@@ -114,10 +91,6 @@ class LoginScreen extends StatelessWidget {
   }
 
   Future<String?> _recoverConfirm(String code, LoginData data) async {
-    debugPrint('Confirm info');
-    debugPrint('Name: ${data.name}');
-    debugPrint('Password: ${data.password}');
-    debugPrint('Code: $code');
     final cognitoUser = CognitoUser(data.name, userPool);
     try {
       // Confirm the recovery with the provided confirmation code
