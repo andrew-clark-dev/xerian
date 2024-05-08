@@ -38,10 +38,9 @@ class _AccountViewState extends State<AccountsView> {
   }
 
   Future<void> _navigateToAccount({Account? account}) async {
-    context.go('/account');
-    // // Refresh the entries when returning from the
-    // // budget entry screen.
-    // await _refreshAccounts();
+    context.push('/account');
+    // Refresh the entries when returning from Account detail screen.
+    await _refreshAccounts();
   }
 
   double _calculateTotalBudget(List<Account?> items) {
