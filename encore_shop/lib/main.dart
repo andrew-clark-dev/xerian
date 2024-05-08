@@ -5,6 +5,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:go_router/go_router.dart';
 
 import 'src/pages/account/account_view.dart';
+import 'src/pages/account/accounts_view.dart';
 
 Future<void> main() async {
   await dotenv.load();
@@ -24,6 +25,12 @@ final GoRouter _router = GoRouter(
           path: 'dashboard',
           builder: (BuildContext context, GoRouterState state) {
             return const DashboardPage();
+          },
+        ),
+        GoRoute(
+          path: 'accounts',
+          builder: (BuildContext context, GoRouterState state) {
+            return const AccountsView();
           },
         ),
         GoRoute(

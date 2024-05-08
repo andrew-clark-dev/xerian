@@ -42,6 +42,11 @@ class Account implements NumberedEntity {
   /// helper method `_$UserToJson`.
   Map<String, dynamic> toJson() => _$AccountToJson(this);
 
+  // Use the factory constructor above to process a list of json (typically returned from dynamodb)
+  static List<Account> fromJsonList(List<dynamic> list) {
+    return list.map((item) => Account.fromJson(item)).toList();
+  }
+
   // Method to clone an account with optional parameters
   Account copyWith({
     String? firstName,
