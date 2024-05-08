@@ -1,8 +1,11 @@
 import 'package:amazon_cognito_identity_dart_2/cognito.dart';
 import 'package:aws_dynamodb_api/dynamodb-2012-08-10.dart';
+import 'package:contextual_logging/contextual_logging.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class Authentication {
+  static final log = Logger();
+
   static Authentication? _instance;
 
   CognitoUserPool _userPool;
@@ -41,6 +44,7 @@ class Authentication {
   get clientCredentials => _clientCredentials;
 
   static void login(name, password) async {
+    log.i("Authentication : Login via Cognito");
     final userPool = CognitoUserPool(
       '${(dotenv.env['POOL_ID'])}',
       '${(dotenv.env['CLIENT_ID'])}',
@@ -55,9 +59,13 @@ class Authentication {
 
     final session = (await user.authenticateUser(authDetails))!;
 
+    log.i("Authentication : Session created");
+
     var credentials =
         CognitoCredentials('${(dotenv.env['IDENTITY_POOL_ID'])}', userPool);
     await credentials.getAwsCredentials(session.getIdToken().getJwtToken());
+
+    log.i("Authentication : AWS credentials retrieved");
 
     final clientCredentials = AwsClientCredentials(
         accessKey: credentials.accessKeyId!,
@@ -66,5 +74,7 @@ class Authentication {
 
     _instance = Authentication._privateConstructor(
         userPool, user, authDetails, session, credentials, clientCredentials);
+
+    log.i("Authentication : Login successful.");
   }
 }
