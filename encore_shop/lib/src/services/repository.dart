@@ -10,16 +10,14 @@ import 'aws_services.dart';
 class Repository with ContextualLogger {
   final AWSServices aws = AWSServices();
   final String _tableName;
-  final Entity Function(Map<String, dynamic>) _fromJson;
 
   Map<String, AttributeValue>? _lastEvaluatedKey;
 
-  factory Repository(
-      tableName, Entity Function(Map<String, dynamic>) fromJson) {
-    return Repository._privateConstructor(tableName, fromJson);
+  factory Repository(tableName) {
+    return Repository._privateConstructor(tableName);
   }
 
-  Repository._privateConstructor(this._tableName, this._fromJson);
+  Repository._privateConstructor(this._tableName);
 
   // Future<List<Entity>> getNextPage() async {
   //   final scanResponse = await aws.dynamoDB.getItem(
@@ -62,14 +60,14 @@ class Repository with ContextualLogger {
     }
   }
 
-  Future<Entity> get(Uuid id) async {
+  Future<dynamic> get(Uuid id) async {
     // Retrieve the item, from the given table
     final item = await aws.dynamoDB.getItem(
         key: {'id': AttributeValue(s: id.toString())},
         tableName: _tableName).item;
 
     // Process the results with the given entity conversion
-    return _fromJson(item['entity'].s);
+    return jsonDecode(item['entity'].s);
   }
 
   Future<PutItemOutput> put(Entity entity) async {
