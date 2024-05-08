@@ -177,6 +177,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.18.0"
+  contextual_logging:
+    dependency: "direct main"
+    description:
+      name: contextual_logging
+      sha256: d4580c2f4f1b3b0e90099a66b6dd96219ca6c2f18bc26a8c5d2279429cdd050d
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.2+1"
   convert:
     dependency: transitive
     description:
@@ -453,6 +461,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.0.0"
+  logger:
+    dependency: "direct main"
+    description:
+      name: logger
+      sha256: "8c94b8c219e7e50194efc8771cd0e9f10807d8d3e219af473d89b06cc2ee4e04"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.2.0"
   logging:
     dependency: transitive
     description:
