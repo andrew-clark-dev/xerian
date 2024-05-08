@@ -7,19 +7,15 @@ class AWSServices {
 
   final region = dotenv.env['REGION']!;
 
-  final Authentication _authentication;
-
-  late DynamoDB _dynamoDB;
-
   factory AWSServices() {
-    _instance ??= AWSServices._privateConstructor(Authentication());
+    _instance ??= AWSServices._privateConstructor();
     return _instance!;
   }
 
-  AWSServices._privateConstructor(this._authentication) {
-    _dynamoDB = DynamoDB(
-        region: region, credentials: _authentication.clientCredentials);
-  }
+  AWSServices._privateConstructor();
 
-  get dynamoDB => _dynamoDB;
+  get dynamoDB {
+    return DynamoDB(
+        region: region, credentials: Authentication().clientCredentials);
+  }
 }
