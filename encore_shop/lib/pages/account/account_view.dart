@@ -3,11 +3,15 @@ import 'package:amplify_api/amplify_api.dart';
 import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:encore_shop/models/Account.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class AccountView extends StatefulWidget {
   static const path = '/account';
+
+  final Account? account;
   const AccountView({
     super.key,
+    this.account,
   });
 
   @override
@@ -16,6 +20,9 @@ class AccountView extends StatefulWidget {
 
 class _AccountsViewState extends State<AccountView> {
   final _formKey = GlobalKey<FormState>();
+
+  final NumberFormat formatter = NumberFormat("00000000");
+
   final TextEditingController _firstNameController = TextEditingController();
   final TextEditingController _lastNameController = TextEditingController();
   final TextEditingController _numberController = TextEditingController();
@@ -26,16 +33,17 @@ class _AccountsViewState extends State<AccountView> {
   void initState() {
     super.initState();
 
-    // final account = _account;
-    // if (account != null) {
-    //   _firstNameController.text = account.firstName;
-    //   _lastNameController.text = account.lastName;
-    //   _numberController.text = account.number.toStringAsFixed(2);
-    //   _titleText = 'Update account';
-    // } else {
-    _titleText = 'Create account';
-    // asyncInitState();
-    // }
+    var account = widget.account;
+
+    if (account != null) {
+      _firstNameController.text = account.firstName!;
+      _lastNameController.text = account.lastName!;
+      _numberController.text = formatter.format(account.number);
+      _titleText = 'Update account';
+    } else {
+      _titleText = 'Create account';
+      // asyncInitState();
+    }
   }
 
   // void asyncInitState() async {

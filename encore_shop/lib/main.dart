@@ -48,7 +48,11 @@ final GoRouter _router = GoRouter(
     GoRoute(
       path: AccountView.path,
       builder: (BuildContext context, GoRouterState state) {
-        return const AccountView();
+        if (state.extra != null) {
+          return AccountView(account: state.extra as Account);
+        } else {
+          return const AccountView();
+        }
       },
     ),
     GoRoute(

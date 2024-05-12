@@ -62,7 +62,7 @@ class _AccountsViewState extends State<AccountsView> {
   }
 
   Future<void> _navigateToAccount({Account? account}) async {
-    context.push('/account');
+    context.push('/account', extra: account);
     // Refresh the entries when returning from Account detail screen.
     await _refreshAccounts();
   }
