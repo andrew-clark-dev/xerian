@@ -41,3 +41,12 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# amplify
+node_modules
+.amplify
+amplify_outputs*
+amplifyconfiguration*
+
+# FVM Version Cache
+.fvm/

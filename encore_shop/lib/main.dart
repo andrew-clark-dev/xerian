@@ -1,15 +1,39 @@
-import 'package:encore_shop/src/dashboard/dashboard_page.dart';
-import 'package:encore_shop/src/login/login_screen.dart';
+import 'package:amplify_api/amplify_api.dart';
+import 'package:amplify_auth_cognito/amplify_auth_cognito.dart';
+import 'package:amplify_flutter/amplify_flutter.dart';
+import 'package:encore_shop/models/ModelProvider.dart';
+import 'package:encore_shop/pages/login/login_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:go_router/go_router.dart';
 
-import 'src/pages/account/account_view.dart';
-import 'src/pages/account/accounts_view.dart';
+import 'amplifyconfiguration.dart';
+import 'pages/account/account_view.dart';
+import 'pages/account/accounts_view.dart';
 
 Future<void> main() async {
-  await dotenv.load();
-  runApp(const EncoreShopApp());
+  try {
+    WidgetsFlutterBinding.ensureInitialized();
+    await _configureAmplify();
+    runApp(const EncoreShopApp());
+  } on AmplifyException catch (e) {
+    runApp(Text("Error configuring Amplify: ${e.message}"));
+  }
+}
+
+Future<void> _configureAmplify() async {
+  try {
+    await Amplify.addPlugins(
+      [
+        AmplifyAuthCognito(),
+        AmplifyAPI(
+            options: APIPluginOptions(modelProvider: ModelProvider.instance)),
+      ],
+    );
+    await Amplify.configure(amplifyConfig);
+    safePrint('Successfully configured');
+  } on Exception catch (e) {
+    safePrint('Error configuring Amplify: $e');
+  }
 }
 
 /// The route configuration.
@@ -18,30 +42,20 @@ final GoRouter _router = GoRouter(
     GoRoute(
       path: '/',
       builder: (BuildContext context, GoRouterState state) {
-        return LoginScreen();
+        return const LoginScreen();
       },
-      routes: <RouteBase>[
-        GoRoute(
-          path: 'dashboard',
-          builder: (BuildContext context, GoRouterState state) {
-            return const DashboardPage();
-          },
-        ),
-        GoRoute(
-          path: 'accounts',
-          builder: (BuildContext context, GoRouterState state) {
-            return const AccountsView();
-          },
-        ),
-        GoRoute(
-          path: 'account',
-          builder: (BuildContext context, GoRouterState state) {
-            return const AccountView(
-              account: null,
-            );
-          },
-        ),
-      ],
+    ),
+    GoRoute(
+      path: AccountView.path,
+      builder: (BuildContext context, GoRouterState state) {
+        return const AccountView();
+      },
+    ),
+    GoRoute(
+      path: AccountsView.path,
+      builder: (BuildContext context, GoRouterState state) {
+        return const AccountsView();
+      },
     ),
   ],
 );

@@ -1,0 +1,29 @@
+{
+  "name": "encore_shop",
+  "version": "1.0.0",
+  "description": "A new Flutter project.",
+  "main": "index.js",
+  "directories": {
+    "lib": "lib",
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@aws-amplify/backend": "^1.0.1",
+    "@aws-amplify/backend-cli": "^1.0.2",
+    "aws-cdk": "^2.141.0",
+    "aws-cdk-lib": "^2.141.0",
+    "constructs": "^10.3.0",
+    "esbuild": "^0.21.1",
+    "tsx": "^4.9.3",
+    "typescript": "^5.4.5"
+  },
+  "dependencies": {
+    "aws-amplify": "^6.3.0"
+  }
+}
