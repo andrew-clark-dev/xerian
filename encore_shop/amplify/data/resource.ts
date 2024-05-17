@@ -1,4 +1,4 @@
-import { type ClientSchema, a, defineData } from '@aws-amplify/backend';
+import { type ClientSchema, a, defineData } from "@aws-amplify/backend";
 
 /*== STEP 1 ===============================================================
 The section below creates a Todo database table with a "content" field. Try
@@ -14,6 +14,26 @@ const schema = a.schema({
       number: a.integer(),
     })
     .authorization((allow) => [allow.authenticated()]),
+  Counter: a
+    .model({
+      count: a.integer(),
+    })
+    .authorization((allow) => [allow.authenticated()]),
+
+  incrementCounter: a
+    .mutation()
+    // arguments that this query accepts
+    .arguments({
+      id: a.id(),
+    })
+    // return type of the query
+    .returns(a.ref("Counter"))
+    // only allow signed-in users to call this API
+    .authorization((allow) => [allow.authenticated()])
+    .handler(a.handler.custom({
+      dataSource: a.ref('Counter'),
+      entry: './increment-counter.js'
+    })),
 });
 
 export type Schema = ClientSchema<typeof schema>;

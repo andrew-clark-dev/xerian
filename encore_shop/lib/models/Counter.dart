@@ -23,13 +23,11 @@ import 'ModelProvider.dart';
 import 'package:amplify_core/amplify_core.dart' as amplify_core;
 
 
-/** This is an auto generated class representing the Account type in your schema. */
-class Account extends amplify_core.Model {
-  static const classType = const _AccountModelType();
+/** This is an auto generated class representing the Counter type in your schema. */
+class Counter extends amplify_core.Model {
+  static const classType = const _CounterModelType();
   final String id;
-  final String? _firstName;
-  final String? _lastName;
-  final int? _number;
+  final int? _count;
   final amplify_core.TemporalDateTime? _createdAt;
   final amplify_core.TemporalDateTime? _updatedAt;
 
@@ -40,22 +38,14 @@ class Account extends amplify_core.Model {
   @override
   String getId() => id;
   
-  AccountModelIdentifier get modelIdentifier {
-      return AccountModelIdentifier(
+  CounterModelIdentifier get modelIdentifier {
+      return CounterModelIdentifier(
         id: id
       );
   }
   
-  String? get firstName {
-    return _firstName;
-  }
-  
-  String? get lastName {
-    return _lastName;
-  }
-  
-  int? get number {
-    return _number;
+  int? get count {
+    return _count;
   }
   
   amplify_core.TemporalDateTime? get createdAt {
@@ -66,14 +56,12 @@ class Account extends amplify_core.Model {
     return _updatedAt;
   }
   
-  const Account._internal({required this.id, firstName, lastName, number, createdAt, updatedAt}): _firstName = firstName, _lastName = lastName, _number = number, _createdAt = createdAt, _updatedAt = updatedAt;
+  const Counter._internal({required this.id, count, createdAt, updatedAt}): _count = count, _createdAt = createdAt, _updatedAt = updatedAt;
   
-  factory Account({String? id, String? firstName, String? lastName, int? number}) {
-    return Account._internal(
+  factory Counter({String? id, int? count}) {
+    return Counter._internal(
       id: id == null ? amplify_core.UUID.getUUID() : id,
-      firstName: firstName,
-      lastName: lastName,
-      number: number);
+      count: count);
   }
   
   bool equals(Object other) {
@@ -83,11 +71,9 @@ class Account extends amplify_core.Model {
   @override
   bool operator ==(Object other) {
     if (identical(other, this)) return true;
-    return other is Account &&
+    return other is Counter &&
       id == other.id &&
-      _firstName == other._firstName &&
-      _lastName == other._lastName &&
-      _number == other._number;
+      _count == other._count;
   }
   
   @override
@@ -97,11 +83,9 @@ class Account extends amplify_core.Model {
   String toString() {
     var buffer = new StringBuffer();
     
-    buffer.write("Account {");
+    buffer.write("Counter {");
     buffer.write("id=" + "$id" + ", ");
-    buffer.write("firstName=" + "$_firstName" + ", ");
-    buffer.write("lastName=" + "$_lastName" + ", ");
-    buffer.write("number=" + (_number != null ? _number!.toString() : "null") + ", ");
+    buffer.write("count=" + (_count != null ? _count!.toString() : "null") + ", ");
     buffer.write("createdAt=" + (_createdAt != null ? _createdAt!.format() : "null") + ", ");
     buffer.write("updatedAt=" + (_updatedAt != null ? _updatedAt!.format() : "null"));
     buffer.write("}");
@@ -109,56 +93,44 @@ class Account extends amplify_core.Model {
     return buffer.toString();
   }
   
-  Account copyWith({String? firstName, String? lastName, int? number}) {
-    return Account._internal(
+  Counter copyWith({int? count}) {
+    return Counter._internal(
       id: id,
-      firstName: firstName ?? this.firstName,
-      lastName: lastName ?? this.lastName,
-      number: number ?? this.number);
+      count: count ?? this.count);
   }
   
-  Account copyWithModelFieldValues({
-    ModelFieldValue<String?>? firstName,
-    ModelFieldValue<String?>? lastName,
-    ModelFieldValue<int?>? number
+  Counter copyWithModelFieldValues({
+    ModelFieldValue<int?>? count
   }) {
-    return Account._internal(
+    return Counter._internal(
       id: id,
-      firstName: firstName == null ? this.firstName : firstName.value,
-      lastName: lastName == null ? this.lastName : lastName.value,
-      number: number == null ? this.number : number.value
+      count: count == null ? this.count : count.value
     );
   }
   
-  Account.fromJson(Map<String, dynamic> json)  
+  Counter.fromJson(Map<String, dynamic> json)  
     : id = json['id'],
-      _firstName = json['firstName'],
-      _lastName = json['lastName'],
-      _number = (json['number'] as num?)?.toInt(),
+      _count = (json['count'] as num?)?.toInt(),
       _createdAt = json['createdAt'] != null ? amplify_core.TemporalDateTime.fromString(json['createdAt']) : null,
       _updatedAt = json['updatedAt'] != null ? amplify_core.TemporalDateTime.fromString(json['updatedAt']) : null;
   
   Map<String, dynamic> toJson() => {
-    'id': id, 'firstName': _firstName, 'lastName': _lastName, 'number': _number, 'createdAt': _createdAt?.format(), 'updatedAt': _updatedAt?.format()
+    'id': id, 'count': _count, 'createdAt': _createdAt?.format(), 'updatedAt': _updatedAt?.format()
   };
   
   Map<String, Object?> toMap() => {
     'id': id,
-    'firstName': _firstName,
-    'lastName': _lastName,
-    'number': _number,
+    'count': _count,
     'createdAt': _createdAt,
     'updatedAt': _updatedAt
   };
 
-  static final amplify_core.QueryModelIdentifier<AccountModelIdentifier> MODEL_IDENTIFIER = amplify_core.QueryModelIdentifier<AccountModelIdentifier>();
+  static final amplify_core.QueryModelIdentifier<CounterModelIdentifier> MODEL_IDENTIFIER = amplify_core.QueryModelIdentifier<CounterModelIdentifier>();
   static final ID = amplify_core.QueryField(fieldName: "id");
-  static final FIRSTNAME = amplify_core.QueryField(fieldName: "firstName");
-  static final LASTNAME = amplify_core.QueryField(fieldName: "lastName");
-  static final NUMBER = amplify_core.QueryField(fieldName: "number");
+  static final COUNT = amplify_core.QueryField(fieldName: "count");
   static var schema = amplify_core.Model.defineSchema(define: (amplify_core.ModelSchemaDefinition modelSchemaDefinition) {
-    modelSchemaDefinition.name = "Account";
-    modelSchemaDefinition.pluralName = "Accounts";
+    modelSchemaDefinition.name = "Counter";
+    modelSchemaDefinition.pluralName = "Counters";
     
     modelSchemaDefinition.authRules = [
       amplify_core.AuthRule(
@@ -174,19 +146,7 @@ class Account extends amplify_core.Model {
     modelSchemaDefinition.addField(amplify_core.ModelFieldDefinition.id());
     
     modelSchemaDefinition.addField(amplify_core.ModelFieldDefinition.field(
-      key: Account.FIRSTNAME,
-      isRequired: false,
-      ofType: amplify_core.ModelFieldType(amplify_core.ModelFieldTypeEnum.string)
-    ));
-    
-    modelSchemaDefinition.addField(amplify_core.ModelFieldDefinition.field(
-      key: Account.LASTNAME,
-      isRequired: false,
-      ofType: amplify_core.ModelFieldType(amplify_core.ModelFieldTypeEnum.string)
-    ));
-    
-    modelSchemaDefinition.addField(amplify_core.ModelFieldDefinition.field(
-      key: Account.NUMBER,
+      key: Counter.COUNT,
       isRequired: false,
       ofType: amplify_core.ModelFieldType(amplify_core.ModelFieldTypeEnum.int)
     ));
@@ -207,29 +167,29 @@ class Account extends amplify_core.Model {
   });
 }
 
-class _AccountModelType extends amplify_core.ModelType<Account> {
-  const _AccountModelType();
+class _CounterModelType extends amplify_core.ModelType<Counter> {
+  const _CounterModelType();
   
   @override
-  Account fromJson(Map<String, dynamic> jsonData) {
-    return Account.fromJson(jsonData);
+  Counter fromJson(Map<String, dynamic> jsonData) {
+    return Counter.fromJson(jsonData);
   }
   
   @override
   String modelName() {
-    return 'Account';
+    return 'Counter';
   }
 }
 
 /**
  * This is an auto generated class representing the model identifier
- * of [Account] in your schema.
+ * of [Counter] in your schema.
  */
-class AccountModelIdentifier implements amplify_core.ModelIdentifier<Account> {
+class CounterModelIdentifier implements amplify_core.ModelIdentifier<Counter> {
   final String id;
 
-  /** Create an instance of AccountModelIdentifier using [id] the primary key. */
-  const AccountModelIdentifier({
+  /** Create an instance of CounterModelIdentifier using [id] the primary key. */
+  const CounterModelIdentifier({
     required this.id});
   
   @override
@@ -247,7 +207,7 @@ class AccountModelIdentifier implements amplify_core.ModelIdentifier<Account> {
   String serializeAsString() => serializeAsMap().values.join('#');
   
   @override
-  String toString() => 'AccountModelIdentifier(id: $id)';
+  String toString() => 'CounterModelIdentifier(id: $id)';
   
   @override
   bool operator ==(Object other) {
@@ -255,7 +215,7 @@ class AccountModelIdentifier implements amplify_core.ModelIdentifier<Account> {
       return true;
     }
     
-    return other is AccountModelIdentifier &&
+    return other is CounterModelIdentifier &&
       id == other.id;
   }
   

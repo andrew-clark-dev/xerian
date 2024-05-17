@@ -21,14 +21,16 @@
 
 import 'package:amplify_core/amplify_core.dart' as amplify_core;
 import 'Account.dart';
+import 'Counter.dart';
 
 export 'Account.dart';
+export 'Counter.dart';
 
 class ModelProvider implements amplify_core.ModelProviderInterface {
   @override
-  String version = "02db05bd5f27156d15e3df325241fdff";
+  String version = "22e613742284275f739f60e528e60da5";
   @override
-  List<amplify_core.ModelSchema> modelSchemas = [Account.schema];
+  List<amplify_core.ModelSchema> modelSchemas = [Account.schema, Counter.schema];
   @override
   List<amplify_core.ModelSchema> customTypeSchemas = [];
   static final ModelProvider _instance = ModelProvider();
@@ -39,6 +41,8 @@ class ModelProvider implements amplify_core.ModelProviderInterface {
     switch(modelName) {
       case "Account":
         return Account.classType;
+      case "Counter":
+        return Counter.classType;
       default:
         throw Exception("Failed to find model in model provider for model name: " + modelName);
     }

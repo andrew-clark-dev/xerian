@@ -1,7 +1,9 @@
-// ignore_for_file: prefer_interpolation_to_compose_strings
+import 'dart:convert';
+
 import 'package:amplify_api/amplify_api.dart';
 import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:encore_shop/models/Account.dart';
+import 'package:encore_shop/services/counter_service.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -22,6 +24,7 @@ class _AccountsViewState extends State<AccountView> {
   final _formKey = GlobalKey<FormState>();
 
   final NumberFormat formatter = NumberFormat("00000000");
+  final CounterService counterService = CounterService();
 
   final TextEditingController _firstNameController = TextEditingController();
   final TextEditingController _lastNameController = TextEditingController();
@@ -42,14 +45,14 @@ class _AccountsViewState extends State<AccountView> {
       _titleText = 'Update account';
     } else {
       _titleText = 'Create account';
-      // asyncInitState();
+      _initNumber();
     }
   }
 
-  // void asyncInitState() async {
-  //   _numberController.text =
-  //       await CounterService().getNextValueAsString('account');
-  // }
+  _initNumber() async {
+    final counter = await counterService.increment(Account.classType);
+    _numberController.text = formatter.format(counter.count);
+  }
 
   @override
   void dispose() {

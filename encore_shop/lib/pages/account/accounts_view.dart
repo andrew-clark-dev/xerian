@@ -1,6 +1,7 @@
 import 'package:amplify_api/amplify_api.dart';
 import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:encore_shop/models/Account.dart';
+import 'package:encore_shop/services/counter_service.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
@@ -31,6 +32,7 @@ class _AccountsViewState extends State<AccountsView> {
   @override
   void initState() {
     super.initState();
+    CounterService().initialize();
     _refreshAccounts();
     // Attach listener to scroll controller
     _scrollController.addListener(_scrollListener);
@@ -41,12 +43,12 @@ class _AccountsViewState extends State<AccountsView> {
       final request = ModelQueries.list(Account.classType);
       final response = await Amplify.API.query(request: request).response;
 
-      final accounts = response.data?.items;
       if (response.hasErrors) {
         safePrint('errors: ${response.errors}');
         return;
       }
       setState(() {
+        final accounts = response.data?.items;
         _accounts = accounts!.whereType<Account>().toList();
       });
     } on ApiException catch (e) {
