@@ -17,14 +17,14 @@ class AccountView extends StatefulWidget {
   });
 
   @override
-  State<AccountView> createState() => _AccountsViewState();
+  State<AccountView> createState() => _AccountListViewState();
 }
 
-class _AccountsViewState extends State<AccountView> {
+class _AccountListViewState extends State<AccountView> {
   final _formKey = GlobalKey<FormState>();
 
   final NumberFormat formatter = NumberFormat("00000000");
-  final CounterService counterService = CounterService();
+  final CounterService counter = CounterService(Account.classType);
 
   final TextEditingController _firstNameController = TextEditingController();
   final TextEditingController _lastNameController = TextEditingController();
@@ -45,13 +45,7 @@ class _AccountsViewState extends State<AccountView> {
       _titleText = 'Update account';
     } else {
       _titleText = 'Create account';
-      _initNumber();
     }
-  }
-
-  _initNumber() async {
-    final counter = await counterService.increment(Account.classType);
-    _numberController.text = formatter.format(counter.count);
   }
 
   @override
@@ -66,14 +60,13 @@ class _AccountsViewState extends State<AccountView> {
     // If the form is valid, submit the data
     final firstName = _firstNameController.text;
     final lastName = _lastNameController.text;
-    final number = int.parse(_numberController.text);
 
     // if (_isCreate) {
     // Create a new account entry
     final newAccount = Account(
+      number: await counter.next(),
       firstName: firstName,
       lastName: lastName,
-      number: number,
     );
 
     final request = ModelMutations.create(newAccount);
@@ -88,17 +81,13 @@ class _AccountsViewState extends State<AccountView> {
       );
     } else {
       scaffoldMessenger.showSnackBar(
-        const SnackBar(
-          content: Text('Account details stored successfully'),
+        SnackBar(
+          content:
+              Text('Account ${newAccount.number} details stored successfully'),
         ),
       );
     }
 
-    scaffoldMessenger.showSnackBar(
-      const SnackBar(
-        content: Text('Account details stored successfully'),
-      ),
-    );
     // } else {
     //   // Update account instead
     //   final updateAccount = _account!.copyWith(
@@ -128,11 +117,8 @@ class _AccountsViewState extends State<AccountView> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     TextFormField(
+                      enabled: false,
                       controller: _numberController,
-                      keyboardType: const TextInputType.numberWithOptions(
-                        signed: false,
-                        decimal: true,
-                      ),
                       decoration: const InputDecoration(
                         labelText: 'Number',
                       ),

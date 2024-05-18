@@ -6,15 +6,15 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
-class AccountsView extends StatefulWidget {
+class AccountListView extends StatefulWidget {
   static const path = '/accounts';
-  const AccountsView({super.key});
+  const AccountListView({super.key});
 
   @override
-  State<AccountsView> createState() => _AccountsViewState();
+  State<AccountListView> createState() => _AccountListViewState();
 }
 
-class _AccountsViewState extends State<AccountsView> {
+class _AccountListViewState extends State<AccountListView> {
   List<Account> _accounts = <Account>[];
 
   final NumberFormat formatter = NumberFormat("00000000");
@@ -32,7 +32,7 @@ class _AccountsViewState extends State<AccountsView> {
   @override
   void initState() {
     super.initState();
-    CounterService().initialize();
+    CounterService.initialize();
     _refreshAccounts();
     // Attach listener to scroll controller
     _scrollController.addListener(_scrollListener);

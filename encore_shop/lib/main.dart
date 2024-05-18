@@ -9,7 +9,7 @@ import 'package:go_router/go_router.dart';
 
 import 'amplifyconfiguration.dart';
 import 'pages/account/account_view.dart';
-import 'pages/account/accounts_view.dart';
+import 'pages/account/account_list_view.dart';
 
 Future<void> main() async {
   try {
@@ -57,9 +57,9 @@ final GoRouter _router = GoRouter(
       },
     ),
     GoRoute(
-      path: AccountsView.path,
+      path: AccountListView.path,
       builder: (BuildContext context, GoRouterState state) {
-        return const AccountsView();
+        return const AccountListView();
       },
     ),
   ],

@@ -5,7 +5,7 @@ import 'package:encore_shop/models/Counter.dart';
 
 class CounterService {
   /// a list of models to provider counters for
-  final List<ModelType> models = [Account.classType];
+  static final List<ModelType> models = [Account.classType];
 
   static const graphQLDocument = '''
       mutation AccountCounter(\$id: ID!) {
@@ -15,7 +15,11 @@ class CounterService {
       }
     ''';
 
-  Future<void> _createCounter(id) async {
+  final ModelType _model;
+
+  CounterService(this._model);
+
+  static Future<void> _createCounter(id) async {
     try {
       final counter = Counter(id: id, count: 0);
       final request = ModelMutations.create(counter);
@@ -32,7 +36,7 @@ class CounterService {
     }
   }
 
-  Future<Counter?> _queryItem(id) async {
+  static Future<Counter?> _queryItem(id) async {
     try {
       final request = ModelQueries.get(
         Counter.classType,
@@ -47,7 +51,7 @@ class CounterService {
     }
   }
 
-  initialize() async {
+  static initialize() async {
     for (final model in models) {
       final id = model.modelName();
       if (await _queryItem(id) == null) {
@@ -57,22 +61,19 @@ class CounterService {
   }
 
   /// Atomically increment the counter for the given model (or modelName) and return the incremented value
-  Future<Counter> increment(model) async {
-    String id;
-    if (model is ModelType) {
-      id = model.modelName();
-    } else {
-      id = model;
-    }
-
+  Future<Counter> increment() async {
     final incRequest = GraphQLRequest<Counter>(
         document: graphQLDocument,
-        variables: <String, String>{"id": id},
+        variables: <String, String>{"id": _model.modelName()},
         decodePath: 'incrementCounter',
         modelType: Counter.classType);
 
     final response = await Amplify.API.mutate(request: incRequest).response;
     final count = response.data!;
     return count;
+  }
+
+  Future<int> next() async {
+    return (await increment()).count!;
   }
 }

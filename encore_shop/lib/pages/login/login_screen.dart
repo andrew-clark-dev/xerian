@@ -1,5 +1,5 @@
 import 'package:amplify_authenticator/amplify_authenticator.dart';
-import 'package:encore_shop/pages/account/accounts_view.dart';
+import 'package:encore_shop/pages/account/account_list_view.dart';
 import 'package:flutter/material.dart';
 
 class LoginScreen extends StatelessWidget {
@@ -9,7 +9,7 @@ class LoginScreen extends StatelessWidget {
     return Authenticator(
       child: MaterialApp(
         builder: Authenticator.builder(),
-        home: const AccountsView(),
+        home: const AccountListView(),
       ),
     );
   }
