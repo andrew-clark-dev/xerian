@@ -14,23 +14,95 @@ const schema = a.schema({
     .authorization((allow) => [allow.authenticated()]),
     Account: a
     .model({
-      firstName: a.string(),
+      number: a.integer().required(),
+      firstName: a.string().required(),
       lastName: a.string(),
-      number: a.integer(),
+      email: a.email(),
+      phoneNumber: a.phone(),
+      address: a.string().array(), // fields can be arrays,
+      city: a.string(),
+      state: a.string(),
+      postcode: a.string(),
+      split: a.integer(),
+      items: a.hasMany("Item", "accountId"), // setup relationships between types
     })
     .authorization((allow) => [allow.authenticated()]),
+
     Item: a
     .model({
-      firstName: a.string(),
-      lastName: a.string(),
-      number: a.integer(),
+      sku: a.integer().required(),
+      accountId: a.id().required(),
+      account: a.belongsTo("Account", "accountId"), 
+      categories: a.hasMany("ItemCategory", "itemId"),
+      description: a.string().required(),
+      details: a.string(),
+      images: a.url().array(), // fields can be arrays,
+      quality: a.enum(['AS_NEW','GOOD', 'MARKED']),
+      split: a.integer(),
+      status: a.enum(['TAGGED','HUNG_OUT', 'SOLD', 'TO_DONATE', 'DONATED']),
     })
     .authorization((allow) => [allow.authenticated()]),
+
+    ItemCategory: a.model({
+      // 1. Create reference fields to both ends of
+      //    the many-to-many relationship
+      itemId: a.id().required(),
+      categoryId: a.id().required(),
+      // 2. Create relationship fields to both ends of
+      //    the many-to-many relationship using their
+      //    respective reference fields
+      item: a.belongsTo('Item', 'itemId'),
+      category: a.belongsTo('Category', 'categoryId'),
+    }),
+
+    Category: a
+    .model({
+      type: a.enum(['DEPARTMENT','COLOUR', 'BRAND', 'SIZE']),
+      items: a.hasMany("ItemCategory", "categoryId"), 
+      value: a.string(),
+    })
+    .secondaryIndexes((index) => [index("type")])
+    .authorization((allow) => [allow.authenticated()]),
+
+
     Sale: a
     .model({
-      firstName: a.string(),
-      lastName: a.string(),
       number: a.integer(),
+      status: a.enum(['PARKED','FINALIZED']),
+      finalized: a.datetime(),
+      total: a.float(),
+      subtotal: a.float(),
+      paymentType: a.enum(['CASH','CARD', 'GIFT_CARD', 'ACCOUNT_CREDIT'])
+    })
+    .authorization((allow) => [allow.authenticated()]),
+
+    Refund: a
+    .model({
+      number: a.integer(),
+      status: a.enum(['PARKED','FINALIZED']),
+      finalized: a.datetime(),
+      total: a.float(),
+      subtotal: a.float(),
+      paymentType: a.enum(['CASH'])
+    })
+    .authorization((allow) => [allow.authenticated()]),
+
+
+    Journal: a
+    .model({
+      modelId: a.id().required(),
+      timestamp: a.datetime().required(),
+      action: a.string(),
+      before: a.json(),
+      after: a.json()
+    })
+    .authorization((allow) => [allow.authenticated()]),
+
+    Tag: a
+    .model({
+      modelId: a.id(),
+      key: a.string(),
+      value: a.string(),
     })
     .authorization((allow) => [allow.authenticated()]),
 
@@ -48,7 +120,7 @@ const schema = a.schema({
       dataSource: a.ref('Counter'),
       entry: './increment-counter.js'
     })),
-});
+}).authorization((allow) => [allow.authenticated()]);
 
 export type Schema = ClientSchema<typeof schema>;
 

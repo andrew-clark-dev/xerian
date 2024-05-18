@@ -103,7 +103,6 @@ class _AccountListViewState extends State<AccountView> {
       appBar: AppBar(
         title: Text(_titleText),
       ),
-      drawer: const AppDrawer(), // Add the drawer here
       body: Align(
         alignment: Alignment.topCenter,
         child: ConstrainedBox(

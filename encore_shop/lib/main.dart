@@ -2,6 +2,7 @@ import 'package:amplify_api/amplify_api.dart';
 import 'package:amplify_auth_cognito/amplify_auth_cognito.dart';
 import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:encore_shop/models/ModelProvider.dart';
+import 'package:encore_shop/pages/dashboard/dashboard_view.dart';
 import 'package:encore_shop/pages/login/login_screen.dart';
 
 import 'package:flutter/material.dart';
@@ -44,6 +45,12 @@ final GoRouter _router = GoRouter(
       path: '/',
       builder: (BuildContext context, GoRouterState state) {
         return const LoginScreen();
+      },
+    ),
+    GoRoute(
+      path: DashboardView.path,
+      builder: (BuildContext context, GoRouterState state) {
+        return const DashboardView();
       },
     ),
     GoRoute(
