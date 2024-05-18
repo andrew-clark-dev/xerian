@@ -1,9 +1,8 @@
-import 'dart:convert';
-
 import 'package:amplify_api/amplify_api.dart';
 import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:encore_shop/models/Account.dart';
 import 'package:encore_shop/services/counter_service.dart';
+import 'package:encore_shop/widgets/app_drawer.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -104,6 +103,7 @@ class _AccountListViewState extends State<AccountView> {
       appBar: AppBar(
         title: Text(_titleText),
       ),
+      drawer: const AppDrawer(), // Add the drawer here
       body: Align(
         alignment: Alignment.topCenter,
         child: ConstrainedBox(

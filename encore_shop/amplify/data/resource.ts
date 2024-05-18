@@ -7,16 +7,30 @@ specifies that any unauthenticated user can "create", "read", "update",
 and "delete" any "Todo" records.
 =========================================================================*/
 const schema = a.schema({
-  Account: a
+  Counter: a
+    .model({
+      count: a.integer(),
+    })
+    .authorization((allow) => [allow.authenticated()]),
+    Account: a
     .model({
       firstName: a.string(),
       lastName: a.string(),
       number: a.integer(),
     })
     .authorization((allow) => [allow.authenticated()]),
-  Counter: a
+    Item: a
     .model({
-      count: a.integer(),
+      firstName: a.string(),
+      lastName: a.string(),
+      number: a.integer(),
+    })
+    .authorization((allow) => [allow.authenticated()]),
+    Sale: a
+    .model({
+      firstName: a.string(),
+      lastName: a.string(),
+      number: a.integer(),
     })
     .authorization((allow) => [allow.authenticated()]),
 
