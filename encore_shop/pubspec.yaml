@@ -44,6 +44,9 @@ dependencies:
   pluto_grid_plus: ^8.4.0
   data_table_2: ^2.5.12
   intl: ^0.18.1
+  email_validator: ^2.1.17
+  intl_phone_number_input: ^0.7.4
+  form_validation: ^3.1.1
 
 dev_dependencies:
   flutter_test:

@@ -31,7 +31,7 @@ const schema = a.schema({
     Item: a
     .model({
       sku: a.integer().required(),
-      accountId: a.id().required(),
+      accountId: a.id(),
       account: a.belongsTo("Account", "accountId"), 
       categories: a.hasMany("ItemCategory", "itemId"),
       description: a.string().required(),
@@ -42,6 +42,17 @@ const schema = a.schema({
       status: a.enum(['TAGGED','HUNG_OUT', 'SOLD', 'TO_DONATE', 'DONATED']),
     })
     .authorization((allow) => [allow.authenticated()]),
+    
+    searchAccounts: a
+    .query()
+    .returns(a.ref("Account").array())
+    .authorization((allow) => [allow.publicApiKey()])
+    .handler(
+      a.handler.custom({
+        entry: "./searchAccountResolver.js",
+        dataSource: "osDataSource",
+      })
+    ),
 
     ItemCategory: a.model({
       // 1. Create reference fields to both ends of
