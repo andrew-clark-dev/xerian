@@ -3,6 +3,8 @@ import 'package:amplify_auth_cognito/amplify_auth_cognito.dart';
 import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:encore_shop/models/ModelProvider.dart';
 import 'package:encore_shop/pages/dashboard/dashboard_view.dart';
+import 'package:encore_shop/pages/item/item_list_view.dart';
+import 'package:encore_shop/pages/item/item_view.dart';
 import 'package:encore_shop/pages/login/login_screen.dart';
 
 import 'package:flutter/material.dart';
@@ -67,6 +69,22 @@ final GoRouter _router = GoRouter(
       path: AccountListView.path,
       builder: (BuildContext context, GoRouterState state) {
         return const AccountListView();
+      },
+    ),
+    GoRoute(
+      path: ItemView.path,
+      builder: (BuildContext context, GoRouterState state) {
+        if (state.extra != null) {
+          return ItemView(item: state.extra as Item);
+        } else {
+          return const ItemView();
+        }
+      },
+    ),
+    GoRoute(
+      path: ItemListView.path,
+      builder: (BuildContext context, GoRouterState state) {
+        return const ItemListView();
       },
     ),
   ],

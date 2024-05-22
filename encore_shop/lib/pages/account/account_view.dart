@@ -2,9 +2,9 @@ import 'package:amplify_api/amplify_api.dart';
 import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:encore_shop/models/Account.dart';
 import 'package:encore_shop/services/counter_service.dart';
-import 'package:encore_shop/widgets/app_drawer.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:form_validation/form_validation.dart';
 
 class AccountView extends StatefulWidget {
   static const path = '/account';
@@ -25,9 +25,20 @@ class _AccountListViewState extends State<AccountView> {
   final NumberFormat formatter = NumberFormat("00000000");
   final CounterService counter = CounterService(Account.classType);
 
+  final TextEditingController _numberController = TextEditingController();
   final TextEditingController _firstNameController = TextEditingController();
   final TextEditingController _lastNameController = TextEditingController();
-  final TextEditingController _numberController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _phoneNumberController = TextEditingController();
+  final TextEditingController _addressController = TextEditingController();
+  final TextEditingController _cityController = TextEditingController();
+  final TextEditingController _stateController = TextEditingController();
+  final TextEditingController _postcodeController = TextEditingController();
+  final TextEditingController _splitController = TextEditingController();
+
+  final emailValidator = Validator(validators: [const EmailValidator()]);
+  final phoneValidator = Validator(validators: [const PhoneNumberValidator()]);
+  final requiredValidator = Validator(validators: [const RequiredValidator()]);
 
   late final String _titleText;
 
@@ -128,16 +139,66 @@ class _AccountListViewState extends State<AccountView> {
                         labelText: 'First Name',
                       ),
                       validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter a first name';
-                        }
-                        return null;
+                        return requiredValidator.validate(
+                            label: 'First Name', value: value);
                       },
                     ),
                     TextFormField(
                       controller: _lastNameController,
                       decoration: const InputDecoration(
                         labelText: 'Last Name',
+                      ),
+                    ),
+                    TextFormField(
+                      controller: _emailController,
+                      decoration: const InputDecoration(
+                        labelText: 'E-Mail Address',
+                      ),
+                      validator: (value) {
+                        return emailValidator.validate(
+                            label: 'E-Mail Address', value: value);
+                      },
+                    ),
+                    TextFormField(
+                      controller: _phoneNumberController,
+                      decoration: const InputDecoration(
+                        labelText: 'Phone Number',
+                      ),
+                      validator: (value) {
+                        return phoneValidator.validate(
+                            label: 'Phone Number', value: value);
+                      },
+                    ),
+                    TextFormField(
+                      controller: _addressController,
+                      decoration: const InputDecoration(
+                        labelText: 'Address',
+                      ),
+                      keyboardType: TextInputType.multiline,
+                      maxLines: 3,
+                    ),
+                    TextFormField(
+                      controller: _cityController,
+                      decoration: const InputDecoration(
+                        labelText: 'City',
+                      ),
+                    ),
+                    TextFormField(
+                      controller: _stateController,
+                      decoration: const InputDecoration(
+                        labelText: 'State',
+                      ),
+                    ),
+                    TextFormField(
+                      controller: _postcodeController,
+                      decoration: const InputDecoration(
+                        labelText: 'PostCode',
+                      ),
+                    ),
+                    TextFormField(
+                      controller: _splitController,
+                      decoration: const InputDecoration(
+                        labelText: 'Split',
                       ),
                     ),
                     const SizedBox(height: 20),

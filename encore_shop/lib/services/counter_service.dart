@@ -2,13 +2,14 @@ import 'package:amplify_api/amplify_api.dart';
 import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:encore_shop/models/Account.dart';
 import 'package:encore_shop/models/Counter.dart';
+import 'package:encore_shop/models/Item.dart';
 
 class CounterService {
   /// a list of models to provider counters for
-  static final List<ModelType> models = [Account.classType];
+  static final List<ModelType> models = [Account.classType, Item.classType];
 
   static const graphQLDocument = '''
-      mutation AccountCounter(\$id: ID!) {
+      mutation incrementCounter(\$id: ID!) {
         incrementCounter(id: \$id) {
           id count createdAt updatedAt
         }

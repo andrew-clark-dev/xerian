@@ -1,3 +1,4 @@
+import 'package:encore_shop/services/counter_service.dart';
 import 'package:encore_shop/widgets/app_drawer.dart';
 import 'package:flutter/material.dart';
 
@@ -9,6 +10,7 @@ class DashboardView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    CounterService.initialize();
     return Scaffold(
       appBar: AppBar(
         title: const Text('Dashboard'),

@@ -1,23 +1,22 @@
 import 'package:amplify_api/amplify_api.dart';
 import 'package:amplify_flutter/amplify_flutter.dart';
-import 'package:encore_shop/models/Account.dart';
-import 'package:encore_shop/services/counter_service.dart';
+import 'package:encore_shop/models/Item.dart';
 import 'package:encore_shop/services/row_service.dart';
 import 'package:encore_shop/widgets/app_drawer.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
-class AccountListView extends StatefulWidget {
-  static const path = '/accounts';
-  const AccountListView({super.key});
+class ItemListView extends StatefulWidget {
+  static const path = '/items';
+  const ItemListView({super.key});
 
   @override
-  State<AccountListView> createState() => _AccountListViewState();
+  State<ItemListView> createState() => _ItemListViewState();
 }
 
-class _AccountListViewState extends State<AccountListView> {
-  List<Account> _accounts = <Account>[];
+class _ItemListViewState extends State<ItemListView> {
+  List<Item> _items = <Item>[];
 
   final NumberFormat formatter = NumberFormat("00000000");
 
@@ -27,22 +26,21 @@ class _AccountListViewState extends State<AccountListView> {
   void _scrollListener() {
     if (_scrollController.position.pixels ==
         _scrollController.position.maxScrollExtent) {
-      _refreshAccounts();
+      _refreshItems();
     }
   }
 
   @override
   void initState() {
     super.initState();
-    CounterService.initialize();
-    _refreshAccounts();
+    _refreshItems();
     // Attach listener to scroll controller
     _scrollController.addListener(_scrollListener);
   }
 
-  Future<void> _refreshAccounts() async {
+  Future<void> _refreshItems() async {
     try {
-      final request = ModelQueries.list(Account.classType);
+      final request = ModelQueries.list(Item.classType);
       final response = await Amplify.API.query(request: request).response;
 
       if (response.hasErrors) {
@@ -50,34 +48,31 @@ class _AccountListViewState extends State<AccountListView> {
         return;
       }
       setState(() {
-        final accounts = response.data?.items;
-        _accounts = accounts!.whereType<Account>().toList();
+        final items = response.data?.items;
+        _items = items!.whereType<Item>().toList();
       });
     } on ApiException catch (e) {
       safePrint('Query failed: $e');
     }
   }
 
-  Future<void> _deleteAccount(Account account) async {
-    final request = ModelMutations.delete<Account>(account);
+  Future<void> _deleteItem(Item item) async {
+    final request = ModelMutations.delete<Item>(item);
     final response = await Amplify.API.mutate(request: request).response;
     safePrint('Delete response: $response');
-    await _refreshAccounts();
+    await _refreshItems();
   }
 
-  Future<void> _navigateToAccount({Account? account}) async {
-    context.push('/account', extra: account);
-    // Refresh the entries when returning from Account detail screen.
-    await _refreshAccounts();
+  Future<void> _navigateToItem({Item? item}) async {
+    context.push('/item', extra: item);
+    // Refresh the entries when returning from Items detail screen.
+    await _refreshItems();
   }
 
-  Widget _buildRow(Account account, {TextStyle? style}) {
+  Widget _buildRow(Item item, {TextStyle? style}) {
     return RowService.buildRow([
-      formatter.format(account.number),
-      account.firstName,
-      account.lastName,
-      account.email,
-      account.phoneNumber
+      formatter.format(item.sku),
+      item.status.toString(),
     ], style);
   }
 
@@ -86,11 +81,11 @@ class _AccountListViewState extends State<AccountListView> {
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         // Navigate to the page to create new budget entries
-        onPressed: _navigateToAccount,
+        onPressed: _navigateToItem,
         child: const Icon(Icons.add),
       ),
       appBar: AppBar(
-        title: const Text('Accounts'),
+        title: const Text('Items'),
       ),
       drawer: const AppDrawer(), // Add the drawer here
 
@@ -98,17 +93,14 @@ class _AccountListViewState extends State<AccountListView> {
         child: Padding(
           padding: const EdgeInsets.only(top: 25),
           child: RefreshIndicator(
-            onRefresh: _refreshAccounts,
+            onRefresh: _refreshItems,
             child: Column(
               children: [
                 const SizedBox(height: 30),
                 RowService.buildRow(
                   [
-                    'Number',
-                    'First Name',
-                    'Last Name',
-                    "E-Mail",
-                    "Phone Number"
+                    'SKU',
+                    'Status',
                   ],
                   Theme.of(context).textTheme.titleMedium,
                 ),
@@ -116,11 +108,11 @@ class _AccountListViewState extends State<AccountListView> {
                 Expanded(
                   child: ListView.builder(
                     controller: _scrollController,
-                    itemCount: _accounts.length,
+                    itemCount: _items.length,
                     itemBuilder: (context, index) {
-                      final account = _accounts[index];
+                      final item = _items[index];
                       return Dismissible(
-                          key: const ValueKey(Account),
+                          key: const ValueKey(Item),
                           background: const ColoredBox(
                             color: Colors.red,
                             child: Padding(
@@ -131,12 +123,12 @@ class _AccountListViewState extends State<AccountListView> {
                               ),
                             ),
                           ),
-                          onDismissed: (_) => _deleteAccount(account),
+                          onDismissed: (_) => _deleteItem(item),
                           child: ListTile(
-                              onTap: () => _navigateToAccount(
-                                    account: account,
+                              onTap: () => _navigateToItem(
+                                    item: item,
                                   ),
-                              title: _buildRow(account)));
+                              title: _buildRow(item)));
                     },
                   ),
                 ),
