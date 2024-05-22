@@ -72,7 +72,7 @@ class _ItemListViewState extends State<ItemListView> {
   Widget _buildRow(Item item, {TextStyle? style}) {
     return RowService.buildRow([
       formatter.format(item.sku),
-      item.status.toString(),
+      item.description,
     ], style);
   }
 
@@ -100,7 +100,7 @@ class _ItemListViewState extends State<ItemListView> {
                 RowService.buildRow(
                   [
                     'SKU',
-                    'Status',
+                    'Description',
                   ],
                   Theme.of(context).textTheme.titleMedium,
                 ),
