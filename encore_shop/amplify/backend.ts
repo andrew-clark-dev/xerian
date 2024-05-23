@@ -1,15 +1,19 @@
 import { defineBackend } from '@aws-amplify/backend';
+import { defineFunction } from '@aws-amplify/backend';
+
+
 import { auth } from './auth/resource';
 import { data } from './data/resource';
-import { storage } from "./storage/resource";
+import { openSearchBackup } from "./storage/resource";
+
 
 
 import * as dynamodb from "aws-cdk-lib/aws-dynamodb";
 import * as opensearch from "aws-cdk-lib/aws-opensearchservice";
 import * as iam from "aws-cdk-lib/aws-iam";
 
-import {  Stack } from "aws-cdk-lib";
-import { RemovalPolicy } from "aws-cdk-lib"; 
+import { Stack } from "aws-cdk-lib";
+import { RemovalPolicy } from "aws-cdk-lib";
 
 import * as osis from "aws-cdk-lib/aws-osis";
 import * as logs from "aws-cdk-lib/aws-logs";
@@ -20,7 +24,7 @@ import * as logs from "aws-cdk-lib/aws-logs";
 const backend = defineBackend({
   auth,
   data,
-  storage,
+  openSearchBackup,
 });
 
 
@@ -41,6 +45,13 @@ cfnUserPool.addPropertyOverride(
   }
 );
 
+
+export const importAccounts = defineFunction({
+  // optionally specify a name for the Function (defaults to directory name)
+  name: 'import-accounts',
+  // optionally specify a path to your handler (defaults to "./handler.ts")
+  entry: './handler.ts'
+});
 
 
 const accountTable =
@@ -85,9 +96,9 @@ const openSearchDomain = new opensearch.Domain(
 
 
 // Get the S3Bucket ARN
-const s3BucketArn = backend.storage.resources.bucket.bucketArn;
+const openSearchs3BucketArn = backend.openSearchBackup.resources.bucket.bucketArn;
 // Get the S3Bucket Name
-const s3BucketName = backend.storage.resources.bucket.bucketName;
+const openSearchs3BucketName = backend.openSearchBackup.resources.bucket.bucketName;
 
 
 //Get the region
@@ -127,7 +138,7 @@ const openSearchIntegrationPipelineRole = new iam.Role(
               "s3:PutObject",
               "s3:PutObjectAcl",
             ],
-            resources: [s3BucketArn, s3BucketArn + "/*"],
+            resources: [openSearchs3BucketArn, openSearchs3BucketArn + "/*"],
           }),
           new iam.PolicyStatement({
             effect: iam.Effect.ALLOW,
@@ -198,7 +209,7 @@ dynamodb-pipeline:
           stream:
             start_position: "LATEST"
           export:
-            s3_bucket: "${s3BucketName}"
+            s3_bucket: "${openSearchs3BucketName}"
             s3_region: "${region}"
             s3_prefix: "${tableName}/"
       aws:

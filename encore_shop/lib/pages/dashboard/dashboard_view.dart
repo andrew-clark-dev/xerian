@@ -1,5 +1,6 @@
 import 'package:encore_shop/services/counter_service.dart';
 import 'package:encore_shop/widgets/app_drawer.dart';
+import 'package:encore_shop/widgets/single_file_picker.dart';
 import 'package:flutter/material.dart';
 
 /// Displaysthe application dashboard.
@@ -30,9 +31,7 @@ class DashboardView extends StatelessWidget {
       drawer: const AppDrawer(), // Add the drawer here
 
       body: const Center(
-        child: Text(
-          'Dashboard Page',
-        ),
+        child: SingleFilePicker(),
       ),
     );
   }

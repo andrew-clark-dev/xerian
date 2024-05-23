@@ -1,10 +1,11 @@
 import { defineStorage } from "@aws-amplify/backend"
 
-export const storage = defineStorage({
-  name: "opensearch-backup-bucket-amplify-gen-2",
+export const openSearchBackup = defineStorage({
+  name: "opensearch-backup-bucket",
   access: allow => ({
     'public/*': [
       allow.guest.to(['list', 'write', 'get'])
     ]
   })
 })
+

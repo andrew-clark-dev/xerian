@@ -1,5 +1,4 @@
 import 'package:amplify_authenticator/amplify_authenticator.dart';
-import 'package:encore_shop/pages/account/account_list_view.dart';
 import 'package:encore_shop/pages/dashboard/dashboard_view.dart';
 import 'package:flutter/material.dart';
 

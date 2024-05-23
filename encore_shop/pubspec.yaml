@@ -47,6 +47,8 @@ dependencies:
   email_validator: ^2.1.17
   intl_phone_number_input: ^0.7.4
   form_validation: ^3.1.1
+  file_picker: ^8.0.3
+  open_app_file: ^4.0.2
 
 dev_dependencies:
   flutter_test:
