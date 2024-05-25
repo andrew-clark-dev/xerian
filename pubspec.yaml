@@ -38,6 +38,8 @@ dependencies:
   amplify_flutter: ^2.0.0
   amplify_authenticator: ^2.0.0
 
+  amplify_core: any
+  collection: any
 dev_dependencies:
   flutter_test:
     sdk: flutter
