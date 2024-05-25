@@ -1,0 +1,23 @@
+version: 1
+backend:
+  phases:
+    build:
+      commands:
+        - "npm ci --cache .npm --prefer-offline"
+        - "npx ampx pipeline-deploy --branch $AWS_BRANCH --app-id $AWS_APP_ID --outputs-version 0 --outputs-out-dir lib"
+frontend:
+  phases:
+    preBuild:
+      commands:
+        - "curl https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_3.19.6-stable.tar.xz --output /tmp/flutter_linux_3.19.6-stable.tar.xz"
+        - "tar -xf /tmp/flutter_linux_3.19.6-stable.tar.xz -C /usr/bin/"
+    build:
+      commands:
+        - "/usr/bin/flutter/bin/flutter build web"
+  artifacts:
+    baseDirectory: build/web
+    files:
+      - "**/*"
+  cache:
+    paths:
+      - ".npm/**/*"
