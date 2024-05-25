@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 
 import 'package:go_router/go_router.dart';
 
+import '../pages/settings/web_chrome_settings.dart';
+
 class AppDrawer extends StatelessWidget {
   const AppDrawer({super.key});
 
@@ -40,6 +42,12 @@ class AppDrawer extends StatelessWidget {
             title: const Text('Accounts'),
             onTap: () {
               context.go(AccountListView.path);
+            },
+          ),
+          ListTile(
+            title: const Text('Settings'),
+            onTap: () {
+              context.push(WebChromeSettings.path);
             },
           ),
           // Add more ListTile widgets for additional menu items
