@@ -1,0 +1,29 @@
+{
+  "name": "xerian",
+  "version": "1.0.0",
+  "description": "A new Flutter project.",
+  "main": "index.js",
+  "directories": {
+    "lib": "lib",
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@aws-amplify/backend": "^1.0.2",
+    "@aws-amplify/backend-cli": "^1.0.3",
+    "aws-cdk": "^2.143.0",
+    "aws-cdk-lib": "^2.143.0",
+    "constructs": "^10.3.0",
+    "esbuild": "^0.21.4",
+    "tsx": "^4.11.0",
+    "typescript": "^5.4.5"
+  },
+  "dependencies": {
+    "aws-amplify": "^6.3.4"
+  }
+}
