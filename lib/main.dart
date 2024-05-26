@@ -9,7 +9,6 @@ import 'package:xerian/amplify_config_service.dart';
 import 'package:go_router/go_router.dart';
 import 'package:xerian/models/ModelProvider.dart';
 
-import 'amplifyconfiguration.dart';
 import 'pages/account/account_list_view.dart';
 import 'pages/account/account_view.dart';
 import 'pages/dashboard/dashboard_view.dart';
@@ -38,8 +37,10 @@ Future<void> _configureAmplify() async {
     final storage = AmplifyStorageS3();
     await Amplify.addPlugins([auth, api, storage]);
 
-    //   final amplifyConfig = await AmplifyConfigService.getConfigFromJson();
-    await Amplify.configure(amplifyConfig);
+    final config = await AmplifyConfigService.getConfigFromJson();
+    safePrint(config);
+
+    await Amplify.configure(config);
     safePrint('Successfully configured');
   } on Exception catch (e) {
     safePrint('Error configuring Amplify: $e');
