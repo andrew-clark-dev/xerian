@@ -1,8 +1,36 @@
 import 'dart:convert';
+import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:flutter/services.dart';
 
 class AmplifyConfigService {
-  static getConfigFromJson() async {
+  static Future<String> getConfigFromJson2() async {
+    final String jsonString =
+        await rootBundle.loadString('lib/amplifyconfiguration.json');
+
+    final data = jsonDecode(jsonString) as Map<String, dynamic>;
+
+    AmplifyConfig amplifyConfig = AmplifyConfig.fromJson(data);
+
+    // CognitoUserPoolConfig cognitoUserPoolConfig = CognitoUserPoolConfig(
+    //     poolId: data['aws_user_pools_id'],
+    //     appClientId: data['aws_user_pools_web_client_id'],
+    //     region: data['aws_cognito_region']);
+
+    // CognitoIdentityCredentialsProvider cognitoIdentityCredentialsProvider =
+    //     CognitoIdentityCredentialsProvider(
+    //         poolId: data['aws_cognito_identity_pool_id'],
+    //         region: data['aws_cognito_region']);
+
+    // PasswordProtectionSettings passwordProtectionSettings =
+    //     PasswordProtectionSettings.fromJson(
+    //         data['aws_cognito_password_protection_settings']);
+
+    final json = amplifyConfig.toJson();
+
+    return jsonEncode(json);
+  }
+
+  static Future<String> getConfigFromJson() async {
     final String jsonString =
         await rootBundle.loadString('lib/amplifyconfiguration.json');
     final data = jsonDecode(jsonString) as Map<String, dynamic>;
@@ -57,13 +85,13 @@ class AmplifyConfigService {
             "ApiUrl": "${data['aws_appsync_graphqlEndpoint']}",
             "Region": "${data['aws_appsync_region']}",
             "AuthMode":  "${data['aws_appsync_authenticationType']}",
-            "ClientDatabasePrefix": "data_AWS_IAM"
+            "ClientDatabasePrefix": "data_AMAZON_COGNITO_USER_POOLS"
           },
-          "data_AMAZON_COGNITO_USER_POOLS": {
+          "AWS_IAM": {
             "ApiUrl": "${data['aws_appsync_graphqlEndpoint']}",
             "Region": "${data['aws_appsync_region']}",
             "AuthMode":  "${data['aws_appsync_authenticationType']}",
-            "ClientDatabasePrefix": "data_AMAZON_COGNITO_USER_POOLS"
+            "ClientDatabasePrefix": "data_AWS_IAM"
           }
         }
       }
@@ -76,7 +104,7 @@ class AmplifyConfigService {
           "endpointType": "GraphQL",
           "endpoint": "${data['aws_appsync_graphqlEndpoint']}",
           "region": "${data['aws_appsync_region']}",
-          "authorizationType": "AWS_IAM"
+          "authorizationType": "AMAZON_COGNITO_USER_POOLS"
         }
       }
     }
@@ -85,7 +113,7 @@ class AmplifyConfigService {
     "plugins": {
       "awsS3StoragePlugin": {
         "bucket": "${data['aws_user_files_s3_bucket']}",
-        "region": "${data['aws_user_files_s3_bucket_region']}",
+        "region": "${data['aws_user_files_s3_bucket_region']}"
       }
     }
   }

@@ -38,8 +38,6 @@ Future<void> _configureAmplify() async {
     await Amplify.addPlugins([auth, api, storage]);
 
     final config = await AmplifyConfigService.getConfigFromJson();
-    safePrint(config);
-
     await Amplify.configure(config);
     safePrint('Successfully configured');
   } on Exception catch (e) {
