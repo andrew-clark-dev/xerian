@@ -1,31 +1,17 @@
-import 'dart:io';
-
+import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-class SingleFilePicker extends StatefulWidget {
+class SingleFilePicker extends StatelessWidget {
   const SingleFilePicker({super.key});
-
-  @override
-  State<SingleFilePicker> createState() => _SingleFilePickerState();
-}
-
-class _SingleFilePickerState extends State<SingleFilePicker> {
-  File? file;
-  FilePickerResult? result;
-
   @override
   Widget build(BuildContext context) {
     return ElevatedButton(
       onPressed: () async {
         try {
-          result = await FilePicker.platform.pickFiles();
+          var result = await FilePicker.platform.pickFiles();
           if (result != null) {
-            if (!kIsWeb) {
-              file = File(result!.files.single.path!);
-            }
-            setState(() {});
+            uploadFile(result.files.first);
           } else {
             // User canceled the picker
           }
@@ -33,5 +19,18 @@ class _SingleFilePickerState extends State<SingleFilePicker> {
       },
       child: const Text('Pick File'),
     );
+  }
+
+  Future<void> uploadFile(PlatformFile file) async {
+    final awsFile = AWSFile.fromData(file.bytes as List<int>);
+    try {
+      final result = await Amplify.Storage.uploadFile(
+        localFile: awsFile,
+        path: StoragePath.fromString('import/account/${file.name}'),
+      ).result;
+      safePrint('Uploaded file: ${result.uploadedItem.path}');
+    } on StorageException catch (e) {
+      safePrint(e.message);
+    }
   }
 }

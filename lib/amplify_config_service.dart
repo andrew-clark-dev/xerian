@@ -80,6 +80,14 @@ class AmplifyConfigService {
         }
       }
     }
+  },
+  "storage": {
+    "plugins": {
+      "awsS3StoragePlugin": {
+        "bucket": "${data['aws_user_files_s3_bucket']}",
+        "region": "${data['aws_user_files_s3_bucket_region']}",
+      }
+    }
   }
 }''';
   }

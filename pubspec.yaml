@@ -46,6 +46,8 @@ dependencies:
   form_validation: ^3.1.1
   intl: ^0.18.1
   settings_ui: ^2.0.2
+  aws_common: ^0.7.0
+  amplify_storage_s3: ^2.0.0
 dev_dependencies:
   flutter_test:
     sdk: flutter

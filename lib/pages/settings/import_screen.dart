@@ -11,8 +11,6 @@ class ImportScreen extends StatefulWidget {
 }
 
 class _ImportScreenState extends State<ImportScreen> {
-  bool _toggle = true;
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
