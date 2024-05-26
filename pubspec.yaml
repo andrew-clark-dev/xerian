@@ -45,6 +45,7 @@ dependencies:
   file_picker: ^8.0.3
   form_validation: ^3.1.1
   intl: ^0.18.1
+  settings_ui: ^2.0.2
 dev_dependencies:
   flutter_test:
     sdk: flutter

@@ -13,6 +13,9 @@ import 'pages/dashboard/dashboard_view.dart';
 import 'pages/item/item_list_view.dart';
 import 'pages/item/item_view.dart';
 import 'pages/login/login_screen.dart';
+import 'pages/settings/import_screen.dart';
+import 'pages/settings/web_chrome_addresses_settings.dart';
+import 'pages/settings/web_chrome_settings.dart';
 
 Future<void> main() async {
   try {
@@ -86,6 +89,24 @@ final GoRouter _router = GoRouter(
       path: ItemListView.path,
       builder: (BuildContext context, GoRouterState state) {
         return const ItemListView();
+      },
+    ),
+    GoRoute(
+      path: WebChromeSettings.path,
+      builder: (BuildContext context, GoRouterState state) {
+        return const WebChromeSettings();
+      },
+    ),
+    GoRoute(
+      path: WebChromeAddressesScreen.path,
+      builder: (BuildContext context, GoRouterState state) {
+        return const WebChromeAddressesScreen();
+      },
+    ),
+    GoRoute(
+      path: ImportScreen.path,
+      builder: (BuildContext context, GoRouterState state) {
+        return const ImportScreen();
       },
     ),
   ],
