@@ -1,6 +1,9 @@
 import { type ClientSchema, a, defineData } from "@aws-amplify/backend";
 
 
+import { importAccountCsv } from '../functions/import/resource';
+
+
 const schema = a.schema({
 
   // Models
@@ -112,7 +115,10 @@ const schema = a.schema({
         entry: "./increment-counter.js",
       })
     ),
-}).authorization((allow) => [allow.authenticated()]); // Default is to allow access to authenticated users
+
+})
+  // Default is to allow access to authenticated users
+  .authorization((allow) => [allow.authenticated()]);
 
 export type Schema = ClientSchema<typeof schema>;
 

@@ -1,4 +1,6 @@
-import { defineFunction, defineStorage } from "@aws-amplify/backend";
+import { defineStorage } from "@aws-amplify/backend";
+
+import { importAccountCsv } from '../functions/import/resource';
 
 export const storage = defineStorage({
   name: 'appFiles',
@@ -7,9 +9,5 @@ export const storage = defineStorage({
       allow.authenticated.to(['write'])
     ],
   }),
-  triggers: {
-    onUpload: defineFunction({
-      entry: './on-upload-handler.ts'
-    })
-  }
+  triggers: { onUpload: importAccountCsv }
 });
