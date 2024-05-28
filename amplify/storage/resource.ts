@@ -6,8 +6,11 @@ export const storage = defineStorage({
   name: 'appFiles',
   access: (allow) => ({
     'import/account/*': [
-      allow.authenticated.to(['write'])
-    ],
+      allow.authenticated.to(['write']),
+      allow.resource(importAccountCsv).to(['read', 'write', 'delete'])
+    ]
   }),
   triggers: { onUpload: importAccountCsv }
 });
+
+
