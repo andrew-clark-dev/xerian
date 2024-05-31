@@ -20,11 +20,12 @@ const schema = a.schema({
       lastName: a.string(),
       email: a.email(),
       phoneNumber: a.phone(),
-      address: a.string().array(), // fields can be arrays,
+      address: a.string(), // Multiline string,
       city: a.string(),
       state: a.string(),
       postcode: a.string(),
-      split: a.integer(),
+      balance: a.float(),
+      split: a.float(),
       items: a.hasMany("Item", "accountId"), // setup relationships between types
     }),
 
