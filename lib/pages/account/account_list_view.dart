@@ -73,7 +73,7 @@ class _AccountListViewState extends State<AccountListView> {
 
   Widget _buildRow(Account account, {TextStyle? style}) {
     return RowService.buildRow([
-      formatter.format(account.number),
+      account.number,
       account.firstName,
       account.lastName,
       account.email,

@@ -40,19 +40,22 @@ export const handler = async (event: S3Event, context: Context) => {
                         console.log("Record:", record);
                         var item: any = {
                             id: randomUUID(),
-                            address: record["Address Line 1"] + "\n" + record["Address Line 2"],
+                            address: record["Address Line 1"],
                             city: record.City,
                             createdAt: new Date(record.Created).toISOString(),
+                            phoneNumber: record.Phone,
                             email: record.Email,
                             firstName: record["First Name"],
                             lastName: record["Last Name"],
-                            number: parseInt(record.Number),
+                            number: record.Number,
                             postcode: record.Zip,
                             state: record.State,
                             updatedAt: new Date().toISOString(),
                             __typename: "Account"
                         }
-                        if (record.Phone != "") { item.phoneNumber = record.Phone }
+
+                        if (record["Address Line 2"] != "") item.address += "\n" + record["Address Line 2"];
+
                         const balence = parseFloat(record["Balence"]);
                         if (!isNaN(balence)) { item.balence = balence }
                         const split = parseFloat(record["Default Split"]);
@@ -63,7 +66,7 @@ export const handler = async (event: S3Event, context: Context) => {
                             Item: item
                         });
                         console.log("Create new account:", putCommand);
-                        const response = await docClient.send(putCommand);
+                        const response: any = await docClient.send(putCommand).catch(error => console.error("Error:", error));
                         console.log("Response:", response);
 
                     } catch (error) {
