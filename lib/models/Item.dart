@@ -29,7 +29,6 @@ class Item extends amplify_core.Model {
   static const classType = const _ItemModelType();
   final String id;
   final int? _sku;
-  final Account? _account;
   final List<ItemCategory>? _categories;
   final String? _description;
   final String? _details;
@@ -64,10 +63,6 @@ class Item extends amplify_core.Model {
           underlyingException: e.toString()
           );
     }
-  }
-  
-  Account? get account {
-    return _account;
   }
   
   List<ItemCategory>? get categories {
@@ -115,13 +110,12 @@ class Item extends amplify_core.Model {
     return _updatedAt;
   }
   
-  const Item._internal({required this.id, required sku, account, categories, required description, details, images, quality, split, status, createdAt, updatedAt}): _sku = sku, _account = account, _categories = categories, _description = description, _details = details, _images = images, _quality = quality, _split = split, _status = status, _createdAt = createdAt, _updatedAt = updatedAt;
+  const Item._internal({required this.id, required sku, categories, required description, details, images, quality, split, status, createdAt, updatedAt}): _sku = sku, _categories = categories, _description = description, _details = details, _images = images, _quality = quality, _split = split, _status = status, _createdAt = createdAt, _updatedAt = updatedAt;
   
-  factory Item({String? id, required int sku, Account? account, List<ItemCategory>? categories, required String description, String? details, List<String>? images, ItemQuality? quality, int? split, ItemStatus? status}) {
+  factory Item({String? id, required int sku, List<ItemCategory>? categories, required String description, String? details, List<String>? images, ItemQuality? quality, int? split, ItemStatus? status}) {
     return Item._internal(
       id: id == null ? amplify_core.UUID.getUUID() : id,
       sku: sku,
-      account: account,
       categories: categories != null ? List<ItemCategory>.unmodifiable(categories) : categories,
       description: description,
       details: details,
@@ -141,7 +135,6 @@ class Item extends amplify_core.Model {
     return other is Item &&
       id == other.id &&
       _sku == other._sku &&
-      _account == other._account &&
       DeepCollectionEquality().equals(_categories, other._categories) &&
       _description == other._description &&
       _details == other._details &&
@@ -161,7 +154,6 @@ class Item extends amplify_core.Model {
     buffer.write("Item {");
     buffer.write("id=" + "$id" + ", ");
     buffer.write("sku=" + (_sku != null ? _sku.toString() : "null") + ", ");
-    buffer.write("account=" + (_account != null ? _account.toString() : "null") + ", ");
     buffer.write("description=" + "$_description" + ", ");
     buffer.write("details=" + "$_details" + ", ");
     buffer.write("images=" + (_images != null ? _images.toString() : "null") + ", ");
@@ -175,11 +167,10 @@ class Item extends amplify_core.Model {
     return buffer.toString();
   }
   
-  Item copyWith({int? sku, Account? account, List<ItemCategory>? categories, String? description, String? details, List<String>? images, ItemQuality? quality, int? split, ItemStatus? status}) {
+  Item copyWith({int? sku, List<ItemCategory>? categories, String? description, String? details, List<String>? images, ItemQuality? quality, int? split, ItemStatus? status}) {
     return Item._internal(
       id: id,
       sku: sku ?? this.sku,
-      account: account ?? this.account,
       categories: categories ?? this.categories,
       description: description ?? this.description,
       details: details ?? this.details,
@@ -191,7 +182,6 @@ class Item extends amplify_core.Model {
   
   Item copyWithModelFieldValues({
     ModelFieldValue<int>? sku,
-    ModelFieldValue<Account?>? account,
     ModelFieldValue<List<ItemCategory>?>? categories,
     ModelFieldValue<String>? description,
     ModelFieldValue<String?>? details,
@@ -203,7 +193,6 @@ class Item extends amplify_core.Model {
     return Item._internal(
       id: id,
       sku: sku == null ? this.sku : sku.value,
-      account: account == null ? this.account : account.value,
       categories: categories == null ? this.categories : categories.value,
       description: description == null ? this.description : description.value,
       details: details == null ? this.details : details.value,
@@ -217,11 +206,6 @@ class Item extends amplify_core.Model {
   Item.fromJson(Map<String, dynamic> json)  
     : id = json['id'],
       _sku = (json['sku'] as num?)?.toInt(),
-      _account = json['account'] != null
-        ? json['account']['serializedData'] != null
-          ? Account.fromJson(new Map<String, dynamic>.from(json['account']['serializedData']))
-          : Account.fromJson(new Map<String, dynamic>.from(json['account']))
-        : null,
       _categories = json['categories']  is Map
         ? (json['categories']['items'] is List
           ? (json['categories']['items'] as List)
@@ -245,13 +229,12 @@ class Item extends amplify_core.Model {
       _updatedAt = json['updatedAt'] != null ? amplify_core.TemporalDateTime.fromString(json['updatedAt']) : null;
   
   Map<String, dynamic> toJson() => {
-    'id': id, 'sku': _sku, 'account': _account?.toJson(), 'categories': _categories?.map((ItemCategory? e) => e?.toJson()).toList(), 'description': _description, 'details': _details, 'images': _images, 'quality': amplify_core.enumToString(_quality), 'split': _split, 'status': amplify_core.enumToString(_status), 'createdAt': _createdAt?.format(), 'updatedAt': _updatedAt?.format()
+    'id': id, 'sku': _sku, 'categories': _categories?.map((ItemCategory? e) => e?.toJson()).toList(), 'description': _description, 'details': _details, 'images': _images, 'quality': amplify_core.enumToString(_quality), 'split': _split, 'status': amplify_core.enumToString(_status), 'createdAt': _createdAt?.format(), 'updatedAt': _updatedAt?.format()
   };
   
   Map<String, Object?> toMap() => {
     'id': id,
     'sku': _sku,
-    'account': _account,
     'categories': _categories,
     'description': _description,
     'details': _details,
@@ -266,9 +249,6 @@ class Item extends amplify_core.Model {
   static final amplify_core.QueryModelIdentifier<ItemModelIdentifier> MODEL_IDENTIFIER = amplify_core.QueryModelIdentifier<ItemModelIdentifier>();
   static final ID = amplify_core.QueryField(fieldName: "id");
   static final SKU = amplify_core.QueryField(fieldName: "sku");
-  static final ACCOUNT = amplify_core.QueryField(
-    fieldName: "account",
-    fieldType: amplify_core.ModelFieldType(amplify_core.ModelFieldTypeEnum.model, ofModelName: 'Account'));
   static final CATEGORIES = amplify_core.QueryField(
     fieldName: "categories",
     fieldType: amplify_core.ModelFieldType(amplify_core.ModelFieldTypeEnum.model, ofModelName: 'ItemCategory'));
@@ -299,13 +279,6 @@ class Item extends amplify_core.Model {
       key: Item.SKU,
       isRequired: true,
       ofType: amplify_core.ModelFieldType(amplify_core.ModelFieldTypeEnum.int)
-    ));
-    
-    modelSchemaDefinition.addField(amplify_core.ModelFieldDefinition.belongsTo(
-      key: Item.ACCOUNT,
-      isRequired: false,
-      targetNames: ['accountId'],
-      ofModelName: 'Account'
     ));
     
     modelSchemaDefinition.addField(amplify_core.ModelFieldDefinition.hasMany(

@@ -37,33 +37,34 @@ export const handler = async (event: S3Event, context: Context) => {
                 .on('data', async (record: any) => {
                     try {
                         // Work with each record
-                        var item: any = {};
-                        item.id = randomUUID();
-
+                        console.log("Record:", record);
+                        var item: any = {
+                            id: randomUUID(),
+                            address: record["Address Line 1"] + "\n" + record["Address Line 2"],
+                            city: record.City,
+                            createdAt: new Date(record.Created).toISOString(),
+                            email: record.Email,
+                            firstName: record["First Name"],
+                            lastName: record["Last Name"],
+                            number: parseInt(record.Number),
+                            postcode: record.Zip,
+                            state: record.State,
+                            updatedAt: new Date().toISOString(),
+                            __typename: "Account"
+                        }
+                        if (record.Phone != "") { item.phoneNumber = record.Phone }
+                        const balence = parseFloat(record["Balence"]);
+                        if (!isNaN(balence)) { item.balence = balence }
+                        const split = parseFloat(record["Default Split"]);
+                        if (!isNaN(balence)) { item.split = split }
+                        // split: parseFloat(record["Default Split"]),
                         const putCommand = new PutCommand({
                             TableName: process.env.table_name,
-
-                            Item: {
-                                id: randomUUID(),
-                                address: record['Address Line 1'] + '\n' + record['Address Line 2'],
-                                city: record.City,
-                                createdAt: record.Created,
-                                email: record.Email,
-                                firstName: record['First Name'],
-                                lastName: record['Last Name'],
-                                number: record.Number,
-                                phoneNumber: record.Phone,
-                                postcode: record.Zip,
-                                balence: parseFloat(record['Balence']),
-                                split: parseFloat(record['Default Split']),
-                                state: record.State,
-                                updatedAt: new Date().toISOString(),
-                                __typename: "Account"
-                            },
+                            Item: item
                         });
-                        console.log('Create new account:', putCommand);
+                        console.log("Create new account:", putCommand);
                         const response = await docClient.send(putCommand);
-                        console.log('Response:', response);
+                        console.log("Response:", response);
 
                     } catch (error) {
                         console.error('Error writing to DynamoDB:', error);
@@ -85,17 +86,4 @@ export const handler = async (event: S3Event, context: Context) => {
         console.error(err);
     }
 
-
-    const command = new PutCommand({
-        TableName: "Account-xglodso3wzhnjkq6denojs6sxq-NONE",
-        Item: {
-            id: randomUUID(),
-            CommonName: "Shiba Inu",
-            __typename: "Account"
-        },
-    });
-
-    const response = await docClient.send(command);
-    console.log(response);
-    return response;
 };

@@ -51,7 +51,7 @@ class _AccountListViewState extends State<AccountView> {
     if (account != null) {
       _firstNameController.text = account.firstName;
       _lastNameController.text = account.lastName!;
-      _numberController.text = formatter.format(account.number);
+      _numberController.text = account.number;
       _titleText = 'Update account';
     } else {
       _titleText = 'Create account';
@@ -74,7 +74,7 @@ class _AccountListViewState extends State<AccountView> {
     // if (_isCreate) {
     // Create a new account entry
     final newAccount = Account(
-      number: await counter.next(),
+      number: formatter.format(await counter.next()),
       firstName: firstName,
       lastName: lastName,
     );

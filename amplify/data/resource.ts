@@ -15,25 +15,25 @@ const schema = a.schema({
     .authorization((allow) => [allow.authenticated()]),
   Account: a
     .model({
-      number: a.integer().required(),
+      number: a.string().required(),
       firstName: a.string().required(),
       lastName: a.string(),
-      email: a.email(),
-      phoneNumber: a.phone(),
+      email: a.string(),
+      phoneNumber: a.string(),
       address: a.string(), // Multiline string,
       city: a.string(),
       state: a.string(),
       postcode: a.string(),
       balance: a.float(),
       split: a.float(),
-      items: a.hasMany("Item", "accountId"), // setup relationships between types
+      // items: a.hasMany("Item", "accountId"), // setup relationships between types
     }),
 
   Item: a
     .model({
       sku: a.integer().required(),
-      accountId: a.id(),
-      account: a.belongsTo("Account", "accountId"),
+      // accountId: a.id(),
+      // account: a.belongsTo("Account", "accountId"),
       categories: a.hasMany("ItemCategory", "itemId"),
       description: a.string().required(),
       details: a.string(),

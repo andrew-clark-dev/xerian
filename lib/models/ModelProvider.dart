@@ -49,7 +49,7 @@ export 'Tag.dart';
 
 class ModelProvider implements amplify_core.ModelProviderInterface {
   @override
-  String version = "809feda6faca744999abd6e0014f9fd5";
+  String version = "d6936a784f219720a06ded60fcdde873";
   @override
   List<amplify_core.ModelSchema> modelSchemas = [Account.schema, Category.schema, Counter.schema, Item.schema, ItemCategory.schema, Journal.schema, Refund.schema, Sale.schema, Tag.schema];
   @override
