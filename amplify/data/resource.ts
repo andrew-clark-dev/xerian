@@ -1,9 +1,5 @@
 import { type ClientSchema, a, defineData } from "@aws-amplify/backend";
 
-
-import { importAccountCsv } from '../functions/import/resource';
-
-
 const schema = a.schema({
 
   // Models
