@@ -1,7 +1,8 @@
 import 'dart:convert';
-import 'dart:math';
 import 'package:amplify_core/amplify_core.dart';
 import 'package:flutter/services.dart';
+
+import 'amplify_output.dart';
 
 class AmplifyConfigService {
   static Future<String> getConfigFromJson() async {
@@ -209,8 +210,6 @@ class AmplifyConfigService {
         api: apiConfig,
         storage: storageConfig);
 
-    print(jsonEncode(amplifyConfig));
-
     return jsonEncode(amplifyConfig);
   }
 
@@ -222,5 +221,50 @@ class AmplifyConfigService {
       return APIAuthorizationType.iam;
     }
     throw "Unknown APIAuthorizationType";
+  }
+
+  static Future<String> getConfigFromJson3() async {
+    final String jsonString =
+        await rootBundle.loadString('lib/amplify_outputs.json');
+    final AmplifyOutput amplifyOutput =
+        AmplifyOutput.fromJson(jsonDecode(jsonString));
+
+    StorageConfig? storageConfig;
+    ApiConfig? apiConfig;
+
+    switch (amplifyOutput.data) {
+      case Data data:
+        {
+          apiConfig = ApiConfig(plugins: {
+            AWSApiPluginConfig.pluginKey: AWSApiPluginConfig({
+              AWSApiPluginConfig.pluginKey: AWSApiConfig(
+                  endpointType: EndpointType.graphQL,
+                  endpoint: data.url,
+                  region: data.awsRegion,
+                  authorizationType: AmplifyAuthProviderToken<
+                              TokenIdentityAmplifyAuthProvider>(
+                          data.defaultAuthorizationType.toString())
+                      as APIAuthorizationType)
+            })
+          });
+        }
+    }
+
+    switch (amplifyOutput.storage) {
+      case Storage storage:
+        {
+          storageConfig = StorageConfig(plugins: {
+            S3PluginConfig.pluginKey: S3PluginConfig(
+                bucket: storage.bucketName, region: storage.awsRegion)
+          });
+        }
+    }
+
+    AmplifyConfig amplifyConfig = AmplifyConfig(
+        userAgent: "@aws-amplify/client-config/1.0.2",
+        api: apiConfig,
+        storage: storageConfig);
+
+    return jsonEncode(amplifyConfig);
   }
 }
