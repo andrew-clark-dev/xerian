@@ -1,5 +1,4 @@
 {
-    "$schema": "https://json-schema.org/draft/2020-12/schema",
     "$id": "https://amplify.aws/2024-02/outputs-schema.json",
     "title": "AWS Amplify Backend Outputs",
     "description": "Config format for Amplify Gen 2 client libraries to communicate with backend services.",
