@@ -7,7 +7,7 @@ import { Code, Runtime } from 'aws-cdk-lib/aws-lambda';
 import { IBucket, EventType, Bucket } from 'aws-cdk-lib/aws-s3';
 import { S3EventSourceV2 } from 'aws-cdk-lib/aws-lambda-event-sources';
 
-import { accountImportFunction } from './custom-resources/resource'
+import { importFunction } from './custom-resources/resource'
 /**
  * @see https://docs.amplify.aws/react/build-a-backend/ to add storage, functions, and more
  */
@@ -22,4 +22,6 @@ const backend = defineBackend({
  */
 const customStack = backend.createStack('pythonFunctions');
 
-const accountImport = accountImportFunction(customStack, backend.data.resources.tables['Account'])
+const accountImport = importFunction(customStack, 'account', backend.data.resources.tables['Account'])
+const itemImport = importFunction(customStack, 'item', backend.data.resources.tables['Item'])
+const saleImport = importFunction(customStack, 'sale', backend.data.resources.tables['Sale'])

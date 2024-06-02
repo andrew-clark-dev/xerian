@@ -3,10 +3,12 @@ import logging
 import pandas as pd
 import awswrangler as wr
 import uuid
+import urllib.parse
+import boto3
 from datetime import datetime
 from datetime import UTC
 from dateutil.parser import parse
-import boto3
+
 from botocore.exceptions import ClientError
 from decimal import Decimal
 
@@ -20,7 +22,7 @@ table = dyn_resource.Table(os.getenv('TABLE_NAME'))
 def handler(event, context):
     # Get the S3 bucket and object key from the event
     bucket = event['Records'][0]['s3']['bucket']['name']
-    key = event['Records'][0]['s3']['object']['key']
+    key = urllib.parse.unquote_plus(event['Records'][0]['s3']['object']['key'], encoding='utf-8')
 
     # Parse the CSV content into a Pandas dataframe
     df = wr.s3.read_csv(
@@ -49,7 +51,10 @@ def handler(event, context):
                     'state': row['State'],
                     'balence': balence(row),
                     'updatedAt': datetime.now(UTC).isoformat(sep='T', timespec='milliseconds').replace('+00:00','Z'),
-                    '__typename': 'Account'
+                    'status': status(row),
+                    'original': row.to_json(),
+                    '__typename': 'Account',
+
                 }
                 writer.put_item(Item=item)
                 
@@ -78,3 +83,8 @@ def balence(row):
         return Decimal(row['Balance'])
     except ValueError:
         return Decimal(0)
+
+def status(row):
+    if row['Deactivated'] == '':
+        return 'active'
+    return 'inactive'
