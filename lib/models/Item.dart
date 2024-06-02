@@ -36,6 +36,7 @@ class Item extends amplify_core.Model {
   final ItemQuality? _quality;
   final int? _split;
   final ItemStatus? _status;
+  final String? _original;
   final amplify_core.TemporalDateTime? _createdAt;
   final amplify_core.TemporalDateTime? _updatedAt;
 
@@ -102,6 +103,10 @@ class Item extends amplify_core.Model {
     return _status;
   }
   
+  String? get original {
+    return _original;
+  }
+  
   amplify_core.TemporalDateTime? get createdAt {
     return _createdAt;
   }
@@ -110,9 +115,9 @@ class Item extends amplify_core.Model {
     return _updatedAt;
   }
   
-  const Item._internal({required this.id, required sku, categories, required description, details, images, quality, split, status, createdAt, updatedAt}): _sku = sku, _categories = categories, _description = description, _details = details, _images = images, _quality = quality, _split = split, _status = status, _createdAt = createdAt, _updatedAt = updatedAt;
+  const Item._internal({required this.id, required sku, categories, required description, details, images, quality, split, status, original, createdAt, updatedAt}): _sku = sku, _categories = categories, _description = description, _details = details, _images = images, _quality = quality, _split = split, _status = status, _original = original, _createdAt = createdAt, _updatedAt = updatedAt;
   
-  factory Item({String? id, required int sku, List<ItemCategory>? categories, required String description, String? details, List<String>? images, ItemQuality? quality, int? split, ItemStatus? status}) {
+  factory Item({String? id, required int sku, List<ItemCategory>? categories, required String description, String? details, List<String>? images, ItemQuality? quality, int? split, ItemStatus? status, String? original}) {
     return Item._internal(
       id: id == null ? amplify_core.UUID.getUUID() : id,
       sku: sku,
@@ -122,7 +127,8 @@ class Item extends amplify_core.Model {
       images: images != null ? List<String>.unmodifiable(images) : images,
       quality: quality,
       split: split,
-      status: status);
+      status: status,
+      original: original);
   }
   
   bool equals(Object other) {
@@ -141,7 +147,8 @@ class Item extends amplify_core.Model {
       DeepCollectionEquality().equals(_images, other._images) &&
       _quality == other._quality &&
       _split == other._split &&
-      _status == other._status;
+      _status == other._status &&
+      _original == other._original;
   }
   
   @override
@@ -160,6 +167,7 @@ class Item extends amplify_core.Model {
     buffer.write("quality=" + (_quality != null ? amplify_core.enumToString(_quality)! : "null") + ", ");
     buffer.write("split=" + (_split != null ? _split.toString() : "null") + ", ");
     buffer.write("status=" + (_status != null ? amplify_core.enumToString(_status)! : "null") + ", ");
+    buffer.write("original=" + "$_original" + ", ");
     buffer.write("createdAt=" + (_createdAt != null ? _createdAt.format() : "null") + ", ");
     buffer.write("updatedAt=" + (_updatedAt != null ? _updatedAt.format() : "null"));
     buffer.write("}");
@@ -167,7 +175,7 @@ class Item extends amplify_core.Model {
     return buffer.toString();
   }
   
-  Item copyWith({int? sku, List<ItemCategory>? categories, String? description, String? details, List<String>? images, ItemQuality? quality, int? split, ItemStatus? status}) {
+  Item copyWith({int? sku, List<ItemCategory>? categories, String? description, String? details, List<String>? images, ItemQuality? quality, int? split, ItemStatus? status, String? original}) {
     return Item._internal(
       id: id,
       sku: sku ?? this.sku,
@@ -177,7 +185,8 @@ class Item extends amplify_core.Model {
       images: images ?? this.images,
       quality: quality ?? this.quality,
       split: split ?? this.split,
-      status: status ?? this.status);
+      status: status ?? this.status,
+      original: original ?? this.original);
   }
   
   Item copyWithModelFieldValues({
@@ -188,7 +197,8 @@ class Item extends amplify_core.Model {
     ModelFieldValue<List<String>?>? images,
     ModelFieldValue<ItemQuality?>? quality,
     ModelFieldValue<int?>? split,
-    ModelFieldValue<ItemStatus?>? status
+    ModelFieldValue<ItemStatus?>? status,
+    ModelFieldValue<String?>? original
   }) {
     return Item._internal(
       id: id,
@@ -199,7 +209,8 @@ class Item extends amplify_core.Model {
       images: images == null ? this.images : images.value,
       quality: quality == null ? this.quality : quality.value,
       split: split == null ? this.split : split.value,
-      status: status == null ? this.status : status.value
+      status: status == null ? this.status : status.value,
+      original: original == null ? this.original : original.value
     );
   }
   
@@ -225,11 +236,12 @@ class Item extends amplify_core.Model {
       _quality = amplify_core.enumFromString<ItemQuality>(json['quality'], ItemQuality.values),
       _split = (json['split'] as num?)?.toInt(),
       _status = amplify_core.enumFromString<ItemStatus>(json['status'], ItemStatus.values),
+      _original = json['original'],
       _createdAt = json['createdAt'] != null ? amplify_core.TemporalDateTime.fromString(json['createdAt']) : null,
       _updatedAt = json['updatedAt'] != null ? amplify_core.TemporalDateTime.fromString(json['updatedAt']) : null;
   
   Map<String, dynamic> toJson() => {
-    'id': id, 'sku': _sku, 'categories': _categories?.map((ItemCategory? e) => e?.toJson()).toList(), 'description': _description, 'details': _details, 'images': _images, 'quality': amplify_core.enumToString(_quality), 'split': _split, 'status': amplify_core.enumToString(_status), 'createdAt': _createdAt?.format(), 'updatedAt': _updatedAt?.format()
+    'id': id, 'sku': _sku, 'categories': _categories?.map((ItemCategory? e) => e?.toJson()).toList(), 'description': _description, 'details': _details, 'images': _images, 'quality': amplify_core.enumToString(_quality), 'split': _split, 'status': amplify_core.enumToString(_status), 'original': _original, 'createdAt': _createdAt?.format(), 'updatedAt': _updatedAt?.format()
   };
   
   Map<String, Object?> toMap() => {
@@ -242,6 +254,7 @@ class Item extends amplify_core.Model {
     'quality': _quality,
     'split': _split,
     'status': _status,
+    'original': _original,
     'createdAt': _createdAt,
     'updatedAt': _updatedAt
   };
@@ -258,6 +271,7 @@ class Item extends amplify_core.Model {
   static final QUALITY = amplify_core.QueryField(fieldName: "quality");
   static final SPLIT = amplify_core.QueryField(fieldName: "split");
   static final STATUS = amplify_core.QueryField(fieldName: "status");
+  static final ORIGINAL = amplify_core.QueryField(fieldName: "original");
   static var schema = amplify_core.Model.defineSchema(define: (amplify_core.ModelSchemaDefinition modelSchemaDefinition) {
     modelSchemaDefinition.name = "Item";
     modelSchemaDefinition.pluralName = "Items";
@@ -323,6 +337,12 @@ class Item extends amplify_core.Model {
       key: Item.STATUS,
       isRequired: false,
       ofType: amplify_core.ModelFieldType(amplify_core.ModelFieldTypeEnum.enumeration)
+    ));
+    
+    modelSchemaDefinition.addField(amplify_core.ModelFieldDefinition.field(
+      key: Item.ORIGINAL,
+      isRequired: false,
+      ofType: amplify_core.ModelFieldType(amplify_core.ModelFieldTypeEnum.string)
     ));
     
     modelSchemaDefinition.addField(amplify_core.ModelFieldDefinition.nonQueryField(

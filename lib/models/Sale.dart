@@ -33,6 +33,7 @@ class Sale extends amplify_core.Model {
   final double? _total;
   final double? _subtotal;
   final SalePaymentType? _paymentType;
+  final String? _original;
   final amplify_core.TemporalDateTime? _createdAt;
   final amplify_core.TemporalDateTime? _updatedAt;
 
@@ -73,6 +74,10 @@ class Sale extends amplify_core.Model {
     return _paymentType;
   }
   
+  String? get original {
+    return _original;
+  }
+  
   amplify_core.TemporalDateTime? get createdAt {
     return _createdAt;
   }
@@ -81,9 +86,9 @@ class Sale extends amplify_core.Model {
     return _updatedAt;
   }
   
-  const Sale._internal({required this.id, number, status, finalized, total, subtotal, paymentType, createdAt, updatedAt}): _number = number, _status = status, _finalized = finalized, _total = total, _subtotal = subtotal, _paymentType = paymentType, _createdAt = createdAt, _updatedAt = updatedAt;
+  const Sale._internal({required this.id, number, status, finalized, total, subtotal, paymentType, original, createdAt, updatedAt}): _number = number, _status = status, _finalized = finalized, _total = total, _subtotal = subtotal, _paymentType = paymentType, _original = original, _createdAt = createdAt, _updatedAt = updatedAt;
   
-  factory Sale({String? id, int? number, SaleStatus? status, amplify_core.TemporalDateTime? finalized, double? total, double? subtotal, SalePaymentType? paymentType}) {
+  factory Sale({String? id, int? number, SaleStatus? status, amplify_core.TemporalDateTime? finalized, double? total, double? subtotal, SalePaymentType? paymentType, String? original}) {
     return Sale._internal(
       id: id == null ? amplify_core.UUID.getUUID() : id,
       number: number,
@@ -91,7 +96,8 @@ class Sale extends amplify_core.Model {
       finalized: finalized,
       total: total,
       subtotal: subtotal,
-      paymentType: paymentType);
+      paymentType: paymentType,
+      original: original);
   }
   
   bool equals(Object other) {
@@ -108,7 +114,8 @@ class Sale extends amplify_core.Model {
       _finalized == other._finalized &&
       _total == other._total &&
       _subtotal == other._subtotal &&
-      _paymentType == other._paymentType;
+      _paymentType == other._paymentType &&
+      _original == other._original;
   }
   
   @override
@@ -126,6 +133,7 @@ class Sale extends amplify_core.Model {
     buffer.write("total=" + (_total != null ? _total.toString() : "null") + ", ");
     buffer.write("subtotal=" + (_subtotal != null ? _subtotal.toString() : "null") + ", ");
     buffer.write("paymentType=" + (_paymentType != null ? amplify_core.enumToString(_paymentType)! : "null") + ", ");
+    buffer.write("original=" + "$_original" + ", ");
     buffer.write("createdAt=" + (_createdAt != null ? _createdAt.format() : "null") + ", ");
     buffer.write("updatedAt=" + (_updatedAt != null ? _updatedAt.format() : "null"));
     buffer.write("}");
@@ -133,7 +141,7 @@ class Sale extends amplify_core.Model {
     return buffer.toString();
   }
   
-  Sale copyWith({int? number, SaleStatus? status, amplify_core.TemporalDateTime? finalized, double? total, double? subtotal, SalePaymentType? paymentType}) {
+  Sale copyWith({int? number, SaleStatus? status, amplify_core.TemporalDateTime? finalized, double? total, double? subtotal, SalePaymentType? paymentType, String? original}) {
     return Sale._internal(
       id: id,
       number: number ?? this.number,
@@ -141,7 +149,8 @@ class Sale extends amplify_core.Model {
       finalized: finalized ?? this.finalized,
       total: total ?? this.total,
       subtotal: subtotal ?? this.subtotal,
-      paymentType: paymentType ?? this.paymentType);
+      paymentType: paymentType ?? this.paymentType,
+      original: original ?? this.original);
   }
   
   Sale copyWithModelFieldValues({
@@ -150,7 +159,8 @@ class Sale extends amplify_core.Model {
     ModelFieldValue<amplify_core.TemporalDateTime?>? finalized,
     ModelFieldValue<double?>? total,
     ModelFieldValue<double?>? subtotal,
-    ModelFieldValue<SalePaymentType?>? paymentType
+    ModelFieldValue<SalePaymentType?>? paymentType,
+    ModelFieldValue<String?>? original
   }) {
     return Sale._internal(
       id: id,
@@ -159,7 +169,8 @@ class Sale extends amplify_core.Model {
       finalized: finalized == null ? this.finalized : finalized.value,
       total: total == null ? this.total : total.value,
       subtotal: subtotal == null ? this.subtotal : subtotal.value,
-      paymentType: paymentType == null ? this.paymentType : paymentType.value
+      paymentType: paymentType == null ? this.paymentType : paymentType.value,
+      original: original == null ? this.original : original.value
     );
   }
   
@@ -171,11 +182,12 @@ class Sale extends amplify_core.Model {
       _total = (json['total'] as num?)?.toDouble(),
       _subtotal = (json['subtotal'] as num?)?.toDouble(),
       _paymentType = amplify_core.enumFromString<SalePaymentType>(json['paymentType'], SalePaymentType.values),
+      _original = json['original'],
       _createdAt = json['createdAt'] != null ? amplify_core.TemporalDateTime.fromString(json['createdAt']) : null,
       _updatedAt = json['updatedAt'] != null ? amplify_core.TemporalDateTime.fromString(json['updatedAt']) : null;
   
   Map<String, dynamic> toJson() => {
-    'id': id, 'number': _number, 'status': amplify_core.enumToString(_status), 'finalized': _finalized?.format(), 'total': _total, 'subtotal': _subtotal, 'paymentType': amplify_core.enumToString(_paymentType), 'createdAt': _createdAt?.format(), 'updatedAt': _updatedAt?.format()
+    'id': id, 'number': _number, 'status': amplify_core.enumToString(_status), 'finalized': _finalized?.format(), 'total': _total, 'subtotal': _subtotal, 'paymentType': amplify_core.enumToString(_paymentType), 'original': _original, 'createdAt': _createdAt?.format(), 'updatedAt': _updatedAt?.format()
   };
   
   Map<String, Object?> toMap() => {
@@ -186,6 +198,7 @@ class Sale extends amplify_core.Model {
     'total': _total,
     'subtotal': _subtotal,
     'paymentType': _paymentType,
+    'original': _original,
     'createdAt': _createdAt,
     'updatedAt': _updatedAt
   };
@@ -198,6 +211,7 @@ class Sale extends amplify_core.Model {
   static final TOTAL = amplify_core.QueryField(fieldName: "total");
   static final SUBTOTAL = amplify_core.QueryField(fieldName: "subtotal");
   static final PAYMENTTYPE = amplify_core.QueryField(fieldName: "paymentType");
+  static final ORIGINAL = amplify_core.QueryField(fieldName: "original");
   static var schema = amplify_core.Model.defineSchema(define: (amplify_core.ModelSchemaDefinition modelSchemaDefinition) {
     modelSchemaDefinition.name = "Sale";
     modelSchemaDefinition.pluralName = "Sales";
@@ -249,6 +263,12 @@ class Sale extends amplify_core.Model {
       key: Sale.PAYMENTTYPE,
       isRequired: false,
       ofType: amplify_core.ModelFieldType(amplify_core.ModelFieldTypeEnum.enumeration)
+    ));
+    
+    modelSchemaDefinition.addField(amplify_core.ModelFieldDefinition.field(
+      key: Sale.ORIGINAL,
+      isRequired: false,
+      ofType: amplify_core.ModelFieldType(amplify_core.ModelFieldTypeEnum.string)
     ));
     
     modelSchemaDefinition.addField(amplify_core.ModelFieldDefinition.nonQueryField(

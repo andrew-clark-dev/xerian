@@ -21,7 +21,16 @@ const schema = a.schema({
       state: a.string(),
       postcode: a.string(),
       balance: a.float(),
-      split: a.float(),
+      status: a.enum(["active", "inactive", "suspended"]),
+      original: a.json(),
+      // 1. Create reference fields to both ends of
+      //    the many-to-many relationship
+      // items: a.hasMany("Item", "accountId"),
+      // sales: a.hasMany("Sale", "accountId"),
+      // refunds: a.hasMany("Refund", "accountId"),
+      // 2. Create relationship fields to both ends of
+      //    the many-to-many relationship using their
+      //    respective reference fields
       // items: a.hasMany("Item", "accountId"), // setup relationships between types
     }),
 
@@ -37,6 +46,7 @@ const schema = a.schema({
       quality: a.enum(["asNew", "good", "marked"]),
       split: a.integer(),
       status: a.enum(["tagged", "hungOut", "sold", "toDonate", "donated"]),
+      original: a.json(),
     }),
 
   ItemCategory: a.model({
@@ -67,6 +77,7 @@ const schema = a.schema({
       total: a.float(),
       subtotal: a.float(),
       paymentType: a.enum(["cash", "card", "giftCard", "accountCredit"]),
+      original: a.json(),
     }),
 
   Refund: a

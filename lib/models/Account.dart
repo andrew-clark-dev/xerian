@@ -37,7 +37,8 @@ class Account extends amplify_core.Model {
   final String? _state;
   final String? _postcode;
   final double? _balance;
-  final double? _split;
+  final AccountStatus? _status;
+  final String? _original;
   final amplify_core.TemporalDateTime? _createdAt;
   final amplify_core.TemporalDateTime? _updatedAt;
 
@@ -112,8 +113,12 @@ class Account extends amplify_core.Model {
     return _balance;
   }
   
-  double? get split {
-    return _split;
+  AccountStatus? get status {
+    return _status;
+  }
+  
+  String? get original {
+    return _original;
   }
   
   amplify_core.TemporalDateTime? get createdAt {
@@ -124,9 +129,9 @@ class Account extends amplify_core.Model {
     return _updatedAt;
   }
   
-  const Account._internal({required this.id, required number, required firstName, lastName, email, phoneNumber, address, city, state, postcode, balance, split, createdAt, updatedAt}): _number = number, _firstName = firstName, _lastName = lastName, _email = email, _phoneNumber = phoneNumber, _address = address, _city = city, _state = state, _postcode = postcode, _balance = balance, _split = split, _createdAt = createdAt, _updatedAt = updatedAt;
+  const Account._internal({required this.id, required number, required firstName, lastName, email, phoneNumber, address, city, state, postcode, balance, status, original, createdAt, updatedAt}): _number = number, _firstName = firstName, _lastName = lastName, _email = email, _phoneNumber = phoneNumber, _address = address, _city = city, _state = state, _postcode = postcode, _balance = balance, _status = status, _original = original, _createdAt = createdAt, _updatedAt = updatedAt;
   
-  factory Account({String? id, required String number, required String firstName, String? lastName, String? email, String? phoneNumber, String? address, String? city, String? state, String? postcode, double? balance, double? split}) {
+  factory Account({String? id, required String number, required String firstName, String? lastName, String? email, String? phoneNumber, String? address, String? city, String? state, String? postcode, double? balance, AccountStatus? status, String? original}) {
     return Account._internal(
       id: id == null ? amplify_core.UUID.getUUID() : id,
       number: number,
@@ -139,7 +144,8 @@ class Account extends amplify_core.Model {
       state: state,
       postcode: postcode,
       balance: balance,
-      split: split);
+      status: status,
+      original: original);
   }
   
   bool equals(Object other) {
@@ -161,7 +167,8 @@ class Account extends amplify_core.Model {
       _state == other._state &&
       _postcode == other._postcode &&
       _balance == other._balance &&
-      _split == other._split;
+      _status == other._status &&
+      _original == other._original;
   }
   
   @override
@@ -183,7 +190,8 @@ class Account extends amplify_core.Model {
     buffer.write("state=" + "$_state" + ", ");
     buffer.write("postcode=" + "$_postcode" + ", ");
     buffer.write("balance=" + (_balance != null ? _balance.toString() : "null") + ", ");
-    buffer.write("split=" + (_split != null ? _split.toString() : "null") + ", ");
+    buffer.write("status=" + (_status != null ? amplify_core.enumToString(_status)! : "null") + ", ");
+    buffer.write("original=" + "$_original" + ", ");
     buffer.write("createdAt=" + (_createdAt != null ? _createdAt.format() : "null") + ", ");
     buffer.write("updatedAt=" + (_updatedAt != null ? _updatedAt.format() : "null"));
     buffer.write("}");
@@ -191,7 +199,7 @@ class Account extends amplify_core.Model {
     return buffer.toString();
   }
   
-  Account copyWith({String? number, String? firstName, String? lastName, String? email, String? phoneNumber, String? address, String? city, String? state, String? postcode, double? balance, double? split}) {
+  Account copyWith({String? number, String? firstName, String? lastName, String? email, String? phoneNumber, String? address, String? city, String? state, String? postcode, double? balance, AccountStatus? status, String? original}) {
     return Account._internal(
       id: id,
       number: number ?? this.number,
@@ -204,7 +212,8 @@ class Account extends amplify_core.Model {
       state: state ?? this.state,
       postcode: postcode ?? this.postcode,
       balance: balance ?? this.balance,
-      split: split ?? this.split);
+      status: status ?? this.status,
+      original: original ?? this.original);
   }
   
   Account copyWithModelFieldValues({
@@ -218,7 +227,8 @@ class Account extends amplify_core.Model {
     ModelFieldValue<String?>? state,
     ModelFieldValue<String?>? postcode,
     ModelFieldValue<double?>? balance,
-    ModelFieldValue<double?>? split
+    ModelFieldValue<AccountStatus?>? status,
+    ModelFieldValue<String?>? original
   }) {
     return Account._internal(
       id: id,
@@ -232,7 +242,8 @@ class Account extends amplify_core.Model {
       state: state == null ? this.state : state.value,
       postcode: postcode == null ? this.postcode : postcode.value,
       balance: balance == null ? this.balance : balance.value,
-      split: split == null ? this.split : split.value
+      status: status == null ? this.status : status.value,
+      original: original == null ? this.original : original.value
     );
   }
   
@@ -248,12 +259,13 @@ class Account extends amplify_core.Model {
       _state = json['state'],
       _postcode = json['postcode'],
       _balance = (json['balance'] as num?)?.toDouble(),
-      _split = (json['split'] as num?)?.toDouble(),
+      _status = amplify_core.enumFromString<AccountStatus>(json['status'], AccountStatus.values),
+      _original = json['original'],
       _createdAt = json['createdAt'] != null ? amplify_core.TemporalDateTime.fromString(json['createdAt']) : null,
       _updatedAt = json['updatedAt'] != null ? amplify_core.TemporalDateTime.fromString(json['updatedAt']) : null;
   
   Map<String, dynamic> toJson() => {
-    'id': id, 'number': _number, 'firstName': _firstName, 'lastName': _lastName, 'email': _email, 'phoneNumber': _phoneNumber, 'address': _address, 'city': _city, 'state': _state, 'postcode': _postcode, 'balance': _balance, 'split': _split, 'createdAt': _createdAt?.format(), 'updatedAt': _updatedAt?.format()
+    'id': id, 'number': _number, 'firstName': _firstName, 'lastName': _lastName, 'email': _email, 'phoneNumber': _phoneNumber, 'address': _address, 'city': _city, 'state': _state, 'postcode': _postcode, 'balance': _balance, 'status': amplify_core.enumToString(_status), 'original': _original, 'createdAt': _createdAt?.format(), 'updatedAt': _updatedAt?.format()
   };
   
   Map<String, Object?> toMap() => {
@@ -268,7 +280,8 @@ class Account extends amplify_core.Model {
     'state': _state,
     'postcode': _postcode,
     'balance': _balance,
-    'split': _split,
+    'status': _status,
+    'original': _original,
     'createdAt': _createdAt,
     'updatedAt': _updatedAt
   };
@@ -285,7 +298,8 @@ class Account extends amplify_core.Model {
   static final STATE = amplify_core.QueryField(fieldName: "state");
   static final POSTCODE = amplify_core.QueryField(fieldName: "postcode");
   static final BALANCE = amplify_core.QueryField(fieldName: "balance");
-  static final SPLIT = amplify_core.QueryField(fieldName: "split");
+  static final STATUS = amplify_core.QueryField(fieldName: "status");
+  static final ORIGINAL = amplify_core.QueryField(fieldName: "original");
   static var schema = amplify_core.Model.defineSchema(define: (amplify_core.ModelSchemaDefinition modelSchemaDefinition) {
     modelSchemaDefinition.name = "Account";
     modelSchemaDefinition.pluralName = "Accounts";
@@ -364,9 +378,15 @@ class Account extends amplify_core.Model {
     ));
     
     modelSchemaDefinition.addField(amplify_core.ModelFieldDefinition.field(
-      key: Account.SPLIT,
+      key: Account.STATUS,
       isRequired: false,
-      ofType: amplify_core.ModelFieldType(amplify_core.ModelFieldTypeEnum.double)
+      ofType: amplify_core.ModelFieldType(amplify_core.ModelFieldTypeEnum.enumeration)
+    ));
+    
+    modelSchemaDefinition.addField(amplify_core.ModelFieldDefinition.field(
+      key: Account.ORIGINAL,
+      isRequired: false,
+      ofType: amplify_core.ModelFieldType(amplify_core.ModelFieldTypeEnum.string)
     ));
     
     modelSchemaDefinition.addField(amplify_core.ModelFieldDefinition.nonQueryField(

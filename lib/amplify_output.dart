@@ -1,4 +1,4 @@
-// ignore_for_file: unnecessary_string_interpolations
+// ignore_for_file: unnecessary_string_interpolations, constant_identifier_names
 
 import 'package:json_annotation/json_annotation.dart';
 

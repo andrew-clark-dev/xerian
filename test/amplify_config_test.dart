@@ -1153,7 +1153,7 @@ main() {
       api: apiConfig,
       storage: storageConfig);
 
-  print(jsonEncode(amplifyConfig));
+  safePrint(jsonEncode(amplifyConfig));
 }
 
 APIAuthorizationType toAPIAuthorizationType(String string) {
