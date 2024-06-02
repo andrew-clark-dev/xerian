@@ -8,7 +8,7 @@ import 'package:form_validation/form_validation.dart';
 
 import '../routable.dart';
 
-class ItemView extends StatefulWidget implements Routable {
+class ItemView extends StatefulWidget implements RoutableExtra {
   final Item? item;
   const ItemView({
     super.key,
@@ -17,6 +17,9 @@ class ItemView extends StatefulWidget implements Routable {
 
   @override
   String get path => '/item';
+
+  @override
+  void extra(Object extra) => ItemView(item: extra as Item);
 
   @override
   State<ItemView> createState() => _ItemListViewState();

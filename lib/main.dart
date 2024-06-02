@@ -56,32 +56,27 @@ GoRoute _route(Routable page) {
   );
 }
 
+GoRoute _routeExtra(RoutableExtra page) {
+  return GoRoute(
+    path: page.path,
+    builder: (BuildContext context, GoRouterState state) {
+      if (state.extra != null) {
+        page.extra(state.extra!);
+        return AccountView(account: state.extra as Account);
+      }
+      return page;
+    },
+  );
+}
+
 /// The route configuration.
 final GoRouter _router = GoRouter(
   routes: <RouteBase>[
     _route(const LoginScreen()),
     _route(const DashboardView()),
-    GoRoute(
-      path: const AccountView().path,
-      builder: (BuildContext context, GoRouterState state) {
-        if (state.extra != null) {
-          return AccountView(account: state.extra as Account);
-        } else {
-          return const AccountView();
-        }
-      },
-    ),
+    _routeExtra(const AccountView()),
     _route(const AccountListView()),
-    GoRoute(
-      path: const ItemView().path,
-      builder: (BuildContext context, GoRouterState state) {
-        if (state.extra != null) {
-          return ItemView(item: state.extra as Item);
-        } else {
-          return const ItemView();
-        }
-      },
-    ),
+    _routeExtra(const ItemView()),
     _route(const ItemListView()),
     _route(const ItemForm()),
     GoRoute(

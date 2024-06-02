@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:form_validation/form_validation.dart';
 
-class AccountView extends StatefulWidget implements Routable {
+class AccountView extends StatefulWidget implements RoutableExtra {
   final Account? account;
   const AccountView({
     super.key,
@@ -16,6 +16,9 @@ class AccountView extends StatefulWidget implements Routable {
 
   @override
   String get path => '/account';
+
+  @override
+  void extra(Object extra) => AccountView(account: extra as Account);
 
   @override
   State<AccountView> createState() => _AccountListViewState();
