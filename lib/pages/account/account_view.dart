@@ -1,19 +1,21 @@
 import 'package:amplify_api/amplify_api.dart';
 import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:xerian/models/Account.dart';
+import 'package:xerian/pages/routable.dart';
 import 'package:xerian/services/counter_service.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:form_validation/form_validation.dart';
 
-class AccountView extends StatefulWidget {
-  static const path = '/account';
-
+class AccountView extends StatefulWidget implements Routable {
   final Account? account;
   const AccountView({
     super.key,
     this.account,
   });
+
+  @override
+  String get path => '/account';
 
   @override
   State<AccountView> createState() => _AccountListViewState();

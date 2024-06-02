@@ -60,14 +60,9 @@ GoRoute _route(Routable page) {
 final GoRouter _router = GoRouter(
   routes: <RouteBase>[
     _route(const LoginScreen()),
+    _route(const DashboardView()),
     GoRoute(
-      path: DashboardView.path,
-      builder: (BuildContext context, GoRouterState state) {
-        return const DashboardView();
-      },
-    ),
-    GoRoute(
-      path: AccountView.path,
+      path: const AccountView().path,
       builder: (BuildContext context, GoRouterState state) {
         if (state.extra != null) {
           return AccountView(account: state.extra as Account);
@@ -76,14 +71,9 @@ final GoRouter _router = GoRouter(
         }
       },
     ),
+    _route(const AccountListView()),
     GoRoute(
-      path: AccountListView.path,
-      builder: (BuildContext context, GoRouterState state) {
-        return const AccountListView();
-      },
-    ),
-    GoRoute(
-      path: ItemView.path,
+      path: const ItemView().path,
       builder: (BuildContext context, GoRouterState state) {
         if (state.extra != null) {
           return ItemView(item: state.extra as Item);

@@ -6,14 +6,17 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:form_validation/form_validation.dart';
 
-class ItemView extends StatefulWidget {
-  static const path = '/item';
+import '../routable.dart';
 
+class ItemView extends StatefulWidget implements Routable {
   final Item? item;
   const ItemView({
     super.key,
     this.item,
   });
+
+  @override
+  String get path => '/item';
 
   @override
   State<ItemView> createState() => _ItemListViewState();

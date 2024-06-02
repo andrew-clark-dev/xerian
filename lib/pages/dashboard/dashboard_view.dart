@@ -3,11 +3,14 @@ import 'package:xerian/widgets/app_drawer.dart';
 import 'package:xerian/widgets/single_file_picker.dart';
 import 'package:flutter/material.dart';
 
+import '../routable.dart';
+
 /// Displaysthe application dashboard.
-class DashboardView extends StatelessWidget {
+class DashboardView extends StatelessWidget implements Routable {
   const DashboardView({super.key});
 
-  static const path = '/dashboard';
+  @override
+  String get path => '/dashboard';
 
   @override
   Widget build(BuildContext context) {

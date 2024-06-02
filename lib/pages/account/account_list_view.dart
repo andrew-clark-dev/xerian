@@ -8,9 +8,13 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
-class AccountListView extends StatefulWidget {
-  static const path = '/accounts';
+import '../routable.dart';
+
+class AccountListView extends StatefulWidget implements Routable {
   const AccountListView({super.key});
+
+  @override
+  String get path => '/accounts';
 
   @override
   State<AccountListView> createState() => _AccountListViewState();

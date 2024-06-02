@@ -2,7 +2,9 @@ import 'package:xerian/pages/account/account_list_view.dart';
 import 'package:flutter/material.dart';
 
 import 'package:go_router/go_router.dart';
+import 'package:xerian/pages/dashboard/dashboard_view.dart';
 import 'package:xerian/pages/item/item_form.dart';
+import 'package:xerian/pages/item/item_list_view.dart';
 
 import '../pages/routable.dart';
 import '../pages/settings/web_chrome_settings.dart';
@@ -30,31 +32,19 @@ class AppDrawer extends StatelessWidget {
             ),
             child: Text('Drawer Header'),
           ),
-          ListTile(
-            title: const Text('Dashboard'),
-            onTap: () {
-              context.go('/dashboard');
-            },
-          ),
-          ListTile(
-            title: const Text('Items'),
-            onTap: () {
-              context.go('/items');
-            },
-          ),
+          _listTile(context, const DashboardView(), 'Dashboard'),
+          _listTile(context, const ItemListView(), 'Items'),
+
           ListTile(
             title: const Text('Sales'),
             onTap: () {
               context.go('/sales');
             },
           ),
-          ListTile(
-            title: const Text('Accounts'),
-            onTap: () {
-              context.go(AccountListView.path);
-            },
-          ),
+
+          _listTile(context, const AccountListView(), 'Accounts'),
           _listTile(context, const ItemForm(), 'Add item'),
+
           ListTile(
             title: const Text('Settings'),
             onTap: () {
