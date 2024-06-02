@@ -2,11 +2,21 @@ import 'package:xerian/pages/account/account_list_view.dart';
 import 'package:flutter/material.dart';
 
 import 'package:go_router/go_router.dart';
+import 'package:xerian/pages/item/item_form.dart';
 
+import '../pages/routable.dart';
 import '../pages/settings/web_chrome_settings.dart';
 
 class AppDrawer extends StatelessWidget {
   const AppDrawer({super.key});
+
+  ListTile _listTile(BuildContext context, Routable page, String title) {
+    return ListTile(
+        title: Text(title),
+        onTap: () {
+          context.go(page.path);
+        });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -44,6 +54,7 @@ class AppDrawer extends StatelessWidget {
               context.go(AccountListView.path);
             },
           ),
+          _listTile(context, const ItemForm(), 'Add item'),
           ListTile(
             title: const Text('Settings'),
             onTap: () {

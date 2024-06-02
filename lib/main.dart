@@ -8,6 +8,7 @@ import 'package:xerian/amplify_config_service.dart';
 
 import 'package:go_router/go_router.dart';
 import 'package:xerian/models/ModelProvider.dart';
+import 'package:xerian/pages/item/item_form.dart';
 
 import 'pages/account/account_list_view.dart';
 import 'pages/account/account_view.dart';
@@ -15,6 +16,7 @@ import 'pages/dashboard/dashboard_view.dart';
 import 'pages/item/item_list_view.dart';
 import 'pages/item/item_view.dart';
 import 'pages/login/login_screen.dart';
+import 'pages/routable.dart';
 import 'pages/settings/import_screen.dart';
 import 'pages/settings/web_chrome_addresses_settings.dart';
 import 'pages/settings/web_chrome_settings.dart';
@@ -45,15 +47,19 @@ Future<void> _configureAmplify() async {
   }
 }
 
+GoRoute _route(Routable page) {
+  return GoRoute(
+    path: page.path,
+    builder: (BuildContext context, GoRouterState state) {
+      return page;
+    },
+  );
+}
+
 /// The route configuration.
 final GoRouter _router = GoRouter(
   routes: <RouteBase>[
-    GoRoute(
-      path: '/',
-      builder: (BuildContext context, GoRouterState state) {
-        return const LoginScreen();
-      },
-    ),
+    _route(const LoginScreen()),
     GoRoute(
       path: DashboardView.path,
       builder: (BuildContext context, GoRouterState state) {
@@ -86,12 +92,8 @@ final GoRouter _router = GoRouter(
         }
       },
     ),
-    GoRoute(
-      path: ItemListView.path,
-      builder: (BuildContext context, GoRouterState state) {
-        return const ItemListView();
-      },
-    ),
+    _route(const ItemListView()),
+    _route(const ItemForm()),
     GoRoute(
       path: WebChromeSettings.path,
       builder: (BuildContext context, GoRouterState state) {

@@ -7,9 +7,13 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
-class ItemListView extends StatefulWidget {
-  static const path = '/items';
+import '../routable.dart';
+
+class ItemListView extends StatefulWidget implements Routable {
   const ItemListView({super.key});
+
+  @override
+  String get path => '/items';
 
   @override
   State<ItemListView> createState() => _ItemListViewState();
