@@ -6,7 +6,6 @@ import { Code, Runtime } from 'aws-cdk-lib/aws-lambda';
 import { S3EventSourceV2 } from 'aws-cdk-lib/aws-lambda-event-sources';
 import { Duration, Stack } from 'aws-cdk-lib';
 
-
 export function importFunction(stack: Stack, modelName: string, table: ITable): void {
     const bucket = new Bucket(
         stack,
@@ -36,3 +35,10 @@ export function importFunction(stack: Stack, modelName: string, table: ITable): 
     lambdaFunction.addEventSource(
         new S3EventSourceV2(bucket, { events: [EventType.OBJECT_CREATED] }));
 }
+
+export { opensearchDomain } from "./search/resource";
+export { opensearchPipeline } from "./search/resource";
+
+
+
+

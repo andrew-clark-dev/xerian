@@ -2,12 +2,12 @@ import { defineBackend } from '@aws-amplify/backend';
 import { auth } from './auth/resource';
 import { data } from './data/resource';
 import { storage } from './storage/resource';
-import { Function } from 'aws-cdk-lib/aws-lambda';
-import { Code, Runtime } from 'aws-cdk-lib/aws-lambda';
-import { IBucket, EventType, Bucket } from 'aws-cdk-lib/aws-s3';
-import { S3EventSourceV2 } from 'aws-cdk-lib/aws-lambda-event-sources';
 
 import { importFunction } from './custom-resources/resource'
+import { opensearchDomain } from './custom-resources/resource'
+import { opensearchPipeline } from './custom-resources/resource'
+import { Stack } from 'aws-cdk-lib';
+
 /**
  * @see https://docs.amplify.aws/react/build-a-backend/ to add storage, functions, and more
  */
@@ -18,8 +18,26 @@ const backend = defineBackend({
 });
 
 /**
- * @see https://docs.amplify.aws/gen1/flutter/tools/cli/custom/cdk/ Use CDK to add custom AWS resources
- */
+ * @see https://docs.amplify.aws/flutter/build-a-backend/data/custom-business-logic/search-and-aggregate-queries/ 
+ * Connect to Amazon OpenSearch for search and aggregate queries
+*/
+const dataStack = Stack.of(backend.data);
+
+const osDomain = opensearchDomain(dataStack)
+
+const osPipeline = opensearchPipeline(dataStack,
+  'account',
+  osDomain,
+  backend.data.resources.tables['Account'],
+  backend.data.resources.cfnResources.amplifyDynamoDbTables['Account'],
+  backend.storage.resources.bucket
+)
+
+const osDataSource = backend.data.addOpenSearchDataSource("osDataSource", osDomain);
+
+// /**
+//  * @see https://docs.amplify.aws/gen1/flutter/tools/cli/custom/cdk/ Use CDK to add custom AWS resources
+//  */
 const customStack = backend.createStack('pythonFunctions');
 
 const accountImport = importFunction(customStack, 'account', backend.data.resources.tables['Account'])

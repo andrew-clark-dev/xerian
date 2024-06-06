@@ -34,6 +34,18 @@ const schema = a.schema({
       // items: a.hasMany("Item", "accountId"), // setup relationships between types
     }),
 
+  searchAccounts: a
+    .query()
+    .returns(a.ref("Account").array())
+    .authorization((allow) => [allow.publicApiKey()])
+    .handler(
+      a.handler.custom({
+        entry: "./searchAccountresolver.js",
+        dataSource: "osDataSource",
+      })
+    ),
+
+
   Item: a
     .model({
       sku: a.integer().required(),

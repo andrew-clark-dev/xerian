@@ -18,3 +18,7 @@ samples, guidance on mobile development, and a full API reference.
 Use this for db manipulation
 
 https://github.com/mifi/dynamodump
+
+We are using opensearch to search the entities.
+
+https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/OpenSearchIngestionForDynamoDB.html
