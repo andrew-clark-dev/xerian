@@ -10,6 +10,22 @@ export function request(ctx) {
   return {
     operation: "GET",
     path: "/account/_search",
+    params: {
+      headers: {},
+      queryString: {},
+      body: {
+        from: 0,
+        size: 10,
+        query: {
+            multi_match: { 
+                query: ctx.args.matchString,
+                fields: ['number', 'firstName', 'lastName', 'email', 'address'],
+                type : 'phrase_prefix',
+                lenient: true
+            },
+        },
+      },
+    },
   };
 }
 

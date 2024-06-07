@@ -36,15 +36,15 @@ const schema = a.schema({
 
   searchAccounts: a
     .query()
+    .arguments({ matchString: a.string() })
     .returns(a.ref("Account").array())
-    .authorization((allow) => [allow.publicApiKey()])
     .handler(
       a.handler.custom({
         entry: "./searchAccountresolver.js",
         dataSource: "osDataSource",
       })
-    ),
-
+    )
+    .authorization((allow) => [allow.authenticated()]),
 
   Item: a
     .model({
