@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
-import 'package:xerian/models/Account.dart';
 import 'package:xerian/models/Item.dart';
 import 'package:xerian/services/search_service.dart';
 
@@ -34,8 +33,8 @@ class _ItemFormState extends State<ItemForm> {
         ),
         body: Align(
             alignment: Alignment.topCenter,
-            child: TypeAheadField<Account>(
-              suggestionsCallback: (search) => ss.accountCallback(search),
+            child: TypeAheadField<SimpleSearchReponse>(
+              suggestionsCallback: (search) => ss.accountSearch(search),
               builder: (context, controller, focusNode) {
                 return TextField(
                     controller: controller,
@@ -47,9 +46,8 @@ class _ItemFormState extends State<ItemForm> {
                     ));
               },
               itemBuilder: (context, city) {
-                return ListTile(
-                  title: Text(city.number),
-                  subtitle: Text(city.firstName),
+                return const ListTile(
+                  title: Text("Blah"),
                 );
               },
               onSelected: (city) {

@@ -1,71 +1,61 @@
 import 'dart:convert';
 import 'package:amplify_core/amplify_core.dart';
-import 'package:xerian/models/Account.dart';
 
 class SearchService {
-  static const graphQLDocument = '''
-    query Echo(\$matchString: String!) {
+  static const accountGraphQLDocument = '''
+    query SimpleSearchReponse(\$matchString: String!) {
       searchAccounts(matchString: \$matchString) {
+        id
         number
         firstName
         lastName
+        email
       }
     }
   ''';
 
-  Future<List<Echo>> accountSearch(matchString) async {
+  Future<List<SimpleSearchReponse>> _search(matchString, queryName,
+      graphQLDocument, titleFields, subtitleFields) async {
     final request = GraphQLRequest<String>(
       document: graphQLDocument,
       variables: <String, String>{"matchString": matchString},
     );
     final response = await Amplify.API.query(request: request).response;
-    safePrint(response);
     Map<String, dynamic> jsonMap = json.decode(response.data!);
+    final queryReturns = jsonMap[queryName];
+    if (queryReturns.isEmpty) return [];
     safePrint(jsonMap);
-    List<Echo> result = [];
 
-    // ignore: prefer_typing_uninitialized_variables
-    var echo;
-    for (echo in jsonMap['searchAccounts']) {
-      result.add(Echo.fromJson(echo));
+    List<SimpleSearchReponse> hits = [];
+
+    for (var hit in queryReturns) {
+      hits.add(SimpleSearchReponse.fromJson(hit, titleFields, subtitleFields));
     }
 
-    return result;
-
-//    EchoResponse echoResponse = EchoResponse.fromJson(jsonMap);
-//    return echoResponse.echos;
+    return hits;
   }
 
-  Future<List<Account>> accountCallback(String pattern) async =>
-      Future<List<Account>>.delayed(
-        const Duration(milliseconds: 300),
-        () => [Account(number: '1', firstName: 'andrew')],
-      );
-}
-
-class EchoResponse {
-  final List<Echo> echos;
-
-  EchoResponse({required this.echos});
-
-  factory EchoResponse.fromJson(Map<String, dynamic> json) {
-    return EchoResponse(echos: [] // Echo.fromJson(json['echo']),
-        );
+  Future<List<SimpleSearchReponse>> accountSearch(matchString) async {
+    return _search(matchString, 'searchAccounts', accountGraphQLDocument,
+        ['number'], ['firstName', 'lastName', 'email']);
   }
 }
 
-class Echo {
-  final String number;
-  final String firstName;
-  final String? lastName;
+class SimpleSearchReponse {
+  final String? id;
+  final String? title;
+  final String? subtitle;
 
-  Echo({required this.number, required this.firstName, this.lastName});
+  SimpleSearchReponse({this.id, this.title, this.subtitle});
 
-  factory Echo.fromJson(Map<String, dynamic> json) {
-    return Echo(
-      number: json['number'],
-      firstName: json['firstName'],
-      lastName: json['lastName'],
+  factory SimpleSearchReponse.fromJson(
+      Map<String, dynamic> json, titleFields, subtitleFields) {
+    safePrint(json);
+
+    return SimpleSearchReponse(
+      id: json['id'],
+      title: titleFields.map((field) => json[field]).join(' '),
+      subtitle: subtitleFields.map((field) => json[field]).join(' '),
     );
   }
 }

@@ -43,7 +43,7 @@ class DashboardView extends StatelessWidget implements Routable {
               },
               child: const Text('Enabled'),
             ),
-            TypeAheadField<Echo>(
+            TypeAheadField<SimpleSearchReponse>(
               suggestionsCallback: (search) => ss.accountSearch(search),
               builder: (context, controller, focusNode) {
                 return TextField(
@@ -52,16 +52,16 @@ class DashboardView extends StatelessWidget implements Routable {
                     autofocus: true,
                     decoration: const InputDecoration(
                       border: OutlineInputBorder(),
-                      labelText: 'City',
+                      labelText: 'Account',
                     ));
               },
-              itemBuilder: (context, city) {
+              itemBuilder: (context, simpleSearchResponse) {
                 return ListTile(
-                  title: Text(city.number),
-                  subtitle: Text(city.firstName),
+                  title: Text(simpleSearchResponse.title ?? ""),
+                  subtitle: Text(simpleSearchResponse.subtitle ?? ""),
                 );
               },
-              onSelected: (Echo value) {},
+              onSelected: (SimpleSearchReponse value) {},
             )
           ]),
         ));

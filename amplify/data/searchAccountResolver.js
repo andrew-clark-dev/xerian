@@ -19,7 +19,7 @@ export function request(ctx) {
         query: {
             multi_match: { 
                 query: ctx.args.matchString,
-                fields: ['number', 'firstName', 'lastName', 'email', 'address'],
+                fields: ['number', 'firstName', 'lastName', 'email'],
                 type : 'phrase_prefix',
                 lenient: true
             },
