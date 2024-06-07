@@ -32,7 +32,7 @@ class AppDrawer extends StatelessWidget {
             ),
             child: Text('Drawer Header'),
           ),
-          _listTile(context, const DashboardView(), 'Dashboard'),
+          _listTile(context, DashboardView(), 'Dashboard'),
           _listTile(context, const ItemListView(), 'Items'),
 
           ListTile(

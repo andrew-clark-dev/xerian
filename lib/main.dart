@@ -73,7 +73,7 @@ GoRoute _routeExtra(RoutableExtra page) {
 final GoRouter _router = GoRouter(
   routes: <RouteBase>[
     _route(const LoginScreen()),
-    _route(const DashboardView()),
+    _route(DashboardView()),
     _routeExtra(const AccountView()),
     _route(const AccountListView()),
     _routeExtra(const ItemView()),
