@@ -29,7 +29,7 @@ class Item extends amplify_core.Model {
   static const classType = const _ItemModelType();
   final String id;
   final int? _sku;
-  final List<ItemCategory>? _categories;
+  final Category? _category;
   final String? _description;
   final String? _details;
   final List<String>? _images;
@@ -66,8 +66,8 @@ class Item extends amplify_core.Model {
     }
   }
   
-  List<ItemCategory>? get categories {
-    return _categories;
+  Category? get category {
+    return _category;
   }
   
   String get description {
@@ -115,13 +115,13 @@ class Item extends amplify_core.Model {
     return _updatedAt;
   }
   
-  const Item._internal({required this.id, required sku, categories, required description, details, images, quality, split, status, original, createdAt, updatedAt}): _sku = sku, _categories = categories, _description = description, _details = details, _images = images, _quality = quality, _split = split, _status = status, _original = original, _createdAt = createdAt, _updatedAt = updatedAt;
+  const Item._internal({required this.id, required sku, category, required description, details, images, quality, split, status, original, createdAt, updatedAt}): _sku = sku, _category = category, _description = description, _details = details, _images = images, _quality = quality, _split = split, _status = status, _original = original, _createdAt = createdAt, _updatedAt = updatedAt;
   
-  factory Item({String? id, required int sku, List<ItemCategory>? categories, required String description, String? details, List<String>? images, ItemQuality? quality, int? split, ItemStatus? status, String? original}) {
+  factory Item({String? id, required int sku, Category? category, required String description, String? details, List<String>? images, ItemQuality? quality, int? split, ItemStatus? status, String? original}) {
     return Item._internal(
       id: id == null ? amplify_core.UUID.getUUID() : id,
       sku: sku,
-      categories: categories != null ? List<ItemCategory>.unmodifiable(categories) : categories,
+      category: category,
       description: description,
       details: details,
       images: images != null ? List<String>.unmodifiable(images) : images,
@@ -141,7 +141,7 @@ class Item extends amplify_core.Model {
     return other is Item &&
       id == other.id &&
       _sku == other._sku &&
-      DeepCollectionEquality().equals(_categories, other._categories) &&
+      _category == other._category &&
       _description == other._description &&
       _details == other._details &&
       DeepCollectionEquality().equals(_images, other._images) &&
@@ -161,6 +161,7 @@ class Item extends amplify_core.Model {
     buffer.write("Item {");
     buffer.write("id=" + "$id" + ", ");
     buffer.write("sku=" + (_sku != null ? _sku.toString() : "null") + ", ");
+    buffer.write("category=" + (_category != null ? _category.toString() : "null") + ", ");
     buffer.write("description=" + "$_description" + ", ");
     buffer.write("details=" + "$_details" + ", ");
     buffer.write("images=" + (_images != null ? _images.toString() : "null") + ", ");
@@ -175,11 +176,11 @@ class Item extends amplify_core.Model {
     return buffer.toString();
   }
   
-  Item copyWith({int? sku, List<ItemCategory>? categories, String? description, String? details, List<String>? images, ItemQuality? quality, int? split, ItemStatus? status, String? original}) {
+  Item copyWith({int? sku, Category? category, String? description, String? details, List<String>? images, ItemQuality? quality, int? split, ItemStatus? status, String? original}) {
     return Item._internal(
       id: id,
       sku: sku ?? this.sku,
-      categories: categories ?? this.categories,
+      category: category ?? this.category,
       description: description ?? this.description,
       details: details ?? this.details,
       images: images ?? this.images,
@@ -191,7 +192,7 @@ class Item extends amplify_core.Model {
   
   Item copyWithModelFieldValues({
     ModelFieldValue<int>? sku,
-    ModelFieldValue<List<ItemCategory>?>? categories,
+    ModelFieldValue<Category?>? category,
     ModelFieldValue<String>? description,
     ModelFieldValue<String?>? details,
     ModelFieldValue<List<String>?>? images,
@@ -203,7 +204,7 @@ class Item extends amplify_core.Model {
     return Item._internal(
       id: id,
       sku: sku == null ? this.sku : sku.value,
-      categories: categories == null ? this.categories : categories.value,
+      category: category == null ? this.category : category.value,
       description: description == null ? this.description : description.value,
       details: details == null ? this.details : details.value,
       images: images == null ? this.images : images.value,
@@ -217,19 +218,11 @@ class Item extends amplify_core.Model {
   Item.fromJson(Map<String, dynamic> json)  
     : id = json['id'],
       _sku = (json['sku'] as num?)?.toInt(),
-      _categories = json['categories']  is Map
-        ? (json['categories']['items'] is List
-          ? (json['categories']['items'] as List)
-              .where((e) => e != null)
-              .map((e) => ItemCategory.fromJson(new Map<String, dynamic>.from(e)))
-              .toList()
-          : null)
-        : (json['categories'] is List
-          ? (json['categories'] as List)
-              .where((e) => e?['serializedData'] != null)
-              .map((e) => ItemCategory.fromJson(new Map<String, dynamic>.from(e?['serializedData'])))
-              .toList()
-          : null),
+      _category = json['category'] != null
+        ? json['category']['serializedData'] != null
+          ? Category.fromJson(new Map<String, dynamic>.from(json['category']['serializedData']))
+          : Category.fromJson(new Map<String, dynamic>.from(json['category']))
+        : null,
       _description = json['description'],
       _details = json['details'],
       _images = json['images']?.cast<String>(),
@@ -241,13 +234,13 @@ class Item extends amplify_core.Model {
       _updatedAt = json['updatedAt'] != null ? amplify_core.TemporalDateTime.fromString(json['updatedAt']) : null;
   
   Map<String, dynamic> toJson() => {
-    'id': id, 'sku': _sku, 'categories': _categories?.map((ItemCategory? e) => e?.toJson()).toList(), 'description': _description, 'details': _details, 'images': _images, 'quality': amplify_core.enumToString(_quality), 'split': _split, 'status': amplify_core.enumToString(_status), 'original': _original, 'createdAt': _createdAt?.format(), 'updatedAt': _updatedAt?.format()
+    'id': id, 'sku': _sku, 'category': _category?.toJson(), 'description': _description, 'details': _details, 'images': _images, 'quality': amplify_core.enumToString(_quality), 'split': _split, 'status': amplify_core.enumToString(_status), 'original': _original, 'createdAt': _createdAt?.format(), 'updatedAt': _updatedAt?.format()
   };
   
   Map<String, Object?> toMap() => {
     'id': id,
     'sku': _sku,
-    'categories': _categories,
+    'category': _category,
     'description': _description,
     'details': _details,
     'images': _images,
@@ -262,9 +255,9 @@ class Item extends amplify_core.Model {
   static final amplify_core.QueryModelIdentifier<ItemModelIdentifier> MODEL_IDENTIFIER = amplify_core.QueryModelIdentifier<ItemModelIdentifier>();
   static final ID = amplify_core.QueryField(fieldName: "id");
   static final SKU = amplify_core.QueryField(fieldName: "sku");
-  static final CATEGORIES = amplify_core.QueryField(
-    fieldName: "categories",
-    fieldType: amplify_core.ModelFieldType(amplify_core.ModelFieldTypeEnum.model, ofModelName: 'ItemCategory'));
+  static final CATEGORY = amplify_core.QueryField(
+    fieldName: "category",
+    fieldType: amplify_core.ModelFieldType(amplify_core.ModelFieldTypeEnum.model, ofModelName: 'Category'));
   static final DESCRIPTION = amplify_core.QueryField(fieldName: "description");
   static final DETAILS = amplify_core.QueryField(fieldName: "details");
   static final IMAGES = amplify_core.QueryField(fieldName: "images");
@@ -295,11 +288,11 @@ class Item extends amplify_core.Model {
       ofType: amplify_core.ModelFieldType(amplify_core.ModelFieldTypeEnum.int)
     ));
     
-    modelSchemaDefinition.addField(amplify_core.ModelFieldDefinition.hasMany(
-      key: Item.CATEGORIES,
+    modelSchemaDefinition.addField(amplify_core.ModelFieldDefinition.belongsTo(
+      key: Item.CATEGORY,
       isRequired: false,
-      ofModelName: 'ItemCategory',
-      associatedKey: ItemCategory.ITEM
+      targetNames: ['itemId'],
+      ofModelName: 'Category'
     ));
     
     modelSchemaDefinition.addField(amplify_core.ModelFieldDefinition.field(

@@ -51,7 +51,9 @@ const schema = a.schema({
       sku: a.integer().required(),
       // accountId: a.id(),
       // account: a.belongsTo("Account", "accountId"),
-      categories: a.hasMany("ItemCategory", "itemId"),
+      // 1. Create a reference field
+      itemId: a.id(),
+      category: a.belongsTo('Category', 'itemId'),
       description: a.string().required(),
       details: a.string(),
       images: a.url().array(), // fields can be arrays,
@@ -61,25 +63,13 @@ const schema = a.schema({
       original: a.json(),
     }),
 
-  ItemCategory: a.model({
-    // 1. Create reference fields to both ends of
-    //    the many-to-many relationship
-    itemId: a.id().required(),
-    categoryId: a.id().required(),
-    // 2. Create relationship fields to both ends of
-    //    the many-to-many relationship using their
-    //    respective reference fields
-    item: a.belongsTo("Item", "itemId"),
-    category: a.belongsTo("Category", "categoryId"),
-  }),
-
   Category: a
     .model({
-      type: a.enum(["department", "colour", "brand", "size"]),
-      items: a.hasMany("ItemCategory", "categoryId"),
-      value: a.string(),
-    })
-    .secondaryIndexes((index) => [index("type")]),
+      item: a.hasMany('Item', 'itemId'),
+      //items: a.hasMany("ItemCategory", "categoryId"),
+      value: a.string().required(),
+      alternatives: a.string().array(),
+    }),
 
   Sale: a
     .model({

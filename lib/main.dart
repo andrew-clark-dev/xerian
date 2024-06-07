@@ -8,6 +8,8 @@ import 'package:xerian/amplify_config_service.dart';
 
 import 'package:go_router/go_router.dart';
 import 'package:xerian/models/ModelProvider.dart';
+import 'package:xerian/pages/category/category_list_view.dart';
+import 'package:xerian/pages/category/category_view.dart';
 import 'package:xerian/pages/item/item_form.dart';
 
 import 'pages/account/account_list_view.dart';
@@ -79,6 +81,8 @@ final GoRouter _router = GoRouter(
     _routeExtra(const ItemView()),
     _route(const ItemListView()),
     _route(const ItemForm()),
+    _route(const CategoryView()),
+    _route(const CategoryListView()),
     GoRoute(
       path: WebChromeSettings.path,
       builder: (BuildContext context, GoRouterState state) {

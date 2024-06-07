@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:xerian/models/Item.dart';
 import 'package:xerian/services/search_service.dart';
@@ -24,6 +25,7 @@ class ItemForm extends StatefulWidget implements RoutableExtra {
 
 class _ItemFormState extends State<ItemForm> {
   SearchService ss = SearchService();
+  final _formKey = GlobalKey<FormBuilderState>();
 
   @override
   Widget build(BuildContext context) {
@@ -31,32 +33,36 @@ class _ItemFormState extends State<ItemForm> {
         appBar: AppBar(
           title: const Text("Add Item"),
         ),
-        body: Align(
-            alignment: Alignment.topCenter,
-            child: TypeAheadField<SimpleSearchReponse>(
-              suggestionsCallback: (search) => ss.accountSearch(search),
-              builder: (context, controller, focusNode) {
-                return TextField(
-                    controller: controller,
-                    focusNode: focusNode,
-                    autofocus: true,
-                    decoration: const InputDecoration(
-                      border: OutlineInputBorder(),
-                      labelText: 'City',
-                    ));
-              },
-              itemBuilder: (context, city) {
-                return const ListTile(
-                  title: Text("Blah"),
-                );
-              },
-              onSelected: (city) {
-                // Navigator.of(context).push<void>(
-                //   MaterialPageRoute(
-                //     builder: (context) => CityPage(city: city),
-                //   ),
-                // );
-              },
-            )));
+        body: SingleChildScrollView(
+            child: FormBuilder(
+                key: _formKey,
+                child: Column(children: <Widget>[
+                  FormBuilderField(
+                    name: "account",
+                    builder: (FormFieldState<dynamic> field) {
+                      return TypeAheadField<SimpleSearchReponse>(
+                        suggestionsCallback: (search) =>
+                            ss.accountSearch(search),
+                        builder: (context, controller, focusNode) {
+                          return TextField(
+                              controller: controller,
+                              focusNode: focusNode,
+                              autofocus: true,
+                              decoration: const InputDecoration(
+                                border: OutlineInputBorder(),
+                                labelText: 'Account',
+                              ));
+                        },
+                        itemBuilder: (context, simpleSearchResponse) {
+                          return ListTile(
+                            title: Text(simpleSearchResponse.title ?? ""),
+                            subtitle: Text(simpleSearchResponse.subtitle ?? ""),
+                          );
+                        },
+                        onSelected: (SimpleSearchReponse value) {},
+                      );
+                    },
+                  ),
+                ]))));
   }
 }
