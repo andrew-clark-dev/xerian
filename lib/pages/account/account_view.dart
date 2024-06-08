@@ -18,7 +18,7 @@ class AccountView extends StatefulWidget implements RoutableExtra {
   String get path => '/account';
 
   @override
-  void extra(Object extra) => AccountView(account: extra as Account);
+  extra(Object extra) => AccountView(account: extra as Account);
 
   @override
   State<AccountView> createState() => _AccountListViewState();

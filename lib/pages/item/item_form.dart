@@ -17,7 +17,7 @@ class ItemForm extends StatefulWidget implements RoutableExtra {
   String get path => '/itemadd';
 
   @override
-  void extra(Object extra) => ItemForm(account: extra as Item);
+  extra(Object extra) => ItemForm(account: extra as Item);
 
   @override
   State<ItemForm> createState() => _ItemFormState();

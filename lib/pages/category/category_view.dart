@@ -1,6 +1,7 @@
 import 'package:amplify_api/amplify_api.dart';
 import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:xerian/models/Category.dart' as models;
+import 'package:xerian/models/ModelProvider.dart';
 import 'package:xerian/pages/routable.dart';
 import 'package:flutter/material.dart';
 import 'package:form_validation/form_validation.dart';
@@ -16,7 +17,7 @@ class CategoryView extends StatefulWidget implements RoutableExtra {
   String get path => '/category';
 
   @override
-  void extra(Object extra) => CategoryView(category: extra as models.Category);
+  extra(Object extra) => CategoryView(category: extra as models.Category);
 
   @override
   State<CategoryView> createState() => _CategoryListViewState();
@@ -25,6 +26,7 @@ class CategoryView extends StatefulWidget implements RoutableExtra {
 class _CategoryListViewState extends State<CategoryView> {
   final _formKey = GlobalKey<FormState>();
 
+  final TextEditingController _typeController = TextEditingController();
   final TextEditingController _valueController = TextEditingController();
   final TextEditingController _alternativesController = TextEditingController();
 
@@ -41,7 +43,9 @@ class _CategoryListViewState extends State<CategoryView> {
     var category = widget.category;
 
     if (category != null) {
+      _typeController.text = category.type!.name;
       _valueController.text = category.value;
+      _alternativesController.text = category.alternatives?.join(' ') ?? '';
 
       _titleText = 'Update Category';
     } else {
@@ -57,14 +61,19 @@ class _CategoryListViewState extends State<CategoryView> {
 
   Future<void> _submitForm(ScaffoldMessengerState scaffoldMessenger) async {
     // If the form is valid, submit the data
+    final type = CategoryType.values.byName(_typeController.text);
+
     final value = _valueController.text;
-    final alternatives =
-        _alternativesController.text.split(',').map((e) => e.trim()).toList();
+    // Compress all white space just incase the user put in a few extra spaces
+    final alternatives = _alternativesController.text
+        .trim()
+        .replaceAll(RegExp(' +'), ' ')
+        .split(' ');
 
     // if (_isCreate) {
     // Create a new Category entry
     final newCategory =
-        models.Category(value: value, alternatives: alternatives);
+        models.Category(type: type, value: value, alternatives: alternatives);
 
     final request = ModelMutations.create(newCategory);
 
@@ -113,6 +122,13 @@ class _CategoryListViewState extends State<CategoryView> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    DropdownMenu(
+                        controller: _typeController,
+                        dropdownMenuEntries: CategoryType.values
+                            .map((e) => DropdownMenuEntry<CategoryType>(
+                                value: e, label: e.name))
+                            .toList(),
+                        initialSelection: CategoryType.department),
                     TextFormField(
                       controller: _valueController,
                       decoration: const InputDecoration(
@@ -125,13 +141,8 @@ class _CategoryListViewState extends State<CategoryView> {
                     ),
                     TextFormField(
                       controller: _alternativesController,
-                      decoration: const InputDecoration(
-                        labelText: 'Alternatives',
-                      ),
-                      validator: (value) {
-                        return stringListValidator.validate(
-                            label: 'List', value: value);
-                      },
+                      decoration:
+                          const InputDecoration(labelText: 'Alternatives'),
                     ),
                     const SizedBox(height: 20),
                     ElevatedButton(

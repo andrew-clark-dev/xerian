@@ -53,7 +53,10 @@ const schema = a.schema({
       // account: a.belongsTo("Account", "accountId"),
       // 1. Create a reference field
       itemId: a.id(),
-      category: a.belongsTo('Category', 'itemId'),
+      category: a.string(),
+      brand: a.string(),
+      color: a.string(),
+      size: a.string(),
       description: a.string().required(),
       details: a.string(),
       images: a.url().array(), // fields can be arrays,
@@ -65,8 +68,7 @@ const schema = a.schema({
 
   Category: a
     .model({
-      item: a.hasMany('Item', 'itemId'),
-      //items: a.hasMany("ItemCategory", "categoryId"),
+      type: a.enum(["department", "colour", "brand", "size"]),
       value: a.string().required(),
       alternatives: a.string().array(),
     }),

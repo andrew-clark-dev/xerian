@@ -33,6 +33,13 @@ export function opensearchDomain(stack: Stack) {
             removalPolicy: RemovalPolicy.DESTROY,
         }
     );
+
+    // Create a CloudWatch log group
+    const logGroup = new logs.LogGroup(stack, "LogGroup", {
+        logGroupName: "/aws/vendedlogs/OpenSearchService/pipelines",
+        removalPolicy: RemovalPolicy.DESTROY,
+    });
+
     return openSearchDomain!;
 
 }
@@ -138,23 +145,15 @@ dynamodb-pipeline:
           region: "${stack.region}"
 `;
 
-
-    // Create a CloudWatch log group
-    const logGroup = new logs.LogGroup(stack, "LogGroup", {
-        logGroupName: "/aws/vendedlogs/OpenSearchService/pipelines",
-        removalPolicy: RemovalPolicy.DESTROY,
-    });
-
-
     // Create an OpenSearch Integration Service pipeline
     const cfnPipeline = new osis.CfnPipeline(
         stack,
-        "OpenSearchIntegrationPipeline",
+        `OpenSearchIntegrationPipeline-${indexName}`,
         {
             maxUnits: 4,
             minUnits: 1,
             pipelineConfigurationBody: openSearchTemplate,
-            pipelineName: "dynamodb-integration",
+            pipelineName: `db-integration-${indexName}`,
             logPublishingOptions: {
                 isLoggingEnabled: true,
                 cloudWatchLogDestination: {

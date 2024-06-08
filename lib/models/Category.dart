@@ -28,7 +28,7 @@ import 'package:collection/collection.dart';
 class Category extends amplify_core.Model {
   static const classType = const _CategoryModelType();
   final String id;
-  final List<Item>? _item;
+  final CategoryType? _type;
   final String? _value;
   final List<String>? _alternatives;
   final amplify_core.TemporalDateTime? _createdAt;
@@ -47,8 +47,8 @@ class Category extends amplify_core.Model {
       );
   }
   
-  List<Item>? get item {
-    return _item;
+  CategoryType? get type {
+    return _type;
   }
   
   String get value {
@@ -76,12 +76,12 @@ class Category extends amplify_core.Model {
     return _updatedAt;
   }
   
-  const Category._internal({required this.id, item, required value, alternatives, createdAt, updatedAt}): _item = item, _value = value, _alternatives = alternatives, _createdAt = createdAt, _updatedAt = updatedAt;
+  const Category._internal({required this.id, type, required value, alternatives, createdAt, updatedAt}): _type = type, _value = value, _alternatives = alternatives, _createdAt = createdAt, _updatedAt = updatedAt;
   
-  factory Category({String? id, List<Item>? item, required String value, List<String>? alternatives}) {
+  factory Category({String? id, CategoryType? type, required String value, List<String>? alternatives}) {
     return Category._internal(
       id: id == null ? amplify_core.UUID.getUUID() : id,
-      item: item != null ? List<Item>.unmodifiable(item) : item,
+      type: type,
       value: value,
       alternatives: alternatives != null ? List<String>.unmodifiable(alternatives) : alternatives);
   }
@@ -95,7 +95,7 @@ class Category extends amplify_core.Model {
     if (identical(other, this)) return true;
     return other is Category &&
       id == other.id &&
-      DeepCollectionEquality().equals(_item, other._item) &&
+      _type == other._type &&
       _value == other._value &&
       DeepCollectionEquality().equals(_alternatives, other._alternatives);
   }
@@ -109,6 +109,7 @@ class Category extends amplify_core.Model {
     
     buffer.write("Category {");
     buffer.write("id=" + "$id" + ", ");
+    buffer.write("type=" + (_type != null ? amplify_core.enumToString(_type)! : "null") + ", ");
     buffer.write("value=" + "$_value" + ", ");
     buffer.write("alternatives=" + (_alternatives != null ? _alternatives.toString() : "null") + ", ");
     buffer.write("createdAt=" + (_createdAt != null ? _createdAt.format() : "null") + ", ");
@@ -118,22 +119,22 @@ class Category extends amplify_core.Model {
     return buffer.toString();
   }
   
-  Category copyWith({List<Item>? item, String? value, List<String>? alternatives}) {
+  Category copyWith({CategoryType? type, String? value, List<String>? alternatives}) {
     return Category._internal(
       id: id,
-      item: item ?? this.item,
+      type: type ?? this.type,
       value: value ?? this.value,
       alternatives: alternatives ?? this.alternatives);
   }
   
   Category copyWithModelFieldValues({
-    ModelFieldValue<List<Item>?>? item,
+    ModelFieldValue<CategoryType?>? type,
     ModelFieldValue<String>? value,
     ModelFieldValue<List<String>?>? alternatives
   }) {
     return Category._internal(
       id: id,
-      item: item == null ? this.item : item.value,
+      type: type == null ? this.type : type.value,
       value: value == null ? this.value : value.value,
       alternatives: alternatives == null ? this.alternatives : alternatives.value
     );
@@ -141,31 +142,19 @@ class Category extends amplify_core.Model {
   
   Category.fromJson(Map<String, dynamic> json)  
     : id = json['id'],
-      _item = json['item']  is Map
-        ? (json['item']['items'] is List
-          ? (json['item']['items'] as List)
-              .where((e) => e != null)
-              .map((e) => Item.fromJson(new Map<String, dynamic>.from(e)))
-              .toList()
-          : null)
-        : (json['item'] is List
-          ? (json['item'] as List)
-              .where((e) => e?['serializedData'] != null)
-              .map((e) => Item.fromJson(new Map<String, dynamic>.from(e?['serializedData'])))
-              .toList()
-          : null),
+      _type = amplify_core.enumFromString<CategoryType>(json['type'], CategoryType.values),
       _value = json['value'],
       _alternatives = json['alternatives']?.cast<String>(),
       _createdAt = json['createdAt'] != null ? amplify_core.TemporalDateTime.fromString(json['createdAt']) : null,
       _updatedAt = json['updatedAt'] != null ? amplify_core.TemporalDateTime.fromString(json['updatedAt']) : null;
   
   Map<String, dynamic> toJson() => {
-    'id': id, 'item': _item?.map((Item? e) => e?.toJson()).toList(), 'value': _value, 'alternatives': _alternatives, 'createdAt': _createdAt?.format(), 'updatedAt': _updatedAt?.format()
+    'id': id, 'type': amplify_core.enumToString(_type), 'value': _value, 'alternatives': _alternatives, 'createdAt': _createdAt?.format(), 'updatedAt': _updatedAt?.format()
   };
   
   Map<String, Object?> toMap() => {
     'id': id,
-    'item': _item,
+    'type': _type,
     'value': _value,
     'alternatives': _alternatives,
     'createdAt': _createdAt,
@@ -174,9 +163,7 @@ class Category extends amplify_core.Model {
 
   static final amplify_core.QueryModelIdentifier<CategoryModelIdentifier> MODEL_IDENTIFIER = amplify_core.QueryModelIdentifier<CategoryModelIdentifier>();
   static final ID = amplify_core.QueryField(fieldName: "id");
-  static final ITEM = amplify_core.QueryField(
-    fieldName: "item",
-    fieldType: amplify_core.ModelFieldType(amplify_core.ModelFieldTypeEnum.model, ofModelName: 'Item'));
+  static final TYPE = amplify_core.QueryField(fieldName: "type");
   static final VALUE = amplify_core.QueryField(fieldName: "value");
   static final ALTERNATIVES = amplify_core.QueryField(fieldName: "alternatives");
   static var schema = amplify_core.Model.defineSchema(define: (amplify_core.ModelSchemaDefinition modelSchemaDefinition) {
@@ -196,11 +183,10 @@ class Category extends amplify_core.Model {
     
     modelSchemaDefinition.addField(amplify_core.ModelFieldDefinition.id());
     
-    modelSchemaDefinition.addField(amplify_core.ModelFieldDefinition.hasMany(
-      key: Category.ITEM,
+    modelSchemaDefinition.addField(amplify_core.ModelFieldDefinition.field(
+      key: Category.TYPE,
       isRequired: false,
-      ofModelName: 'Item',
-      associatedKey: Item.CATEGORY
+      ofType: amplify_core.ModelFieldType(amplify_core.ModelFieldTypeEnum.enumeration)
     ));
     
     modelSchemaDefinition.addField(amplify_core.ModelFieldDefinition.field(

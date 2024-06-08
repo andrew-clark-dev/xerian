@@ -70,15 +70,16 @@ class _CategoryListViewState extends State<CategoryListView> {
   }
 
   Future<void> _navigateToCategory({models.Category? category}) async {
-    context.push('/Category', extra: Category);
+    context.push('/Category', extra: category);
     // Refresh the entries when returning from Category detail screen.
     await _refreshCategorys();
   }
 
   Widget _buildRow(models.Category category, {TextStyle? style}) {
     return RowService.buildRow([
+      category.type!.name,
       category.value,
-      category.alternatives.toString().replaceAll(RegExp(r'^.|.$'), ''),
+      category.alternatives?.join(' '),
     ], style);
   }
 
@@ -104,7 +105,7 @@ class _CategoryListViewState extends State<CategoryListView> {
               children: [
                 const SizedBox(height: 30),
                 RowService.buildRow(
-                  ['Value', 'Alternatives'],
+                  ['Type', 'Value', 'Alternatives'],
                   Theme.of(context).textTheme.titleMedium,
                 ),
                 const Divider(),

@@ -25,11 +25,19 @@ const dataStack = Stack.of(backend.data);
 
 const osDomain = opensearchDomain(dataStack)
 
-const osPipeline = opensearchPipeline(dataStack,
+opensearchPipeline(dataStack,
   'account',
   osDomain,
   backend.data.resources.tables['Account'],
   backend.data.resources.cfnResources.amplifyDynamoDbTables['Account'],
+  backend.storage.resources.bucket
+)
+
+opensearchPipeline(dataStack,
+  'category',
+  osDomain,
+  backend.data.resources.tables['Category'],
+  backend.data.resources.cfnResources.amplifyDynamoDbTables['Category'],
   backend.storage.resources.bucket
 )
 

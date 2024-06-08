@@ -19,7 +19,7 @@ class ItemView extends StatefulWidget implements RoutableExtra {
   String get path => '/item';
 
   @override
-  void extra(Object extra) => ItemView(item: extra as Item);
+  extra(Object extra) => ItemView(item: extra as Item);
 
   @override
   State<ItemView> createState() => _ItemListViewState();

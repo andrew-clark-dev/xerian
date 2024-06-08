@@ -5,5 +5,5 @@ abstract class Routable implements Widget {
 }
 
 abstract class RoutableExtra extends Routable {
-  void extra(Object extra);
+  StatefulWidget extra(Object extra);
 }

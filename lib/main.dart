@@ -58,15 +58,14 @@ GoRoute _route(Routable page) {
   );
 }
 
-GoRoute _routeExtra(RoutableExtra page) {
+GoRoute _routeExtra(RoutableExtra prototype) {
   return GoRoute(
-    path: page.path,
+    path: prototype.path,
     builder: (BuildContext context, GoRouterState state) {
       if (state.extra != null) {
-        page.extra(state.extra!);
-        return AccountView(account: state.extra as Account);
+        return prototype.extra(state.extra!);
       }
-      return page;
+      return prototype;
     },
   );
 }
@@ -81,7 +80,7 @@ final GoRouter _router = GoRouter(
     _routeExtra(const ItemView()),
     _route(const ItemListView()),
     _route(const ItemForm()),
-    _route(const CategoryView()),
+    _routeExtra(const CategoryView()),
     _route(const CategoryListView()),
     GoRoute(
       path: WebChromeSettings.path,
