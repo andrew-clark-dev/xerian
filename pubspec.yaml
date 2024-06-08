@@ -52,6 +52,7 @@ dependencies:
   flutter_form_builder: ^9.2.1
   form_builder_validators: ^9.1.0
   flutter_typeahead: ^5.2.0
+  material_symbols_icons: ^4.2758.0
 dev_dependencies:
   flutter_test:
     sdk: flutter

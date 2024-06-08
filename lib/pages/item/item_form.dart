@@ -1,68 +1,93 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
-import 'package:xerian/models/Item.dart';
-import 'package:xerian/services/search_service.dart';
 
+import '../../services/search_service.dart';
+import '../../widgets/dropdown.dart';
 import '../routable.dart';
 
-class ItemForm extends StatefulWidget implements RoutableExtra {
-  final Item? account;
-  const ItemForm({
-    super.key,
-    this.account,
-  });
+// Define a custom Form widget.
+class ItemForm extends StatefulWidget implements Routable {
+  const ItemForm({super.key});
 
   @override
-  String get path => '/itemadd';
+  String get path => '/newitem';
 
   @override
-  extra(Object extra) => ItemForm(account: extra as Item);
-
-  @override
-  State<ItemForm> createState() => _ItemFormState();
+  ItemFormState createState() {
+    return ItemFormState();
+  }
 }
 
-class _ItemFormState extends State<ItemForm> {
-  SearchService ss = SearchService();
-  final _formKey = GlobalKey<FormBuilderState>();
+// Define a corresponding State class.
+// This class holds data related to the form.
+class ItemFormState extends State<ItemForm> {
+  // Create a global key that uniquely identifies the Form widget
+  // and allows validation of the form.
+  //
+  // Note: This is a `GlobalKey<FormState>`,
+  // not a GlobalKey<ItemFormState>.
+  final _formKey = GlobalKey<FormState>();
+
+  final searchService = SearchService();
+
+  @override
+  void initState() {
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: const Text("Add Item"),
+          title: const Text("New Item"),
         ),
-        body: SingleChildScrollView(
-            child: FormBuilder(
-                key: _formKey,
-                child: Column(children: <Widget>[
-                  FormBuilderField(
-                    name: "account",
-                    builder: (FormFieldState<dynamic> field) {
-                      return TypeAheadField<SimpleSearchReponse>(
-                        suggestionsCallback: (search) =>
-                            ss.accountSearch(search),
-                        builder: (context, controller, focusNode) {
-                          return TextField(
-                              controller: controller,
-                              focusNode: focusNode,
-                              autofocus: true,
-                              decoration: const InputDecoration(
-                                border: OutlineInputBorder(),
-                                labelText: 'Account',
-                              ));
-                        },
-                        itemBuilder: (context, simpleSearchResponse) {
-                          return ListTile(
-                            title: Text(simpleSearchResponse.title ?? ""),
-                            subtitle: Text(simpleSearchResponse.subtitle ?? ""),
-                          );
-                        },
-                        onSelected: (SimpleSearchReponse value) {},
-                      );
-                    },
-                  ),
-                ]))));
+        body: Form(
+          // Build a Form widget using the _formKey created above.
+          key: _formKey,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              TextFormField(
+                decoration: const InputDecoration(
+                  border: UnderlineInputBorder(),
+                  labelText: 'Enter your username',
+                ),
+                // The validator receives the text that the user has entered.
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter some text';
+                  }
+                  return null;
+                },
+              ),
+              TypeAheadField<SimpleSearchReponse>(
+                suggestionsCallback: (search) =>
+                    searchService.accountSearch(search),
+                builder: (context, controller, focusNode) {
+                  return TextField(
+                      controller: controller,
+                      focusNode: focusNode,
+                      autofocus: true,
+                      decoration: const InputDecoration(
+                        border: OutlineInputBorder(),
+                        labelText: 'Account',
+                      ));
+                },
+                itemBuilder: (context, simpleSearchResponse) {
+                  return ListTile(
+                    title: Text(simpleSearchResponse.title ?? ""),
+                    subtitle: Text(simpleSearchResponse.subtitle ?? ""),
+                  );
+                },
+                onSelected: (SimpleSearchReponse value) {},
+              ),
+              const SizedBox(width: 100),
+              const DepartmentDropDown(),
+              const ColourDropDown(),
+              const BrandDropDown(),
+              const SizeDropDown(),
+            ],
+          ),
+        ));
   }
 }
