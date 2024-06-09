@@ -27,12 +27,10 @@ class ModelListView extends StatefulWidget implements Routable {
 
 class _ModelListViewState extends State<ModelListView> {
   late Api api;
-  late TileService tileService;
   @override
   void initState() {
     super.initState();
     api = Api(widget.modelType);
-    tileService = TileService(widget.fields);
     _fetchMore();
   }
 
@@ -56,7 +54,7 @@ class _ModelListViewState extends State<ModelListView> {
     }
   }
 
-  NotificationListener listener() {
+  NotificationListener listener(TileService tileService) {
     return NotificationListener<ScrollNotification>(
       onNotification: (notification) {
         if (notification is ScrollEndNotification &&
@@ -93,6 +91,7 @@ class _ModelListViewState extends State<ModelListView> {
 
   @override
   Widget build(BuildContext context) {
+    final tileService = TileService(widget.fields, context);
     return Scaffold(
         appBar: AppBar(
           title: Text(widget.modelType.modelName().capitalized),
@@ -105,7 +104,7 @@ class _ModelListViewState extends State<ModelListView> {
                 Theme.of(context).textTheme.titleMedium,
               ),
               const Divider(),
-              Expanded(child: listener())
+              Expanded(child: listener(tileService))
             ])));
   }
 }
