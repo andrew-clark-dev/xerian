@@ -103,9 +103,7 @@ const schema = a.schema({
       type: a.enum(["department", "colour", "brand", "size"]),
       value: a.string().required(),
       alternatives: a.string().array(),
-    })
-    .secondaryIndexes((index) => [index("value")]),
-
+    }),
 
   Refund: a
     .model({
