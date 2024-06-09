@@ -53,6 +53,8 @@ dependencies:
   form_builder_validators: ^9.1.0
   flutter_typeahead: ^5.2.0
   material_symbols_icons: ^4.2758.0
+  logging: ^1.2.0
+  graphql_flutter: ^5.2.0-beta.7
 dev_dependencies:
   flutter_test:
     sdk: flutter

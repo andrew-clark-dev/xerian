@@ -2,22 +2,22 @@ import 'package:xerian/pages/account/account_list_view.dart';
 import 'package:flutter/material.dart';
 
 import 'package:go_router/go_router.dart';
-import 'package:xerian/pages/category/category_list_view.dart';
+import 'package:xerian/models/Category.dart' as models;
 import 'package:xerian/pages/dashboard/dashboard_view.dart';
 import 'package:xerian/pages/item/item_form.dart';
 import 'package:xerian/pages/item/item_list_view.dart';
 
-import '../pages/routable.dart';
 import '../pages/settings/web_chrome_settings.dart';
+import '../services/route_path.dart';
 
 class AppDrawer extends StatelessWidget {
   const AppDrawer({super.key});
 
-  ListTile _listTile(BuildContext context, Routable page, String title) {
+  ListTile _listTile(BuildContext context, String path, String title) {
     return ListTile(
         title: Text(title),
         onTap: () {
-          context.go(page.path);
+          context.go(path);
         });
   }
 
@@ -33,8 +33,8 @@ class AppDrawer extends StatelessWidget {
             ),
             child: Text('Drawer Header'),
           ),
-          _listTile(context, DashboardView(), 'Dashboard'),
-          _listTile(context, const ItemListView(), 'Items'),
+          _listTile(context, DashboardView().path, 'Dashboard'),
+          _listTile(context, const ItemListView().path, 'Items'),
 
           ListTile(
             title: const Text('Sales'),
@@ -43,9 +43,10 @@ class AppDrawer extends StatelessWidget {
             },
           ),
 
-          _listTile(context, const AccountListView(), 'Accounts'),
-          _listTile(context, const CategoryListView(), 'Categories'),
-          _listTile(context, const ItemForm(), 'Add item'),
+          _listTile(context, const AccountListView().path, 'Accounts'),
+          _listTile(context, RoutePath.listPath(models.Category.classType),
+              'Categories'),
+          _listTile(context, const ItemForm().path, 'Add item'),
 
           ListTile(
             title: const Text('Settings'),
