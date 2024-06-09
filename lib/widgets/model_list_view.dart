@@ -77,7 +77,7 @@ class _ModelListViewState extends State<ModelListView> {
           itemBuilder: (context, index) {
             if (index < models.length) {
               // you can have here your custom widgets for displaying posts or what
-              return ListTile(title: tileService.tile(models[index]!));
+              return tileService.dismissible(models[index]!);
             } else {
               return loading
                   ? const Center(
