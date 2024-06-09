@@ -75,7 +75,7 @@ class _ModelListViewState extends State<ModelListView> {
           // attach the scroll controller to this List
           controller: controller,
           // we can pragmatically increase posts length by 1 to show a spinner for loading more
-          itemCount: models.length + (page!.hasNextResult ? 1 : 0),
+          itemCount: models.length + ((page?.hasNextResult ?? false) ? 1 : 0),
           itemBuilder: (context, index) {
             if (index < models.length) {
               // you can have here your custom widgets for displaying posts or what
