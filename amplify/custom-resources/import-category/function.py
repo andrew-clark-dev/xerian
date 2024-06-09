@@ -10,7 +10,6 @@ from datetime import UTC
 from dateutil.parser import parse
 
 from botocore.exceptions import ClientError
-import truncateTable
 
 
 log = logging.getLogger(__name__)
@@ -73,8 +72,7 @@ def handler(event, context):
                     '__typename': 'Category',
                 }
                 items[row['Size']+'size'] = size
-            # We have read all the categries, now we delete the current table
-            truncateTable(os.getenv('TABLE_NAME'))
+
             for item in items.values():
                 writer.put_item(Item=item)
 

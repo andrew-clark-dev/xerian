@@ -3,8 +3,9 @@ import boto3
 dynamo = boto3.resource("dynamodb")
 
 
-def truncateTable(tableName):
-    table = dynamo.Table(tableName)
+def handler(event, context):
+
+    table = dynamo.Table(event["tablename"])
 
     # get the table keys
     tableKeyNames = [key.get("AttributeName") for key in table.key_schema]

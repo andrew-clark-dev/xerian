@@ -35,10 +35,10 @@ export function opensearchDomain(stack: Stack) {
     );
 
     // Create a CloudWatch log group
-    // const logGroup = new logs.LogGroup(stack, "LogGroup", {
-    //     logGroupName: "/aws/vendedlogs/OpenSearchService/pipelines",
-    //     removalPolicy: RemovalPolicy.DESTROY,
-    // });
+    const logGroup = new logs.LogGroup(stack, "LogGroup", {
+        logGroupName: "/aws/vendedlogs/OpenSearchService/pipelines",
+        removalPolicy: RemovalPolicy.DESTROY,
+    });
 
     return openSearchDomain!;
 
@@ -139,7 +139,7 @@ dynamodb-pipeline:
         action: '\${getMetadata("opensearch_action")}'
         document_version: '\${getMetadata("document_version")}'
         document_version_type: "external"
-        bulk_size: 4
+        bulk_size: 1
         aws:
           sts_role_arn: "${openSearchIntegrationPipelineRole.roleArn}"
           region: "${stack.region}"
@@ -150,16 +150,16 @@ dynamodb-pipeline:
         stack,
         `OpenSearchIntegrationPipeline-${indexName}`,
         {
-            maxUnits: 4,
+            maxUnits: 1,
             minUnits: 1,
             pipelineConfigurationBody: openSearchTemplate,
             pipelineName: `db-integration-${indexName}`,
-            // logPublishingOptions: {
-            //     isLoggingEnabled: true,
-            //     cloudWatchLogDestination: {
-            //         logGroup: "/aws/vendedlogs/OpenSearchService/pipelines",
-            //     },
-            // },
+            logPublishingOptions: {
+                isLoggingEnabled: true,
+                cloudWatchLogDestination: {
+                    logGroup: "/aws/vendedlogs/OpenSearchService/pipelines",
+                },
+            },
         }
     );
 

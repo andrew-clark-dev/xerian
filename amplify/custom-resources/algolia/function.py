@@ -1,4 +1,4 @@
-from algoliasearch.search_client import SearchClient
+# from algoliasearch.search_client import SearchClient
 
 from __future__ import print_function
 
