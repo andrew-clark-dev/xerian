@@ -25,7 +25,7 @@ def handler(event, context):
     key = urllib.parse.unquote_plus(event['Records'][0]['s3']['object']['key'], encoding='utf-8')
 
     # Parse the CSV content into a Pandas dataframe
-    df = wr.s3.read_csv(
+    df = wr.s3.read_excel(
         f's3://{bucket}/{key}',
         dtype=str
     )

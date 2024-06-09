@@ -40,20 +40,16 @@ const schema = a.schema({
     .returns(a.ref("Account").array())
     .handler(
       a.handler.custom({
-        entry: "./searchAccountresolver.js",
+        entry: "./searchAccountResolver.js",
         dataSource: "osDataSource",
       })
-    )
-    .authorization((allow) => [allow.authenticated()]),
+    ),
 
   Item: a
     .model({
       sku: a.integer().required(),
-      // accountId: a.id(),
-      // account: a.belongsTo("Account", "accountId"),
-      // 1. Create a reference field
-      itemId: a.id(),
-      category: a.string(),
+      account: a.string(),
+      deparment: a.string(),
       brand: a.string(),
       color: a.string(),
       size: a.string(),
@@ -66,16 +62,22 @@ const schema = a.schema({
       original: a.json(),
     }),
 
-  Category: a
-    .model({
-      type: a.enum(["department", "colour", "brand", "size"]),
-      value: a.string().required(),
-      alternatives: a.string().array(),
-    }),
+  searchItems: a
+    .query()
+    .arguments({ matchString: a.string() })
+    .returns(a.ref("Item").array())
+    .handler(
+      a.handler.custom({
+        entry: "./searchItemResolver.js",
+        dataSource: "osDataSource",
+      })
+    ),
 
   Sale: a
     .model({
-      number: a.integer(),
+      number: a.integer().required(),
+      item: a.string().required(),
+      account: a.string().required(),
       status: a.enum(["parked", "finalized"]),
       finalized: a.datetime(),
       total: a.float(),
@@ -83,6 +85,27 @@ const schema = a.schema({
       paymentType: a.enum(["cash", "card", "giftCard", "accountCredit"]),
       original: a.json(),
     }),
+
+  searchSales: a
+    .query()
+    .arguments({ matchString: a.string() })
+    .returns(a.ref("Sale").array())
+    .handler(
+      a.handler.custom({
+        entry: "./searchSaleResolver.js",
+        dataSource: "osDataSource",
+      })
+    ),
+
+
+  Category: a
+    .model({
+      type: a.enum(["department", "colour", "brand", "size"]),
+      value: a.string().required(),
+      alternatives: a.string().array(),
+    })
+    .secondaryIndexes((index) => [index("value")]),
+
 
   Refund: a
     .model({

@@ -22,7 +22,7 @@ export function opensearchDomain(stack: Stack) {
             // },
             capacity: {
                 masterNodes: 0,
-                dataNodes: 2,
+                dataNodes: 1,
                 dataNodeInstanceType: 't2.small.search', // Specify the instance type here
             },
 
@@ -35,10 +35,10 @@ export function opensearchDomain(stack: Stack) {
     );
 
     // Create a CloudWatch log group
-    const logGroup = new logs.LogGroup(stack, "LogGroup", {
-        logGroupName: "/aws/vendedlogs/OpenSearchService/pipelines",
-        removalPolicy: RemovalPolicy.DESTROY,
-    });
+    // const logGroup = new logs.LogGroup(stack, "LogGroup", {
+    //     logGroupName: "/aws/vendedlogs/OpenSearchService/pipelines",
+    //     removalPolicy: RemovalPolicy.DESTROY,
+    // });
 
     return openSearchDomain!;
 
@@ -154,12 +154,12 @@ dynamodb-pipeline:
             minUnits: 1,
             pipelineConfigurationBody: openSearchTemplate,
             pipelineName: `db-integration-${indexName}`,
-            logPublishingOptions: {
-                isLoggingEnabled: true,
-                cloudWatchLogDestination: {
-                    logGroup: "/aws/vendedlogs/OpenSearchService/pipelines",
-                },
-            },
+            // logPublishingOptions: {
+            //     isLoggingEnabled: true,
+            //     cloudWatchLogDestination: {
+            //         logGroup: "/aws/vendedlogs/OpenSearchService/pipelines",
+            //     },
+            // },
         }
     );
 

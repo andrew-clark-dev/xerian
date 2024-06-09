@@ -10,7 +10,8 @@ from datetime import UTC
 from dateutil.parser import parse
 
 from botocore.exceptions import ClientError
-from decimal import Decimal
+import truncateTable
+
 
 log = logging.getLogger(__name__)
 log.setLevel('INFO')
@@ -25,27 +26,58 @@ def handler(event, context):
     key = urllib.parse.unquote_plus(event['Records'][0]['s3']['object']['key'], encoding='utf-8')
 
     # Parse the CSV content into a Pandas dataframe
-    df = wr.s3.read_csv(
+    df = wr.s3.read_excel(
         f's3://{bucket}/{key}',
         dtype=str
     )
     df = df.fillna('')
 
+
+
     # Process your data (e.g., perform transformations or analysis)
     
     # Type,Created,Created By,Deactivated,Email,Phone,First Name,Last Name,Company,Tags,Balance,Payable,Default Split,Terms,Inventory Type,Address Line 1,Address Line 2,City,State,Zip,Number Of Sales,Number Of Items,Last Viewed,Last Activity,Last Item Entered,Last Settlement
     try:
+        items = {}
         with table.batch_writer() as writer:
             for index, row in df.iterrows():
-                item = {
+                
+                deparment = {
                     'id': str(uuid.uuid4()),
-                    'type' : row('Type'),
-                    'value': row['Value'],
-                    'alternatives': row['Alternatives'].strip().split(),
+                    'type' : 'department',
+                    'value': row['Category'],
                     '__typename': 'Category',
                 }
-                writer.put_item(Item=item)
+                items[row['Category']+'department'] = deparment
                 
+                colour = {
+                    'id': str(uuid.uuid4()),
+                    'type' : 'colour',
+                    'value': row['Color'],
+                    '__typename': 'Category',
+                }
+                items[row['Color']+'color'] = colour
+
+                brand = {
+                    'id': str(uuid.uuid4()),
+                    'type' : 'brand',
+                    'value': row['Brand'],
+                    '__typename': 'Category',
+                }
+                items[row['Brand']+'brand'] = brand
+
+                size = {
+                    'id': str(uuid.uuid4()),
+                    'type' : 'size',
+                    'value': row['Size'],
+                    '__typename': 'Category',
+                }
+                items[row['Size']+'size'] = size
+            # We have read all the categries, now we delete the current table
+            truncateTable(os.getenv('TABLE_NAME'))
+            for item in items.values():
+                writer.put_item(Item=item)
+
     except ClientError as err:
         log.error(
             f'Could not load data into table {table.name}. Here is why:{ err.response["Error"]["Code"]}: {err.response["Error"]["Message"]}'
@@ -58,21 +90,3 @@ def handler(event, context):
         'statusCode': 200,
         'body': 'CSV file processed successfully',
     }
-
-
-def address(row):
-    result = row['Address Line 1']
-    if (row['Address Line 2'] != ''): 
-        result += '\n' + row['Address Line 2'];
-    return result
-
-def balence(row):
-    try:
-        return Decimal(row['Balance'])
-    except ValueError:
-        return Decimal(0)
-
-def status(row):
-    if row['Deactivated'] == '':
-        return 'active'
-    return 'inactive'
