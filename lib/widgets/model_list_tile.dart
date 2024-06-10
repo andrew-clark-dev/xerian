@@ -15,33 +15,37 @@ class TileService {
 
   TileService(this.fields, this.context);
 
-  ListTile tile(Model model) {
-    List<String> values = [];
-
-    for (final field in fields) {
-      values.add(model.toMap()[field].toString());
-    }
+  ListTile tile(Model model, fields, {bool dismissable = false}) {
     return ListTile(
-      title: _buildRow(values),
+      title: _buildRow(model, fields, dismissable: dismissable),
       onTap: () =>
           context.push(RoutePath.path(model.getInstanceType()), extra: model),
     );
   }
 
-  Row _buildRow(List<String?> values) {
+  Row _buildRow(Model model, List<String> fields, {bool dismissable = false}) {
+    List<String> values = [];
+
+    for (final field in fields) {
+      values.add(model.toMap()[field].toString());
+    }
+
     List<Widget> children = [];
     for (final value in values) {
       children.add(Expanded(
-        child: Text(value ?? "", textAlign: TextAlign.left),
+        child: Text(value, textAlign: TextAlign.left),
       ));
     }
-    children.add(const Expanded(
-      child: Icon(Icons.delete),
-    ));
+    if (!dismissable) {
+      children.add(Expanded(
+          child: ElevatedButton(
+              onPressed: () async => _deleteModel(model),
+              child: const Icon(Icons.delete))));
+    }
     return Row(children: children);
   }
 
-  Future<void> _deleteModel(Model model) async {
+  _deleteModel(Model model) async {
     final request = ModelMutations.delete<Model>(model);
     final response = await Amplify.API.mutate(request: request).response;
     log.info(
@@ -62,6 +66,6 @@ class TileService {
           ),
         ),
         onDismissed: (_) => _deleteModel(model),
-        child: tile(model));
+        child: tile(model, true));
   }
 }
