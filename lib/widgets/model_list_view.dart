@@ -5,7 +5,10 @@ import 'package:xerian/widgets/model_list_tile.dart';
 
 import '../pages/routable.dart';
 import '../services/api.dart';
+import '../services/route_path.dart';
 import '../services/row_service.dart';
+import 'app_drawer.dart';
+import 'package:go_router/go_router.dart';
 
 const limit = 20;
 
@@ -93,9 +96,16 @@ class _ModelListViewState extends State<ModelListView> {
   Widget build(BuildContext context) {
     final tileService = TileService(widget.fields, context);
     return Scaffold(
+        floatingActionButton: FloatingActionButton(
+          // Navigate to the page to create new budget entries
+          onPressed: () => context.push(RoutePath.path(widget.modelType)),
+          child: const Icon(Icons.add),
+        ),
         appBar: AppBar(
           title: Text(widget.modelType.modelName().capitalized),
         ),
+        drawer: const AppDrawer(), // Add the drawer here
+
         body: Padding(
             padding: const EdgeInsets.only(top: 25),
             child: Column(children: [

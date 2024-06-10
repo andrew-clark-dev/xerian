@@ -35,6 +35,9 @@ class TileService {
         child: Text(value ?? "", textAlign: TextAlign.left),
       ));
     }
+    children.add(const Expanded(
+      child: Icon(Icons.delete),
+    ));
     return Row(children: children);
   }
 
