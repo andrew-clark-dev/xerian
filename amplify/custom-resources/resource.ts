@@ -38,6 +38,7 @@ export function importFunction(stack: Stack, modelName: string, table: ITable): 
 
 export { opensearchDomain } from "./search/resource";
 export { opensearchPipeline } from "./search/resource";
+export { algoliaSearchInjest } from "./algolia/resource";
 
 
 
