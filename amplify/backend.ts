@@ -3,7 +3,7 @@ import { auth } from './auth/resource';
 import { data } from './data/resource';
 import { storage } from './storage/resource';
 
-import { importFunction } from './custom-resources/resource'
+import { algoliaSearchInjest, importFunction } from './custom-resources/resource'
 import { opensearchDomain } from './custom-resources/resource'
 import { opensearchPipeline } from './custom-resources/resource'
 import { Stack } from 'aws-cdk-lib';
@@ -28,29 +28,29 @@ const osDomain = opensearchDomain(searchStack)
 
 const dataStack = Stack.of(backend.data);
 
-opensearchPipeline(dataStack,
-  'account',
-  osDomain,
-  backend.data.resources.tables['Account'],
-  backend.data.resources.cfnResources.amplifyDynamoDbTables['Account'],
-  backend.storage.resources.bucket
-)
+// opensearchPipeline(dataStack,
+//   'account',
+//   osDomain,
+//   backend.data.resources.tables['Account'],
+//   backend.data.resources.cfnResources.amplifyDynamoDbTables['Account'],
+//   backend.storage.resources.bucket
+// )
 
-opensearchPipeline(dataStack,
-  'item',
-  osDomain,
-  backend.data.resources.tables['Item'],
-  backend.data.resources.cfnResources.amplifyDynamoDbTables['Item'],
-  backend.storage.resources.bucket
-)
+// opensearchPipeline(dataStack,
+//   'item',
+//   osDomain,
+//   backend.data.resources.tables['Item'],
+//   backend.data.resources.cfnResources.amplifyDynamoDbTables['Item'],
+//   backend.storage.resources.bucket
+// )
 
-opensearchPipeline(dataStack,
-  'sale',
-  osDomain,
-  backend.data.resources.tables['Sale'],
-  backend.data.resources.cfnResources.amplifyDynamoDbTables['Sale'],
-  backend.storage.resources.bucket
-)
+// opensearchPipeline(dataStack,
+//   'sale',
+//   osDomain,
+//   backend.data.resources.tables['Sale'],
+//   backend.data.resources.cfnResources.amplifyDynamoDbTables['Sale'],
+//   backend.storage.resources.bucket
+// )
 
 
 const osDataSource = backend.data.addOpenSearchDataSource("osDataSource", osDomain);
@@ -64,3 +64,4 @@ const accountImport = importFunction(customStack, 'account', backend.data.resour
 const itemImport = importFunction(customStack, 'item', backend.data.resources.tables['Item'])
 const saleImport = importFunction(customStack, 'sale', backend.data.resources.tables['Sale'])
 const categoryImport = importFunction(customStack, 'category', backend.data.resources.tables['Category'])
+const searchLayer = algoliaSearchInjest(customStack)
