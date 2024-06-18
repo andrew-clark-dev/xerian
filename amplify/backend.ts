@@ -24,7 +24,7 @@ const backend = defineBackend({
 
 const searchStack = backend.createStack('amplifySearch');
 
-const osDomain = opensearchDomain(searchStack)
+// const osDomain = opensearchDomain(searchStack)
 
 const dataStack = Stack.of(backend.data);
 
@@ -53,7 +53,7 @@ const dataStack = Stack.of(backend.data);
 // )
 
 
-const osDataSource = backend.data.addOpenSearchDataSource("osDataSource", osDomain);
+// const osDataSource = backend.data.addOpenSearchDataSource("osDataSource", osDomain);
 
 // /**
 //  * @see https://docs.amplify.aws/gen1/flutter/tools/cli/custom/cdk/ Use CDK to add custom AWS resources
@@ -64,4 +64,4 @@ const accountImport = importFunction(customStack, 'account', backend.data.resour
 const itemImport = importFunction(customStack, 'item', backend.data.resources.tables['Item'])
 const saleImport = importFunction(customStack, 'sale', backend.data.resources.tables['Sale'])
 const categoryImport = importFunction(customStack, 'category', backend.data.resources.tables['Category'])
-const searchLayer = algoliaSearchInjest(customStack)
+// const searchLayer = algoliaSearchInjest(customStack)
