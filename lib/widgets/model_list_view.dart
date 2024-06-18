@@ -1,6 +1,7 @@
 import 'package:logging/logging.dart';
 import 'package:amplify_core/amplify_core.dart';
 import 'package:flutter/material.dart';
+import 'package:xerian/models/ModelProvider.dart';
 import 'package:xerian/widgets/model_list_tile.dart';
 
 import '../pages/routable.dart';
@@ -9,6 +10,7 @@ import '../services/route_path.dart';
 import '../services/row_service.dart';
 import 'app_drawer.dart';
 import 'package:go_router/go_router.dart';
+import 'package:xerian/models/Category.dart' as cat;
 
 const limit = 20;
 
@@ -54,11 +56,14 @@ class _ModelListViewState extends State<ModelListView> {
     loading = true;
 
     try {
+      final queryPredicate = cat.Category.TYPE.eq(CategoryType.colour);
+
       final query = filter == null
           ? null
-          : QueryPredicateOperation(
-              "", EqualQueryOperator<Model>(menu!.controller!.value as Model));
-      page = (await api.fetch(page, query: query))!;
+          : const QueryPredicateOperation(
+              "type", EqualQueryOperator<String>(""));
+      // EqualQueryOperator<Model>(menu!.controller!.value as Model));
+      page = (await api.fetch(page, query: queryPredicate))!;
       setState(() {
         models += page!.items;
       });
@@ -120,12 +125,12 @@ class _ModelListViewState extends State<ModelListView> {
         body: Padding(
             padding: const EdgeInsets.only(top: 25),
             child: Column(children: [
+              if (filter != null) filter!.menu(),
               RowService.buildRow(
                 widget.fields,
                 Theme.of(context).textTheme.titleMedium,
               ),
               const Divider(),
-              if (filter != null) filter!.menu(),
               Expanded(child: listener(tileService))
             ])));
   }
@@ -134,15 +139,16 @@ class _ModelListViewState extends State<ModelListView> {
 class DropDownFilter<T extends Enum> {
   final TextEditingController controller = TextEditingController();
 
-  final dynamic values;
+  final List<T> values;
 
   DropDownFilter(this.values);
 
   DropdownMenu menu() {
     return DropdownMenu(
         controller: controller,
-        dropdownMenuEntries: (values
-            .map((e) => DropdownMenuEntry<T>(value: e, label: e.name))
+        dropdownMenuEntries: (this
+            .values
+            .map((e) => DropdownMenuEntry<T>(value: e, label: (e as Enum).name))
             .toList()));
   }
 }
