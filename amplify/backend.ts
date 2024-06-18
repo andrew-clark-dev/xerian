@@ -63,5 +63,5 @@ const customStack = backend.createStack('amplifyCustom');
 const accountImport = importFunction(customStack, 'account', backend.data.resources.tables['Account'])
 const itemImport = importFunction(customStack, 'item', backend.data.resources.tables['Item'])
 const saleImport = importFunction(customStack, 'sale', backend.data.resources.tables['Sale'])
-const categoryImport = importFunction(customStack, 'category', backend.data.resources.tables['Category'])
+const groupImport = importFunction(customStack, 'group', backend.data.resources.tables['Group'])
 // const searchLayer = algoliaSearchInjest(customStack)

@@ -21,8 +21,8 @@
 
 import 'package:amplify_core/amplify_core.dart' as amplify_core;
 import 'Account.dart';
-import 'Category.dart';
 import 'Counter.dart';
+import 'Group.dart';
 import 'Item.dart';
 import 'Journal.dart';
 import 'Refund.dart';
@@ -31,9 +31,9 @@ import 'Tag.dart';
 
 export 'Account.dart';
 export 'AccountStatus.dart';
-export 'Category.dart';
-export 'CategoryType.dart';
 export 'Counter.dart';
+export 'Group.dart';
+export 'GroupType.dart';
 export 'Item.dart';
 export 'ItemQuality.dart';
 export 'ItemStatus.dart';
@@ -48,9 +48,9 @@ export 'Tag.dart';
 
 class ModelProvider implements amplify_core.ModelProviderInterface {
   @override
-  String version = "fe0b2502ad935ee041af5ba9a73240d4";
+  String version = "882cbfde2d941c5374b559d97343eab3";
   @override
-  List<amplify_core.ModelSchema> modelSchemas = [Account.schema, Category.schema, Counter.schema, Item.schema, Journal.schema, Refund.schema, Sale.schema, Tag.schema];
+  List<amplify_core.ModelSchema> modelSchemas = [Account.schema, Counter.schema, Group.schema, Item.schema, Journal.schema, Refund.schema, Sale.schema, Tag.schema];
   @override
   List<amplify_core.ModelSchema> customTypeSchemas = [];
   static final ModelProvider _instance = ModelProvider();
@@ -61,10 +61,10 @@ class ModelProvider implements amplify_core.ModelProviderInterface {
     switch(modelName) {
       case "Account":
         return Account.classType;
-      case "Category":
-        return Category.classType;
       case "Counter":
         return Counter.classType;
+      case "Group":
+        return Group.classType;
       case "Item":
         return Item.classType;
       case "Journal":

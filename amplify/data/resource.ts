@@ -97,10 +97,9 @@ const schema = a.schema({
       })
     ),
 
-
-  Category: a
+  Group: a
     .model({
-      type: a.enum(["department", "colour", "brand", "size"]),
+      type: a.enum(["category", "color", "brand", "size"]),
       value: a.string().required(),
       alternatives: a.string().array(),
     }),

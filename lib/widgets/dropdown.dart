@@ -1,9 +1,8 @@
 import 'package:amplify_api/amplify_api.dart';
 import 'package:amplify_core/amplify_core.dart';
 import 'package:flutter/material.dart';
-import 'package:xerian/models/CategoryType.dart';
-
-import '../models/Category.dart' as model;
+import '../models/Group.dart';
+import '../models/GroupType.dart';
 
 abstract class DropDown<Model> extends StatefulWidget {
   const DropDown({super.key});
@@ -12,7 +11,7 @@ abstract class DropDown<Model> extends StatefulWidget {
 class DepartmentDropDown<Model> extends DropDown {
   const DepartmentDropDown({super.key});
   @override
-  State<DropDown> createState() => _DepartmentState();
+  State<DropDown> createState() => _CategoryState();
 }
 
 class BrandDropDown<Model> extends DropDown {
@@ -92,13 +91,13 @@ abstract class _DropDownState extends State<DropDown> {
   String menuLabel();
 }
 
-abstract class _CategoryState extends _DropDownState {
-  CategoryType categoryType();
+abstract class _GroupState extends _DropDownState {
+  GroupType groupType();
   @override
-  menuLabel() => categoryType().name;
+  menuLabel() => groupType().name;
   @override
   getModels() async {
-    final request = ModelQueries.list(model.Category.classType);
+    final request = ModelQueries.list(Group.classType);
     final response = await Amplify.API.query(request: request).response;
     if (response.hasErrors) {
       throw "Cannot read Department state, errors: ${response.errors}";
@@ -106,37 +105,37 @@ abstract class _CategoryState extends _DropDownState {
     final items = response.data?.items;
     if (items == null) return [];
     return items
-        .whereType<model.Category>()
-        .where((m) => m.type == categoryType())
+        .whereType<Group>()
+        .where((m) => m.type == groupType())
         .toList();
   }
 }
 
-class _DepartmentState extends _CategoryState {
+class _CategoryState extends _GroupState {
   @override
-  CategoryType categoryType() => CategoryType.department;
+  GroupType groupType() => GroupType.category;
 }
 
 class _ColourState extends _CategoryState {
   @override
-  CategoryType categoryType() => CategoryType.colour;
+  GroupType groupType() => GroupType.color;
 }
 
 class _BrandState extends _CategoryState {
   @override
-  CategoryType categoryType() => CategoryType.brand;
+  GroupType groupType() => GroupType.brand;
 }
 
 class _SizeState extends _CategoryState {
   @override
-  CategoryType categoryType() => CategoryType.size;
+  GroupType groupType() => GroupType.size;
 }
 
-extension CategoryMenuItems on Model {
+extension GroupMenuItems on Model {
   get label {
     switch (runtimeType) {
-      case const (model.Category):
-        return (this as model.Category).value;
+      case const (Group):
+        return (this as Group).value;
     }
     return null;
   }

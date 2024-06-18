@@ -24,11 +24,11 @@ import 'package:amplify_core/amplify_core.dart' as amplify_core;
 import 'package:collection/collection.dart';
 
 
-/** This is an auto generated class representing the Category type in your schema. */
-class Category extends amplify_core.Model {
-  static const classType = const _CategoryModelType();
+/** This is an auto generated class representing the Group type in your schema. */
+class Group extends amplify_core.Model {
+  static const classType = const _GroupModelType();
   final String id;
-  final CategoryType? _type;
+  final GroupType? _type;
   final String? _value;
   final List<String>? _alternatives;
   final amplify_core.TemporalDateTime? _createdAt;
@@ -41,13 +41,13 @@ class Category extends amplify_core.Model {
   @override
   String getId() => id;
   
-  CategoryModelIdentifier get modelIdentifier {
-      return CategoryModelIdentifier(
+  GroupModelIdentifier get modelIdentifier {
+      return GroupModelIdentifier(
         id: id
       );
   }
   
-  CategoryType? get type {
+  GroupType? get type {
     return _type;
   }
   
@@ -76,10 +76,10 @@ class Category extends amplify_core.Model {
     return _updatedAt;
   }
   
-  const Category._internal({required this.id, type, required value, alternatives, createdAt, updatedAt}): _type = type, _value = value, _alternatives = alternatives, _createdAt = createdAt, _updatedAt = updatedAt;
+  const Group._internal({required this.id, type, required value, alternatives, createdAt, updatedAt}): _type = type, _value = value, _alternatives = alternatives, _createdAt = createdAt, _updatedAt = updatedAt;
   
-  factory Category({String? id, CategoryType? type, required String value, List<String>? alternatives}) {
-    return Category._internal(
+  factory Group({String? id, GroupType? type, required String value, List<String>? alternatives}) {
+    return Group._internal(
       id: id == null ? amplify_core.UUID.getUUID() : id,
       type: type,
       value: value,
@@ -93,7 +93,7 @@ class Category extends amplify_core.Model {
   @override
   bool operator ==(Object other) {
     if (identical(other, this)) return true;
-    return other is Category &&
+    return other is Group &&
       id == other.id &&
       _type == other._type &&
       _value == other._value &&
@@ -107,7 +107,7 @@ class Category extends amplify_core.Model {
   String toString() {
     var buffer = new StringBuffer();
     
-    buffer.write("Category {");
+    buffer.write("Group {");
     buffer.write("id=" + "$id" + ", ");
     buffer.write("type=" + (_type != null ? amplify_core.enumToString(_type)! : "null") + ", ");
     buffer.write("value=" + "$_value" + ", ");
@@ -119,20 +119,20 @@ class Category extends amplify_core.Model {
     return buffer.toString();
   }
   
-  Category copyWith({CategoryType? type, String? value, List<String>? alternatives}) {
-    return Category._internal(
+  Group copyWith({GroupType? type, String? value, List<String>? alternatives}) {
+    return Group._internal(
       id: id,
       type: type ?? this.type,
       value: value ?? this.value,
       alternatives: alternatives ?? this.alternatives);
   }
   
-  Category copyWithModelFieldValues({
-    ModelFieldValue<CategoryType?>? type,
+  Group copyWithModelFieldValues({
+    ModelFieldValue<GroupType?>? type,
     ModelFieldValue<String>? value,
     ModelFieldValue<List<String>?>? alternatives
   }) {
-    return Category._internal(
+    return Group._internal(
       id: id,
       type: type == null ? this.type : type.value,
       value: value == null ? this.value : value.value,
@@ -140,9 +140,9 @@ class Category extends amplify_core.Model {
     );
   }
   
-  Category.fromJson(Map<String, dynamic> json)  
+  Group.fromJson(Map<String, dynamic> json)  
     : id = json['id'],
-      _type = amplify_core.enumFromString<CategoryType>(json['type'], CategoryType.values),
+      _type = amplify_core.enumFromString<GroupType>(json['type'], GroupType.values),
       _value = json['value'],
       _alternatives = json['alternatives']?.cast<String>(),
       _createdAt = json['createdAt'] != null ? amplify_core.TemporalDateTime.fromString(json['createdAt']) : null,
@@ -161,14 +161,14 @@ class Category extends amplify_core.Model {
     'updatedAt': _updatedAt
   };
 
-  static final amplify_core.QueryModelIdentifier<CategoryModelIdentifier> MODEL_IDENTIFIER = amplify_core.QueryModelIdentifier<CategoryModelIdentifier>();
+  static final amplify_core.QueryModelIdentifier<GroupModelIdentifier> MODEL_IDENTIFIER = amplify_core.QueryModelIdentifier<GroupModelIdentifier>();
   static final ID = amplify_core.QueryField(fieldName: "id");
   static final TYPE = amplify_core.QueryField(fieldName: "type");
   static final VALUE = amplify_core.QueryField(fieldName: "value");
   static final ALTERNATIVES = amplify_core.QueryField(fieldName: "alternatives");
   static var schema = amplify_core.Model.defineSchema(define: (amplify_core.ModelSchemaDefinition modelSchemaDefinition) {
-    modelSchemaDefinition.name = "Category";
-    modelSchemaDefinition.pluralName = "Categories";
+    modelSchemaDefinition.name = "Group";
+    modelSchemaDefinition.pluralName = "Groups";
     
     modelSchemaDefinition.authRules = [
       amplify_core.AuthRule(
@@ -184,19 +184,19 @@ class Category extends amplify_core.Model {
     modelSchemaDefinition.addField(amplify_core.ModelFieldDefinition.id());
     
     modelSchemaDefinition.addField(amplify_core.ModelFieldDefinition.field(
-      key: Category.TYPE,
+      key: Group.TYPE,
       isRequired: false,
       ofType: amplify_core.ModelFieldType(amplify_core.ModelFieldTypeEnum.enumeration)
     ));
     
     modelSchemaDefinition.addField(amplify_core.ModelFieldDefinition.field(
-      key: Category.VALUE,
+      key: Group.VALUE,
       isRequired: true,
       ofType: amplify_core.ModelFieldType(amplify_core.ModelFieldTypeEnum.string)
     ));
     
     modelSchemaDefinition.addField(amplify_core.ModelFieldDefinition.field(
-      key: Category.ALTERNATIVES,
+      key: Group.ALTERNATIVES,
       isRequired: false,
       isArray: true,
       ofType: amplify_core.ModelFieldType(amplify_core.ModelFieldTypeEnum.collection, ofModelName: amplify_core.ModelFieldTypeEnum.string.name)
@@ -218,29 +218,29 @@ class Category extends amplify_core.Model {
   });
 }
 
-class _CategoryModelType extends amplify_core.ModelType<Category> {
-  const _CategoryModelType();
+class _GroupModelType extends amplify_core.ModelType<Group> {
+  const _GroupModelType();
   
   @override
-  Category fromJson(Map<String, dynamic> jsonData) {
-    return Category.fromJson(jsonData);
+  Group fromJson(Map<String, dynamic> jsonData) {
+    return Group.fromJson(jsonData);
   }
   
   @override
   String modelName() {
-    return 'Category';
+    return 'Group';
   }
 }
 
 /**
  * This is an auto generated class representing the model identifier
- * of [Category] in your schema.
+ * of [Group] in your schema.
  */
-class CategoryModelIdentifier implements amplify_core.ModelIdentifier<Category> {
+class GroupModelIdentifier implements amplify_core.ModelIdentifier<Group> {
   final String id;
 
-  /** Create an instance of CategoryModelIdentifier using [id] the primary key. */
-  const CategoryModelIdentifier({
+  /** Create an instance of GroupModelIdentifier using [id] the primary key. */
+  const GroupModelIdentifier({
     required this.id});
   
   @override
@@ -258,7 +258,7 @@ class CategoryModelIdentifier implements amplify_core.ModelIdentifier<Category> 
   String serializeAsString() => serializeAsMap().values.join('#');
   
   @override
-  String toString() => 'CategoryModelIdentifier(id: $id)';
+  String toString() => 'GroupModelIdentifier(id: $id)';
   
   @override
   bool operator ==(Object other) {
@@ -266,7 +266,7 @@ class CategoryModelIdentifier implements amplify_core.ModelIdentifier<Category> 
       return true;
     }
     
-    return other is CategoryModelIdentifier &&
+    return other is GroupModelIdentifier &&
       id == other.id;
   }
   

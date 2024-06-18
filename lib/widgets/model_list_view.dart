@@ -10,7 +10,6 @@ import '../services/route_path.dart';
 import '../services/row_service.dart';
 import 'app_drawer.dart';
 import 'package:go_router/go_router.dart';
-import 'package:xerian/models/Category.dart' as cat;
 
 const limit = 20;
 
@@ -56,7 +55,7 @@ class _ModelListViewState extends State<ModelListView> {
     loading = true;
 
     try {
-      final queryPredicate = cat.Category.TYPE.eq(CategoryType.colour);
+      final queryPredicate = Group.TYPE.eq(GroupType.color);
 
       final query = filter == null
           ? null

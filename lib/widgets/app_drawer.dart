@@ -2,11 +2,11 @@ import 'package:xerian/pages/account/account_list_view.dart';
 import 'package:flutter/material.dart';
 
 import 'package:go_router/go_router.dart';
-import 'package:xerian/models/Category.dart' as models;
 import 'package:xerian/pages/dashboard/dashboard_view.dart';
 import 'package:xerian/pages/item/item_form.dart';
 import 'package:xerian/pages/item/item_list_view.dart';
 
+import '../models/Group.dart';
 import '../pages/settings/web_chrome_settings.dart';
 import '../services/route_path.dart';
 
@@ -44,8 +44,7 @@ class AppDrawer extends StatelessWidget {
           ),
 
           _listTile(context, const AccountListView().path, 'Accounts'),
-          _listTile(context, RoutePath.listPath(models.Category.classType),
-              'Categories'),
+          _listTile(context, RoutePath.listPath(Group.classType), 'Categories'),
           _listTile(context, const ItemForm().path, 'Add item'),
 
           ListTile(

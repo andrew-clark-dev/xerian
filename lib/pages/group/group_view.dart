@@ -1,29 +1,30 @@
 import 'package:amplify_api/amplify_api.dart';
 import 'package:amplify_flutter/amplify_flutter.dart';
-import 'package:xerian/models/Category.dart' as models;
-import 'package:xerian/models/ModelProvider.dart';
+import 'package:xerian/models/Group.dart';
 import 'package:xerian/pages/routable.dart';
 import 'package:flutter/material.dart';
 import 'package:form_validation/form_validation.dart';
 
-class CategoryView extends StatefulWidget implements RoutableExtra {
-  final models.Category? category;
-  const CategoryView({
+import '../../models/GroupType.dart';
+
+class GroupView extends StatefulWidget implements RoutableExtra {
+  final Group? group;
+  const GroupView({
     super.key,
-    this.category,
+    this.group,
   });
 
   @override
   String get path => '/category';
 
   @override
-  extra(Object extra) => CategoryView(category: extra as models.Category);
+  extra(Object extra) => GroupView(group: extra as Group);
 
   @override
-  State<CategoryView> createState() => _CategoryListViewState();
+  State<GroupView> createState() => _GroupListViewState();
 }
 
-class _CategoryListViewState extends State<CategoryView> {
+class _GroupListViewState extends State<GroupView> {
   final _formKey = GlobalKey<FormState>();
 
   final TextEditingController _typeController = TextEditingController();
@@ -40,16 +41,16 @@ class _CategoryListViewState extends State<CategoryView> {
   void initState() {
     super.initState();
 
-    var category = widget.category;
+    var group = widget.group;
 
-    if (category != null) {
-      _typeController.text = category.type!.name;
-      _valueController.text = category.value;
-      _alternativesController.text = category.alternatives?.join(' ') ?? '';
+    if (group != null) {
+      _typeController.text = group.type!.name;
+      _valueController.text = group.value;
+      _alternativesController.text = group.alternatives?.join(' ') ?? '';
 
-      _titleText = 'Update Category';
+      _titleText = 'Update Group';
     } else {
-      _titleText = 'Create Category';
+      _titleText = 'Create Group';
     }
   }
 
@@ -61,43 +62,42 @@ class _CategoryListViewState extends State<CategoryView> {
 
   Future<void> _submitForm(ScaffoldMessengerState scaffoldMessenger) async {
     // If the form is valid, submit the data
-    final type = CategoryType.values.byName(_typeController.text);
+    final type = GroupType.values.byName(_typeController.text);
 
     final value = _valueController.text;
     // Compress all white space just incase the user put in a few extra spaces
     final alternatives = _alternativesController.text.split(RegExp(' +'));
 
     // if (_isCreate) {
-    // Create a new Category entry
-    final newCategory =
-        models.Category(type: type, value: value, alternatives: alternatives);
+    // Create a new Group entry
+    final newGroup =
+        Group(type: type, value: value, alternatives: alternatives);
 
-    final request = ModelMutations.create(newCategory);
+    final request = ModelMutations.create(newGroup);
 
     final response = await Amplify.API.mutate(request: request).response;
 
     if (response.hasErrors) {
       scaffoldMessenger.showSnackBar(
         const SnackBar(
-          content: Text('Category details store failed'),
+          content: Text('Group details store failed'),
         ),
       );
     } else {
       scaffoldMessenger.showSnackBar(
         SnackBar(
-          content:
-              Text('Category ${newCategory.value} details stored successfully'),
+          content: Text('Group ${newGroup.value} details stored successfully'),
         ),
       );
     }
 
     // } else {
-    //   // Update Category instead
-    //   final updateCategory = _Category!.copyWith(
+    //   // Update Group instead
+    //   final updateGroup = _Group!.copyWith(
     //     firstName: firstName,
     //     lastName: lastName.isNotEmpty ? lastName : null,
     //   );
-    //   await repo.put(updateCategory);
+    //   await repo.put(updateGroup);
     // }
   }
 
@@ -121,11 +121,11 @@ class _CategoryListViewState extends State<CategoryView> {
                   children: [
                     DropdownMenu(
                         controller: _typeController,
-                        dropdownMenuEntries: CategoryType.values
-                            .map((e) => DropdownMenuEntry<CategoryType>(
+                        dropdownMenuEntries: GroupType.values
+                            .map((e) => DropdownMenuEntry<GroupType>(
                                 value: e, label: e.name))
                             .toList(),
-                        initialSelection: CategoryType.department),
+                        initialSelection: GroupType.category),
                     TextFormField(
                       controller: _valueController,
                       decoration: const InputDecoration(

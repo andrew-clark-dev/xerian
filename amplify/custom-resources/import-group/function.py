@@ -36,11 +36,11 @@ def handler(event, context):
     try:
         items =  set()
         for index, row in df.iterrows():
-            items.add(Entry('department', row['Category'], row['Created']))
-            items.add(Entry('colour', row['Color'], row['Created']))
+            items.add(Entry('category', row['Category'], row['Created']))
+            items.add(Entry('color', row['Color'], row['Created']))
             items.add(Entry('brand', row['Brand'], row['Created']))
             items.add(Entry('size', row['Size'], row['Created']))
-        log.info(f'Number of catogories found: {len(items)}')
+        log.info(f'Number of groups found: {len(items)}')
         with table.batch_writer() as writer:
             for item in items:
                 log.info(f'Putting: {item.toItem()}')
@@ -80,5 +80,5 @@ class Entry:
             'value': self.value,
             'createdAt': parse(self.created).isoformat(sep='T', timespec='milliseconds') + 'Z',
             'updatedAt': datetime.now(UTC).isoformat(sep='T', timespec='milliseconds').replace('+00:00','Z'),
-            '__typename': 'Category',
+            '__typename': 'Group',
         }

@@ -28,6 +28,8 @@ class Sale extends amplify_core.Model {
   static const classType = const _SaleModelType();
   final String id;
   final int? _number;
+  final String? _item;
+  final String? _account;
   final SaleStatus? _status;
   final amplify_core.TemporalDateTime? _finalized;
   final double? _total;
@@ -50,8 +52,43 @@ class Sale extends amplify_core.Model {
       );
   }
   
-  int? get number {
-    return _number;
+  int get number {
+    try {
+      return _number!;
+    } catch(e) {
+      throw amplify_core.AmplifyCodeGenModelException(
+          amplify_core.AmplifyExceptionMessages.codeGenRequiredFieldForceCastExceptionMessage,
+          recoverySuggestion:
+            amplify_core.AmplifyExceptionMessages.codeGenRequiredFieldForceCastRecoverySuggestion,
+          underlyingException: e.toString()
+          );
+    }
+  }
+  
+  String get item {
+    try {
+      return _item!;
+    } catch(e) {
+      throw amplify_core.AmplifyCodeGenModelException(
+          amplify_core.AmplifyExceptionMessages.codeGenRequiredFieldForceCastExceptionMessage,
+          recoverySuggestion:
+            amplify_core.AmplifyExceptionMessages.codeGenRequiredFieldForceCastRecoverySuggestion,
+          underlyingException: e.toString()
+          );
+    }
+  }
+  
+  String get account {
+    try {
+      return _account!;
+    } catch(e) {
+      throw amplify_core.AmplifyCodeGenModelException(
+          amplify_core.AmplifyExceptionMessages.codeGenRequiredFieldForceCastExceptionMessage,
+          recoverySuggestion:
+            amplify_core.AmplifyExceptionMessages.codeGenRequiredFieldForceCastRecoverySuggestion,
+          underlyingException: e.toString()
+          );
+    }
   }
   
   SaleStatus? get status {
@@ -86,12 +123,14 @@ class Sale extends amplify_core.Model {
     return _updatedAt;
   }
   
-  const Sale._internal({required this.id, number, status, finalized, total, subtotal, paymentType, original, createdAt, updatedAt}): _number = number, _status = status, _finalized = finalized, _total = total, _subtotal = subtotal, _paymentType = paymentType, _original = original, _createdAt = createdAt, _updatedAt = updatedAt;
+  const Sale._internal({required this.id, required number, required item, required account, status, finalized, total, subtotal, paymentType, original, createdAt, updatedAt}): _number = number, _item = item, _account = account, _status = status, _finalized = finalized, _total = total, _subtotal = subtotal, _paymentType = paymentType, _original = original, _createdAt = createdAt, _updatedAt = updatedAt;
   
-  factory Sale({String? id, int? number, SaleStatus? status, amplify_core.TemporalDateTime? finalized, double? total, double? subtotal, SalePaymentType? paymentType, String? original}) {
+  factory Sale({String? id, required int number, required String item, required String account, SaleStatus? status, amplify_core.TemporalDateTime? finalized, double? total, double? subtotal, SalePaymentType? paymentType, String? original}) {
     return Sale._internal(
       id: id == null ? amplify_core.UUID.getUUID() : id,
       number: number,
+      item: item,
+      account: account,
       status: status,
       finalized: finalized,
       total: total,
@@ -110,6 +149,8 @@ class Sale extends amplify_core.Model {
     return other is Sale &&
       id == other.id &&
       _number == other._number &&
+      _item == other._item &&
+      _account == other._account &&
       _status == other._status &&
       _finalized == other._finalized &&
       _total == other._total &&
@@ -128,6 +169,8 @@ class Sale extends amplify_core.Model {
     buffer.write("Sale {");
     buffer.write("id=" + "$id" + ", ");
     buffer.write("number=" + (_number != null ? _number.toString() : "null") + ", ");
+    buffer.write("item=" + "$_item" + ", ");
+    buffer.write("account=" + "$_account" + ", ");
     buffer.write("status=" + (_status != null ? amplify_core.enumToString(_status)! : "null") + ", ");
     buffer.write("finalized=" + (_finalized != null ? _finalized.format() : "null") + ", ");
     buffer.write("total=" + (_total != null ? _total.toString() : "null") + ", ");
@@ -141,10 +184,12 @@ class Sale extends amplify_core.Model {
     return buffer.toString();
   }
   
-  Sale copyWith({int? number, SaleStatus? status, amplify_core.TemporalDateTime? finalized, double? total, double? subtotal, SalePaymentType? paymentType, String? original}) {
+  Sale copyWith({int? number, String? item, String? account, SaleStatus? status, amplify_core.TemporalDateTime? finalized, double? total, double? subtotal, SalePaymentType? paymentType, String? original}) {
     return Sale._internal(
       id: id,
       number: number ?? this.number,
+      item: item ?? this.item,
+      account: account ?? this.account,
       status: status ?? this.status,
       finalized: finalized ?? this.finalized,
       total: total ?? this.total,
@@ -154,7 +199,9 @@ class Sale extends amplify_core.Model {
   }
   
   Sale copyWithModelFieldValues({
-    ModelFieldValue<int?>? number,
+    ModelFieldValue<int>? number,
+    ModelFieldValue<String>? item,
+    ModelFieldValue<String>? account,
     ModelFieldValue<SaleStatus?>? status,
     ModelFieldValue<amplify_core.TemporalDateTime?>? finalized,
     ModelFieldValue<double?>? total,
@@ -165,6 +212,8 @@ class Sale extends amplify_core.Model {
     return Sale._internal(
       id: id,
       number: number == null ? this.number : number.value,
+      item: item == null ? this.item : item.value,
+      account: account == null ? this.account : account.value,
       status: status == null ? this.status : status.value,
       finalized: finalized == null ? this.finalized : finalized.value,
       total: total == null ? this.total : total.value,
@@ -177,6 +226,8 @@ class Sale extends amplify_core.Model {
   Sale.fromJson(Map<String, dynamic> json)  
     : id = json['id'],
       _number = (json['number'] as num?)?.toInt(),
+      _item = json['item'],
+      _account = json['account'],
       _status = amplify_core.enumFromString<SaleStatus>(json['status'], SaleStatus.values),
       _finalized = json['finalized'] != null ? amplify_core.TemporalDateTime.fromString(json['finalized']) : null,
       _total = (json['total'] as num?)?.toDouble(),
@@ -187,12 +238,14 @@ class Sale extends amplify_core.Model {
       _updatedAt = json['updatedAt'] != null ? amplify_core.TemporalDateTime.fromString(json['updatedAt']) : null;
   
   Map<String, dynamic> toJson() => {
-    'id': id, 'number': _number, 'status': amplify_core.enumToString(_status), 'finalized': _finalized?.format(), 'total': _total, 'subtotal': _subtotal, 'paymentType': amplify_core.enumToString(_paymentType), 'original': _original, 'createdAt': _createdAt?.format(), 'updatedAt': _updatedAt?.format()
+    'id': id, 'number': _number, 'item': _item, 'account': _account, 'status': amplify_core.enumToString(_status), 'finalized': _finalized?.format(), 'total': _total, 'subtotal': _subtotal, 'paymentType': amplify_core.enumToString(_paymentType), 'original': _original, 'createdAt': _createdAt?.format(), 'updatedAt': _updatedAt?.format()
   };
   
   Map<String, Object?> toMap() => {
     'id': id,
     'number': _number,
+    'item': _item,
+    'account': _account,
     'status': _status,
     'finalized': _finalized,
     'total': _total,
@@ -206,6 +259,8 @@ class Sale extends amplify_core.Model {
   static final amplify_core.QueryModelIdentifier<SaleModelIdentifier> MODEL_IDENTIFIER = amplify_core.QueryModelIdentifier<SaleModelIdentifier>();
   static final ID = amplify_core.QueryField(fieldName: "id");
   static final NUMBER = amplify_core.QueryField(fieldName: "number");
+  static final ITEM = amplify_core.QueryField(fieldName: "item");
+  static final ACCOUNT = amplify_core.QueryField(fieldName: "account");
   static final STATUS = amplify_core.QueryField(fieldName: "status");
   static final FINALIZED = amplify_core.QueryField(fieldName: "finalized");
   static final TOTAL = amplify_core.QueryField(fieldName: "total");
@@ -231,8 +286,20 @@ class Sale extends amplify_core.Model {
     
     modelSchemaDefinition.addField(amplify_core.ModelFieldDefinition.field(
       key: Sale.NUMBER,
-      isRequired: false,
+      isRequired: true,
       ofType: amplify_core.ModelFieldType(amplify_core.ModelFieldTypeEnum.int)
+    ));
+    
+    modelSchemaDefinition.addField(amplify_core.ModelFieldDefinition.field(
+      key: Sale.ITEM,
+      isRequired: true,
+      ofType: amplify_core.ModelFieldType(amplify_core.ModelFieldTypeEnum.string)
+    ));
+    
+    modelSchemaDefinition.addField(amplify_core.ModelFieldDefinition.field(
+      key: Sale.ACCOUNT,
+      isRequired: true,
+      ofType: amplify_core.ModelFieldType(amplify_core.ModelFieldTypeEnum.string)
     ));
     
     modelSchemaDefinition.addField(amplify_core.ModelFieldDefinition.field(
