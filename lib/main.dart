@@ -8,9 +8,9 @@ import 'package:xerian/amplify_config_service.dart';
 
 import 'package:go_router/go_router.dart';
 import 'package:xerian/models/ModelProvider.dart';
+import 'package:xerian/pages/category/category_list_view.dart';
 import 'package:xerian/pages/category/category_view.dart';
 import 'package:xerian/pages/item/item_form.dart';
-import 'package:xerian/widgets/model_list_view.dart';
 
 import 'pages/account/account_list_view.dart';
 import 'pages/account/account_view.dart';
@@ -22,8 +22,6 @@ import 'pages/routable.dart';
 import 'pages/settings/import_screen.dart';
 import 'pages/settings/web_chrome_addresses_settings.dart';
 import 'pages/settings/web_chrome_settings.dart';
-
-import 'package:xerian/models/Category.dart' as models;
 
 Future<void> main() async {
   try {
@@ -83,7 +81,7 @@ final GoRouter _router = GoRouter(
     _route(const ItemListView()),
     _route(const ItemForm()),
     _routeExtra(const CategoryView()),
-    _route(ModelListView(models.Category.classType, const ['value', 'id'])),
+    _route(CategoryListView()),
     GoRoute(
       path: WebChromeSettings.path,
       builder: (BuildContext context, GoRouterState state) {

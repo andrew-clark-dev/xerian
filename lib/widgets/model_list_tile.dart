@@ -15,15 +15,15 @@ class TileService {
 
   TileService(this.fields, this.context);
 
-  ListTile tile(Model model, fields, {bool dismissable = false}) {
+  ListTile tile(Model model, {bool dismissable = false}) {
     return ListTile(
-      title: _buildRow(model, fields, dismissable: dismissable),
+      title: _buildRow(model, dismissable: dismissable),
       onTap: () =>
           context.push(RoutePath.path(model.getInstanceType()), extra: model),
     );
   }
 
-  Row _buildRow(Model model, List<String> fields, {bool dismissable = false}) {
+  Row _buildRow(Model model, {bool dismissable = false}) {
     List<String> values = [];
 
     for (final field in fields) {
@@ -66,6 +66,6 @@ class TileService {
           ),
         ),
         onDismissed: (_) => _deleteModel(model),
-        child: tile(model, true));
+        child: tile(model, dismissable: true));
   }
 }

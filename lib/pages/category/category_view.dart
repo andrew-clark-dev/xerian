@@ -65,10 +65,7 @@ class _CategoryListViewState extends State<CategoryView> {
 
     final value = _valueController.text;
     // Compress all white space just incase the user put in a few extra spaces
-    final alternatives = _alternativesController.text
-        .trim()
-        .replaceAll(RegExp(' +'), ' ')
-        .split(' ');
+    final alternatives = _alternativesController.text.split(RegExp(' +'));
 
     // if (_isCreate) {
     // Create a new Category entry

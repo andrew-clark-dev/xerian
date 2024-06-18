@@ -9,8 +9,8 @@ class Api {
 
   Api(this.modelType);
 
-  Future<PaginatedResult<Model>?> fetch(
-      {PaginatedResult<Model>? page, QueryPredicate<Model>? query}) async {
+  Future<PaginatedResult<Model>?> fetch(PaginatedResult<Model>? page,
+      {QueryPredicate<Model>? query}) async {
     try {
       GraphQLRequest<PaginatedResult<Model>> request;
       if (page == null) {

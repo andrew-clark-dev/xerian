@@ -18,7 +18,9 @@ class ModelListView extends StatefulWidget implements Routable {
   final ModelType modelType;
   final List<String> fields;
 
-  ModelListView(this.modelType, this.fields, {super.key});
+  final DropDownFilter? filter;
+
+  ModelListView(this.modelType, this.fields, {super.key, this.filter});
 
   @override
   // ignore: library_private_types_in_public_api,
@@ -30,9 +32,14 @@ class ModelListView extends StatefulWidget implements Routable {
 
 class _ModelListViewState extends State<ModelListView> {
   late Api api;
+  late DropDownFilter? filter;
+  late DropdownMenu? menu;
+
   @override
   void initState() {
     super.initState();
+    filter = widget.filter;
+    menu = filter?.menu();
     api = Api(widget.modelType);
     _fetchMore();
   }
@@ -45,8 +52,13 @@ class _ModelListViewState extends State<ModelListView> {
 
   Future<void> _fetchMore() async {
     loading = true;
+
     try {
-      page = (await api.fetch(page: page))!;
+      final query = filter == null
+          ? null
+          : QueryPredicateOperation(
+              "", EqualQueryOperator<Model>(menu!.controller!.value as Model));
+      page = (await api.fetch(page, query: query))!;
       setState(() {
         models += page!.items;
       });
@@ -105,7 +117,6 @@ class _ModelListViewState extends State<ModelListView> {
           title: Text(widget.modelType.modelName().capitalized),
         ),
         drawer: const AppDrawer(), // Add the drawer here
-
         body: Padding(
             padding: const EdgeInsets.only(top: 25),
             child: Column(children: [
@@ -114,7 +125,24 @@ class _ModelListViewState extends State<ModelListView> {
                 Theme.of(context).textTheme.titleMedium,
               ),
               const Divider(),
+              if (filter != null) filter!.menu(),
               Expanded(child: listener(tileService))
             ])));
+  }
+}
+
+class DropDownFilter<T extends Enum> {
+  final TextEditingController controller = TextEditingController();
+
+  final dynamic values;
+
+  DropDownFilter(this.values);
+
+  DropdownMenu menu() {
+    return DropdownMenu(
+        controller: controller,
+        dropdownMenuEntries: (values
+            .map((e) => DropdownMenuEntry<T>(value: e, label: e.name))
+            .toList()));
   }
 }
