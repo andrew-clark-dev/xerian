@@ -1,6 +1,6 @@
 import 'package:amplify_api/amplify_api.dart';
 import 'package:amplify_flutter/amplify_flutter.dart';
-import 'package:xerian/models/Account.dart';
+import 'package:xerian/models/ModelProvider.dart';
 import 'package:xerian/pages/routable.dart';
 import 'package:xerian/services/counter_service.dart';
 import 'package:flutter/material.dart';
@@ -40,6 +40,7 @@ class _AccountListViewState extends State<AccountView> {
   final TextEditingController _stateController = TextEditingController();
   final TextEditingController _postcodeController = TextEditingController();
   final TextEditingController _splitController = TextEditingController();
+  final TextEditingController _adprefsController = TextEditingController();
 
   final emailValidator = Validator(validators: [const EmailValidator()]);
   final phoneValidator = Validator(validators: [const PhoneNumberValidator()]);
@@ -73,15 +74,13 @@ class _AccountListViewState extends State<AccountView> {
 
   Future<void> _submitForm(ScaffoldMessengerState scaffoldMessenger) async {
     // If the form is valid, submit the data
-    final firstName = _firstNameController.text;
-    final lastName = _lastNameController.text;
 
-    // if (_isCreate) {
     // Create a new account entry
     final newAccount = Account(
       number: formatter.format(await counter.next()),
-      firstName: firstName,
-      lastName: lastName,
+      firstName: _firstNameController.text,
+      lastName: _firstNameController.text,
+      adprefs: AccountAdprefs.values.byName(_adprefsController.text),
     );
 
     final request = ModelMutations.create(newAccount);
@@ -173,6 +172,22 @@ class _AccountListViewState extends State<AccountView> {
                         return phoneValidator.validate(
                             label: 'Phone Number', value: value);
                       },
+                    ),
+                    DropdownMenu<AccountAdprefs>(
+                      initialSelection: AccountAdprefs.promoSms,
+                      controller: _adprefsController,
+                      // requestFocusOnTap is enabled/disabled by platforms when it is null.
+                      // On mobile platforms, this is false by default. Setting this to true will
+                      // trigger focus request on the text field and virtual keyboard will appear
+                      // afterward. On desktop platforms however, this defaults to true.
+                      requestFocusOnTap: true,
+                      label: const Text('Communication preference'),
+                      dropdownMenuEntries: AccountAdprefs.values
+                          .map<DropdownMenuEntry<AccountAdprefs>>(
+                              (AccountAdprefs prefs) {
+                        return DropdownMenuEntry<AccountAdprefs>(
+                            value: prefs, label: prefs.name);
+                      }).toList(),
                     ),
                     TextFormField(
                       controller: _addressController,

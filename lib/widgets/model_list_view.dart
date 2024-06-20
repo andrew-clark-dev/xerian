@@ -57,10 +57,10 @@ class _ModelListViewState extends State<ModelListView> {
     try {
       final queryPredicate = Group.TYPE.eq(GroupType.color);
 
-      final query = filter == null
-          ? null
-          : const QueryPredicateOperation(
-              "type", EqualQueryOperator<String>(""));
+      // final query = filter == null
+      //     ? null
+      //     : const QueryPredicateOperation(
+      //         "type", EqualQueryOperator<String>(""));
       // EqualQueryOperator<Model>(menu!.controller!.value as Model));
       page = (await api.fetch(page, query: queryPredicate))!;
       setState(() {

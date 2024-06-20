@@ -8,6 +8,7 @@ import 'package:xerian/amplify_config_service.dart';
 
 import 'package:go_router/go_router.dart';
 import 'package:xerian/models/ModelProvider.dart';
+import 'package:xerian/pages/admin/admin_settings.dart';
 import 'package:xerian/pages/group/group_list_view.dart';
 import 'package:xerian/pages/group/group_view.dart';
 import 'package:xerian/pages/item/item_form.dart';
@@ -19,9 +20,6 @@ import 'pages/item/item_list_view.dart';
 import 'pages/item/item_view.dart';
 import 'pages/login/login_screen.dart';
 import 'pages/routable.dart';
-import 'pages/settings/import_screen.dart';
-import 'pages/settings/web_chrome_addresses_settings.dart';
-import 'pages/settings/web_chrome_settings.dart';
 
 Future<void> main() async {
   try {
@@ -82,24 +80,7 @@ final GoRouter _router = GoRouter(
     _route(const ItemForm()),
     _routeExtra(const GroupView()),
     _route(GroupListView()),
-    GoRoute(
-      path: WebChromeSettings.path,
-      builder: (BuildContext context, GoRouterState state) {
-        return const WebChromeSettings();
-      },
-    ),
-    GoRoute(
-      path: WebChromeAddressesScreen.path,
-      builder: (BuildContext context, GoRouterState state) {
-        return const WebChromeAddressesScreen();
-      },
-    ),
-    GoRoute(
-      path: ImportScreen.path,
-      builder: (BuildContext context, GoRouterState state) {
-        return const ImportScreen();
-      },
-    ),
+    _route(const AdminSettings()),
   ],
 );
 

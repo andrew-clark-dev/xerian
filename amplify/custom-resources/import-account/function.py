@@ -24,11 +24,12 @@ def handler(event, context):
     bucket = event['Records'][0]['s3']['bucket']['name']
     key = urllib.parse.unquote_plus(event['Records'][0]['s3']['object']['key'], encoding='utf-8')
 
-    # Parse the CSV content into a Pandas dataframe
-    df = wr.s3.read_csv(
+    # Parse the Excel content into a Pandas dataframe
+    df = wr.s3.read_excel(
         f's3://{bucket}/{key}',
-        dtype=str
+        dtype="string"
     )
+    log.info(f'Dtypes - {df.dtypes}')
     df = df.fillna('')
 
     # Process your data (e.g., perform transformations or analysis)
@@ -37,12 +38,15 @@ def handler(event, context):
     try:
         with table.batch_writer() as writer:
             for index, row in df.iterrows():
+                log.info(f'Row - {row}')
+                phone = phoneNumber(row)
                 item = {
                     'id': str(uuid.uuid4()),
                     'address' : address(row),
                     'city': row['City'],
                     'createdAt': parse(row['Created']).isoformat(sep='T', timespec='milliseconds') + 'Z',
-                    'phoneNumber': row['Phone'],
+                    'phoneNumber': phone,
+                    'isMobile': phone.startswith('07'), 
                     'email': row['Email'],
                     'firstName': row['First Name'],
                     'lastName': row['Last Name'],
@@ -51,6 +55,7 @@ def handler(event, context):
                     'state': row['State'],
                     'balence': balence(row),
                     'updatedAt': datetime.now(UTC).isoformat(sep='T', timespec='milliseconds').replace('+00:00','Z'),
+                    'adprefs': 'none',
                     'status': status(row),
                     'original': row.to_json(),
                     '__typename': 'Account',
@@ -88,3 +93,15 @@ def status(row):
     if row['Deactivated'] == '':
         return 'active'
     return 'inactive'
+
+def phoneNumber(row):
+    result = row['Phone']
+    # First remove spaces.
+    result = result.replace(' ', '')
+    # Replace +41 with 0 , for Swiss numbers
+    result = result.replace('+41', '0')
+    # Replace 0041 with 0 , for Swiss numbers
+    result = result.replace('0041', '0')
+    # Special case if 417 this is very likely a 07 ..
+    result = result.replace('417', '07')
+    return result

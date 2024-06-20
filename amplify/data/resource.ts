@@ -9,6 +9,24 @@ const schema = a.schema({
       count: a.integer(),
     })
     .authorization((allow) => [allow.authenticated()]),
+
+
+  incrementCounter: a
+    .mutation()
+    // arguments that this query accepts
+    .arguments({
+      id: a.id(),
+    })
+    // return type of the query
+    .returns(a.ref("Counter"))
+    // only allow signed-in users to call this API
+    .handler(
+      a.handler.custom({
+        dataSource: a.ref("Counter"),
+        entry: "./increment-counter.js",
+      })
+    ),
+
   Account: a
     .model({
       number: a.string().required(),
@@ -16,11 +34,13 @@ const schema = a.schema({
       lastName: a.string(),
       email: a.string(),
       phoneNumber: a.string(),
+      isMobile: a.boolean().default(false),
       address: a.string(), // Multiline string,
       city: a.string(),
       state: a.string(),
       postcode: a.string(),
       balance: a.float(),
+      adprefs: a.enum(["promoSms", "none", "all"]),
       status: a.enum(["active", "inactive", "suspended"]),
       original: a.json(),
       // 1. Create reference fields to both ends of
@@ -32,7 +52,8 @@ const schema = a.schema({
       //    the many-to-many relationship using their
       //    respective reference fields
       // items: a.hasMany("Item", "accountId"), // setup relationships between types
-    }),
+    })
+    .secondaryIndexes((index) => [index("number")]),
 
   searchAccounts: a
     .query()
@@ -42,6 +63,17 @@ const schema = a.schema({
       a.handler.custom({
         entry: "./searchAccountResolver.js",
         dataSource: "osDataSource",
+      })
+    ),
+
+  getAccountByNumber: a
+    .query()
+    .arguments({ number: a.string() })
+    .returns(a.ref("Account"))
+    .handler(
+      a.handler.custom({
+        entry: "./get-account-by-number.js",
+        dataSource: a.ref("Account"),
       })
     ),
 
@@ -129,24 +161,6 @@ const schema = a.schema({
       key: a.string(),
       value: a.string(),
     }),
-
-  //Custom Queries/Modifcations
-
-  incrementCounter: a
-    .mutation()
-    // arguments that this query accepts
-    .arguments({
-      id: a.id(),
-    })
-    // return type of the query
-    .returns(a.ref("Counter"))
-    // only allow signed-in users to call this API
-    .handler(
-      a.handler.custom({
-        dataSource: a.ref("Counter"),
-        entry: "./increment-counter.js",
-      })
-    ),
 
 })
   // Default is to allow access to authenticated users

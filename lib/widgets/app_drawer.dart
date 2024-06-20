@@ -2,12 +2,12 @@ import 'package:xerian/pages/account/account_list_view.dart';
 import 'package:flutter/material.dart';
 
 import 'package:go_router/go_router.dart';
+import 'package:xerian/pages/admin/admin_settings.dart';
 import 'package:xerian/pages/dashboard/dashboard_view.dart';
 import 'package:xerian/pages/item/item_form.dart';
 import 'package:xerian/pages/item/item_list_view.dart';
 
 import '../models/Group.dart';
-import '../pages/settings/web_chrome_settings.dart';
 import '../services/route_path.dart';
 
 class AppDrawer extends StatelessWidget {
@@ -35,25 +35,16 @@ class AppDrawer extends StatelessWidget {
           ),
           _listTile(context, DashboardView().path, 'Dashboard'),
           _listTile(context, const ItemListView().path, 'Items'),
-
           ListTile(
             title: const Text('Sales'),
             onTap: () {
               context.go('/sales');
             },
           ),
-
           _listTile(context, const AccountListView().path, 'Accounts'),
           _listTile(context, RoutePath.listPath(Group.classType), 'Categories'),
           _listTile(context, const ItemForm().path, 'Add item'),
-
-          ListTile(
-            title: const Text('Settings'),
-            onTap: () {
-              context.push(WebChromeSettings.path);
-            },
-          ),
-          // Add more ListTile widgets for additional menu items
+          _listTile(context, const AdminSettings().path, 'Administration'),
         ],
       ),
     );

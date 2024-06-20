@@ -30,6 +30,7 @@ import 'Sale.dart';
 import 'Tag.dart';
 
 export 'Account.dart';
+export 'AccountAdprefs.dart';
 export 'AccountStatus.dart';
 export 'Counter.dart';
 export 'Group.dart';
@@ -48,7 +49,7 @@ export 'Tag.dart';
 
 class ModelProvider implements amplify_core.ModelProviderInterface {
   @override
-  String version = "882cbfde2d941c5374b559d97343eab3";
+  String version = "e958a6d3535f25262f01660a59f6cc02";
   @override
   List<amplify_core.ModelSchema> modelSchemas = [Account.schema, Counter.schema, Group.schema, Item.schema, Journal.schema, Refund.schema, Sale.schema, Tag.schema];
   @override
