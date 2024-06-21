@@ -5,10 +5,14 @@ import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:logging/logging.dart';
 import 'package:settings_ui/settings_ui.dart';
+import 'package:xerian/models/ModelProvider.dart';
 
-import '../../models/Account.dart';
+import '../../services/extended_model_queries.dart';
 import '../routable.dart';
+
+final Logger log = Logger("AdminSettings");
 
 class AdminSettings extends StatelessWidget implements Routable {
   @override
@@ -60,69 +64,6 @@ class AdminSettings extends StatelessWidget implements Routable {
     );
   }
 
-  static const graphQLDocument = '''
-      query listAccountByNumber(\$number: String!) {
-        listAccountByNumber(number: \$number) {
-            items {
-              firstName
-              lastName
-              number
-              id
-              address
-              adprefs
-              balance
-              city
-              createdAt
-              email
-              isMobile
-              original
-              phoneNumber
-              postcode
-              state
-              status
-              updatedAt
-          }
-        }
-      }
-    ''';
-
-  static const graphQLDocument2 = '''
-query listAccounts(\$filter: ModelAccountFilterInput, \$limit: Int, \$nextToken: String) { 
-listAccounts(filter: \$filter, limit: \$limit, nextToken: \$nextToken) { 
-items { 
-  id 
-  number 
-  firstName 
-  lastName 
-  email 
-  phoneNumber 
-  isMobile 
-  address 
-  city 
-  state 
-  postcode 
-  balance 
-  adprefs 
-  status 
-  original 
-  createdAt 
-  updatedAt } 
-nextToken } 
-}
-''';
-
-  /// Atomically increment the counter for the given model (or modelName) and return the incremented value
-  Future<Account> getByNumber(String number) async {
-    final incRequest = GraphQLRequest<Account>(
-        document: graphQLDocument,
-        variables: <String, String>{"number": number},
-        modelType: Account.classType);
-
-    final response = await Amplify.API.query(request: incRequest).response;
-    final count = response.data!;
-    return count;
-  }
-
   Future<void> processFile() async {
     NumberFormat formatter = NumberFormat("000000");
 
@@ -136,35 +77,30 @@ nextToken }
         var key = line.split(',')[0].trim();
         if (key.isNotEmpty) {
           var number = formatter.format(int.parse(key));
+          i += 1;
 
-          final queryPredicate = Account.NUMBER.eq(number);
-
-          final request = ModelQueries.list<Account>(
-            Account.classType,
-            where: queryPredicate,
-          );
-
-          request.modelType;
-
-          // final response = await Amplify.API.query(request: request).response;
-
-          // print('Response - $response');
-
-          final incRequest = GraphQLRequest<PaginatedResult<Account>>(
-              document: graphQLDocument,
-              variables: <String, String>{"number": number},
-              decodePath: 'listAccountByNumber',
-              modelType: const PaginatedModelType(Account.classType));
+          final request = ExtendedModelQueries.listBy<Account>(
+              Account.classType, Account.schema.indexes!.first, number);
 
           final incresponse =
-              await Amplify.API.query(request: incRequest).response;
+              await Amplify.API.query(request: request).response;
 
-          print('Response - $incresponse');
+          var items = incresponse.data!.items;
 
-          i += i;
-
-          if (i > 10) {
-            break;
+          if (items.isEmpty) {
+            log.warning('$i - Number - $number not found');
+          } else {
+            Account account = items.first!;
+            if (account.phoneNumber != null &&
+                account.isMobile == true &&
+                account.adprefs != AccountAdprefs.promoSms) {
+              final update = account.copyWith(adprefs: AccountAdprefs.promoSms);
+              final request = ModelMutations.update(update);
+              await Amplify.API.mutate(request: request).response;
+              safePrint('$i - Number - $number updated');
+            } else {
+              safePrint('$i - Number - $number NOT updated');
+            }
           }
         }
       }

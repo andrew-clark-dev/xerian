@@ -66,17 +66,6 @@ const schema = a.schema({
       })
     ),
 
-  getAccountByNumber: a
-    .query()
-    .arguments({ number: a.string() })
-    .returns(a.ref("Account"))
-    .handler(
-      a.handler.custom({
-        entry: "./get-account-by-number.js",
-        dataSource: a.ref("Account"),
-      })
-    ),
-
   Item: a
     .model({
       sku: a.integer().required(),

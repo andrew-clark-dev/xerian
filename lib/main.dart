@@ -5,6 +5,7 @@ import 'package:amplify_storage_s3/amplify_storage_s3.dart';
 import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:xerian/amplify_config_service.dart';
+import 'package:logging/logging.dart';
 
 import 'package:go_router/go_router.dart';
 import 'package:xerian/models/ModelProvider.dart';
@@ -23,6 +24,7 @@ import 'pages/routable.dart';
 
 Future<void> main() async {
   try {
+    Logger.root.level = Level.ALL;
     WidgetsFlutterBinding.ensureInitialized();
     await _configureAmplify();
     runApp(const Xerian());
