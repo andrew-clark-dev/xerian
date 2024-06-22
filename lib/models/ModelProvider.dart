@@ -22,19 +22,21 @@
 import 'package:amplify_core/amplify_core.dart' as amplify_core;
 import 'Account.dart';
 import 'Dashboard.dart';
+import 'Login.dart';
 import 'Settings.dart';
 
 export 'Account.dart';
 export 'AccountComunicationPreferences.dart';
 export 'AccountStatus.dart';
 export 'Dashboard.dart';
+export 'Login.dart';
 export 'Settings.dart';
 
 class ModelProvider implements amplify_core.ModelProviderInterface {
   @override
-  String version = "b3d8b6470fd1b7fb5619c386cdafba33";
+  String version = "d3994d0aecc609560badaa1413ad81e2";
   @override
-  List<amplify_core.ModelSchema> modelSchemas = [Account.schema, Dashboard.schema, Settings.schema];
+  List<amplify_core.ModelSchema> modelSchemas = [Account.schema, Dashboard.schema, Login.schema, Settings.schema];
   @override
   List<amplify_core.ModelSchema> customTypeSchemas = [];
   static final ModelProvider _instance = ModelProvider();
@@ -47,6 +49,8 @@ class ModelProvider implements amplify_core.ModelProviderInterface {
         return Account.classType;
       case "Dashboard":
         return Dashboard.classType;
+      case "Login":
+        return Login.classType;
       case "Settings":
         return Settings.classType;
       default:

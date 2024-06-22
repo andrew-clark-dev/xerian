@@ -10,6 +10,7 @@ import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:xerian/amplify_config_service.dart';
 import 'package:xerian/models/ModelProvider.dart';
 import 'package:xerian/pages/dashboard/dashboard_view.dart';
+import 'package:xerian/services/model_extensions.dart';
 
 import 'pages/login/login_screen.dart';
 
@@ -20,7 +21,7 @@ Future<void> main() async {
     Logger.root.level = Level.ALL;
     WidgetsFlutterBinding.ensureInitialized();
     await _configureAmplify();
-    runApp(const EncoreShopApp());
+    runApp(EncoreShopApp());
   } on AmplifyException catch (e) {
     runApp(Text("Error configuring Amplify: ${e.message}"));
   }
@@ -42,22 +43,45 @@ Future<void> _configureAmplify() async {
   }
 }
 
-/// The route configuration.
-final GoRouter _router = GoRouter(routes: <RouteBase>[
-  GoRoute(
-    path: '/',
-    builder: (BuildContext context, GoRouterState state) {
-      return const LoginScreen();
-    },
-  ),
-  Config.route(Dashboard.classType, const DashboardView()),
-  Config.listRoute(Account.classType),
-  Config.viewRoute(Account.classType),
-]);
-
 class EncoreShopApp extends StatelessWidget {
   /// Constructs a [EncoreShopApp]
-  const EncoreShopApp({super.key});
+  EncoreShopApp({super.key});
+
+  /// The route configuration.
+  late final GoRouter _router = GoRouter(
+      initialLocation: Dashboard.classType.path(), // start at the dashboard
+      routes: <RouteBase>[
+        Config.route(Login.classType, const LoginScreen()),
+        Config.route(Dashboard.classType, const DashboardView()),
+        Config.listRoute(Account.classType),
+        Config.viewRoute(Account.classType),
+      ],
+
+      // redirect to the login page if the user is not logged in
+      redirect: (BuildContext context, GoRouterState state) async {
+        // if the user is not logged in, they need to login
+        final loggedIn = await isAuthorized();
+        final loggingIn = state.path == Login.classType.path();
+        if (!loggedIn) return loggingIn ? null : Login.classType.path();
+
+        // if the user is logged in but still on the login page, send them to
+        // the home page
+        if (loggingIn) return '/';
+
+        // no need to redirect at all
+        return null;
+      });
+
+  Future<bool> isAuthorized() async {
+    try {
+      final result = await Amplify.Auth.fetchAuthSession();
+      safePrint('User is signed in: ${result.isSignedIn}');
+      return result.isSignedIn;
+    } on AuthException catch (e) {
+      safePrint('Error retrieving auth session: ${e.message}');
+      return false;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {

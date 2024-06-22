@@ -23,9 +23,9 @@ import 'ModelProvider.dart';
 import 'package:amplify_core/amplify_core.dart' as amplify_core;
 
 
-/** This is an auto generated class representing the Dashboard type in your schema. */
-class Dashboard extends amplify_core.Model {
-  static const classType = const _DashboardModelType();
+/** This is an auto generated class representing the Login type in your schema. */
+class Login extends amplify_core.Model {
+  static const classType = const _LoginModelType();
   final String id;
   final String? _email;
   final String? _config;
@@ -39,8 +39,8 @@ class Dashboard extends amplify_core.Model {
   @override
   String getId() => id;
   
-  DashboardModelIdentifier get modelIdentifier {
-      return DashboardModelIdentifier(
+  LoginModelIdentifier get modelIdentifier {
+      return LoginModelIdentifier(
         id: id
       );
   }
@@ -61,10 +61,10 @@ class Dashboard extends amplify_core.Model {
     return _updatedAt;
   }
   
-  const Dashboard._internal({required this.id, email, config, createdAt, updatedAt}): _email = email, _config = config, _createdAt = createdAt, _updatedAt = updatedAt;
+  const Login._internal({required this.id, email, config, createdAt, updatedAt}): _email = email, _config = config, _createdAt = createdAt, _updatedAt = updatedAt;
   
-  factory Dashboard({String? id, String? email, String? config}) {
-    return Dashboard._internal(
+  factory Login({String? id, String? email, String? config}) {
+    return Login._internal(
       id: id == null ? amplify_core.UUID.getUUID() : id,
       email: email,
       config: config);
@@ -77,7 +77,7 @@ class Dashboard extends amplify_core.Model {
   @override
   bool operator ==(Object other) {
     if (identical(other, this)) return true;
-    return other is Dashboard &&
+    return other is Login &&
       id == other.id &&
       _email == other._email &&
       _config == other._config;
@@ -90,7 +90,7 @@ class Dashboard extends amplify_core.Model {
   String toString() {
     var buffer = new StringBuffer();
     
-    buffer.write("Dashboard {");
+    buffer.write("Login {");
     buffer.write("id=" + "$id" + ", ");
     buffer.write("email=" + "$_email" + ", ");
     buffer.write("config=" + "$_config" + ", ");
@@ -101,25 +101,25 @@ class Dashboard extends amplify_core.Model {
     return buffer.toString();
   }
   
-  Dashboard copyWith({String? email, String? config}) {
-    return Dashboard._internal(
+  Login copyWith({String? email, String? config}) {
+    return Login._internal(
       id: id,
       email: email ?? this.email,
       config: config ?? this.config);
   }
   
-  Dashboard copyWithModelFieldValues({
+  Login copyWithModelFieldValues({
     ModelFieldValue<String?>? email,
     ModelFieldValue<String?>? config
   }) {
-    return Dashboard._internal(
+    return Login._internal(
       id: id,
       email: email == null ? this.email : email.value,
       config: config == null ? this.config : config.value
     );
   }
   
-  Dashboard.fromJson(Map<String, dynamic> json)  
+  Login.fromJson(Map<String, dynamic> json)  
     : id = json['id'],
       _email = json['email'],
       _config = json['config'],
@@ -138,13 +138,13 @@ class Dashboard extends amplify_core.Model {
     'updatedAt': _updatedAt
   };
 
-  static final amplify_core.QueryModelIdentifier<DashboardModelIdentifier> MODEL_IDENTIFIER = amplify_core.QueryModelIdentifier<DashboardModelIdentifier>();
+  static final amplify_core.QueryModelIdentifier<LoginModelIdentifier> MODEL_IDENTIFIER = amplify_core.QueryModelIdentifier<LoginModelIdentifier>();
   static final ID = amplify_core.QueryField(fieldName: "id");
   static final EMAIL = amplify_core.QueryField(fieldName: "email");
   static final CONFIG = amplify_core.QueryField(fieldName: "config");
   static var schema = amplify_core.Model.defineSchema(define: (amplify_core.ModelSchemaDefinition modelSchemaDefinition) {
-    modelSchemaDefinition.name = "Dashboard";
-    modelSchemaDefinition.pluralName = "Dashboards";
+    modelSchemaDefinition.name = "Login";
+    modelSchemaDefinition.pluralName = "Logins";
     
     modelSchemaDefinition.authRules = [
       amplify_core.AuthRule(
@@ -160,13 +160,13 @@ class Dashboard extends amplify_core.Model {
     modelSchemaDefinition.addField(amplify_core.ModelFieldDefinition.id());
     
     modelSchemaDefinition.addField(amplify_core.ModelFieldDefinition.field(
-      key: Dashboard.EMAIL,
+      key: Login.EMAIL,
       isRequired: false,
       ofType: amplify_core.ModelFieldType(amplify_core.ModelFieldTypeEnum.string)
     ));
     
     modelSchemaDefinition.addField(amplify_core.ModelFieldDefinition.field(
-      key: Dashboard.CONFIG,
+      key: Login.CONFIG,
       isRequired: false,
       ofType: amplify_core.ModelFieldType(amplify_core.ModelFieldTypeEnum.string)
     ));
@@ -187,29 +187,29 @@ class Dashboard extends amplify_core.Model {
   });
 }
 
-class _DashboardModelType extends amplify_core.ModelType<Dashboard> {
-  const _DashboardModelType();
+class _LoginModelType extends amplify_core.ModelType<Login> {
+  const _LoginModelType();
   
   @override
-  Dashboard fromJson(Map<String, dynamic> jsonData) {
-    return Dashboard.fromJson(jsonData);
+  Login fromJson(Map<String, dynamic> jsonData) {
+    return Login.fromJson(jsonData);
   }
   
   @override
   String modelName() {
-    return 'Dashboard';
+    return 'Login';
   }
 }
 
 /**
  * This is an auto generated class representing the model identifier
- * of [Dashboard] in your schema.
+ * of [Login] in your schema.
  */
-class DashboardModelIdentifier implements amplify_core.ModelIdentifier<Dashboard> {
+class LoginModelIdentifier implements amplify_core.ModelIdentifier<Login> {
   final String id;
 
-  /** Create an instance of DashboardModelIdentifier using [id] the primary key. */
-  const DashboardModelIdentifier({
+  /** Create an instance of LoginModelIdentifier using [id] the primary key. */
+  const LoginModelIdentifier({
     required this.id});
   
   @override
@@ -227,7 +227,7 @@ class DashboardModelIdentifier implements amplify_core.ModelIdentifier<Dashboard
   String serializeAsString() => serializeAsMap().values.join('#');
   
   @override
-  String toString() => 'DashboardModelIdentifier(id: $id)';
+  String toString() => 'LoginModelIdentifier(id: $id)';
   
   @override
   bool operator ==(Object other) {
@@ -235,7 +235,7 @@ class DashboardModelIdentifier implements amplify_core.ModelIdentifier<Dashboard
       return true;
     }
     
-    return other is DashboardModelIdentifier &&
+    return other is LoginModelIdentifier &&
       id == other.id;
   }
   
