@@ -54,6 +54,7 @@ dependencies:
   logging: ^1.2.0
   graphql_flutter: ^5.2.0-beta.7
   amplify_api_dart: ^0.5.1
+  change_case: ^2.1.0
 dev_dependencies:
   flutter_test:
     sdk: flutter

@@ -15,18 +15,22 @@ class ModelListTile extends ListTile {
 
   @override
   Widget build(BuildContext context) {
-    final fields = ModelConfig(model.getInstanceType()).listFields();
+    final fields = ModelConfig(model.getInstanceType()).values(model);
     return ListTile(
-      title: _buildRow(fields),
+      title: buildRow(fields),
       onTap: () => context.push(model.getInstanceType().path(), extra: model),
     );
   }
 
-  Row _buildRow(List values) {
+  static Row buildRow(List values, {TextStyle? style}) {
     List<Widget> children = [];
     for (final value in values) {
       children.add(Expanded(
-        child: Text(value, textAlign: TextAlign.left),
+        child: Text(
+          value,
+          textAlign: TextAlign.left,
+          style: style,
+        ),
       ));
     }
     return Row(children: children);

@@ -5,6 +5,7 @@ import 'package:xerian/models/Account.dart';
 import 'package:xerian/services/model_extensions.dart';
 import 'package:xerian/widgets/model_list_view.dart';
 import 'package:xerian/widgets/model_view.dart';
+import 'package:change_case/change_case.dart';
 
 class ModelConfig {
   final ModelType modelType;
@@ -14,23 +15,33 @@ class ModelConfig {
   static final modelConfig = {
     Account.classType: {
       'listFields': [
-        ('number'),
-        ('firstName'),
-        ('lastName'),
-        ('phoneNumber'),
-        ('email', 'E-Mail'),
-        ('balance'),
-        ('comunicationPreferences', 'Contact')
+        ['number'],
+        ['firstName'],
+        ['lastName'],
+        ['phoneNumber'],
+        ['email', 'E-Mail'],
+        ['balance'],
+        ['comunicationPreferences', 'Contact']
       ]
     }
   };
 
-  List _get(String name) {
+  List<List<String>> _get(String name) {
     return modelConfig[modelType]![name]!;
   }
 
   List<String> listFields() {
-    return _get('listFields').map((r) => r.$1 as String).toList();
+    return _get('listFields').map((d) => d[0]).toList();
+  }
+
+  List<String> listTitles() {
+    return _get('listFields').map((d) {
+      if (d.length > 1) {
+        return d[1];
+      } else {
+        return (d[0]).toCapitalCase();
+      }
+    }).toList();
   }
 
   List<String> values(Model model) {
@@ -39,10 +50,6 @@ class ModelConfig {
       result.add(model.toMap()[field].toString());
     }
     return result;
-  }
-
-  List<String> listTitles() {
-    return _get('listFields').map((r) => r.$1 as String).toList();
   }
 
   GoRoute listRoute() {

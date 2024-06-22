@@ -1,11 +1,11 @@
 import 'package:logging/logging.dart';
 import 'package:amplify_core/amplify_core.dart';
 import 'package:flutter/material.dart';
+import 'package:xerian/model_config.dart';
 import 'package:xerian/widgets/model_list_tile.dart';
 
 import '../services/api.dart';
 import '../services/model_extensions.dart';
-import '../services/row_service.dart';
 import 'app_drawer.dart';
 import 'package:go_router/go_router.dart';
 
@@ -107,10 +107,8 @@ class _ModelListViewState extends State<ModelListView> {
         body: Padding(
             padding: const EdgeInsets.only(top: 25),
             child: Column(children: [
-              RowService.buildRow(
-                widget.fields,
-                Theme.of(context).textTheme.titleMedium,
-              ),
+              ModelListTile.buildRow(ModelConfig(modelType).listTitles(),
+                  style: Theme.of(context).textTheme.titleMedium),
               const Divider(),
               Expanded(child: listener())
             ])));
