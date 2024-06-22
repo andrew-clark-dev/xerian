@@ -6,31 +6,55 @@ import 'package:xerian/services/model_extensions.dart';
 import 'package:xerian/widgets/model_list_view.dart';
 import 'package:xerian/widgets/model_view.dart';
 
-class Config {
+class ModelConfig {
+  final ModelType modelType;
+
+  ModelConfig(this.modelType);
+
   static final modelConfig = {
     Account.classType: {
-      'listFields': const [
-        'number',
-        'firstName',
-        'lastName',
-        'phoneNumber',
-        'email',
-        'balance',
-        'comunicationPreferences'
+      'listFields': [
+        ('number'),
+        ('firstName'),
+        ('lastName'),
+        ('phoneNumber'),
+        ('email', 'E-Mail'),
+        ('balance'),
+        ('comunicationPreferences', 'Contact')
       ]
     }
   };
 
-  static GoRoute listRoute(ModelType modelType) {
+  List _get(String name) {
+    return modelConfig[modelType]![name]!;
+  }
+
+  List<String> listFields() {
+    return _get('listFields').map((r) => r.$1 as String).toList();
+  }
+
+  List<String> values(Model model) {
+    List<String> result = [];
+    for (final field in listFields()) {
+      result.add(model.toMap()[field].toString());
+    }
+    return result;
+  }
+
+  List<String> listTitles() {
+    return _get('listFields').map((r) => r.$1 as String).toList();
+  }
+
+  GoRoute listRoute() {
     return GoRoute(
       path: modelType.listPath(),
       builder: (BuildContext context, GoRouterState state) {
-        return ModelListView(modelType, modelConfig[modelType]!['listFields']!);
+        return ModelListView(modelType, listFields());
       },
     );
   }
 
-  static GoRoute viewRoute(ModelType modelType) {
+  GoRoute viewRoute() {
     return GoRoute(
       path: modelType.path(),
       builder: (BuildContext context, GoRouterState state) {
@@ -42,7 +66,7 @@ class Config {
     );
   }
 
-  static GoRoute route(ModelType modelType, Widget page) {
+  GoRoute route(Widget page) {
     return GoRoute(
       path: modelType.path(),
       builder: (BuildContext context, GoRouterState state) {

@@ -14,7 +14,7 @@ import 'package:xerian/services/model_extensions.dart';
 
 import 'pages/login/login_screen.dart';
 
-import 'config.dart';
+import 'model_config.dart';
 
 Future<void> main() async {
   try {
@@ -51,10 +51,10 @@ class EncoreShopApp extends StatelessWidget {
   late final GoRouter _router = GoRouter(
       initialLocation: Dashboard.classType.path(), // start at the dashboard
       routes: <RouteBase>[
-        Config.route(Login.classType, const LoginScreen()),
-        Config.route(Dashboard.classType, const DashboardView()),
-        Config.listRoute(Account.classType),
-        Config.viewRoute(Account.classType),
+        ModelConfig(Login.classType).route(const LoginScreen()),
+        ModelConfig(Dashboard.classType).route(const DashboardView()),
+        ModelConfig(Account.classType).listRoute(),
+        ModelConfig(Account.classType).viewRoute(),
       ],
 
       // redirect to the login page if the user is not logged in

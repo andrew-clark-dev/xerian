@@ -2,32 +2,27 @@ import 'package:amplify_core/amplify_core.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:logging/logging.dart';
+import 'package:xerian/model_config.dart';
 
 import '../services/model_extensions.dart';
 
-class ModelListTile {
+class ModelListTile extends ListTile {
   final Logger log = Logger("ModelListTile");
 
-  final List<String> fields;
+  final Model model;
 
-  final BuildContext context;
+  ModelListTile(this.model, {super.key});
 
-  ModelListTile(this.fields, this.context);
-
-  ListTile tile(Model model, {bool dismissable = false}) {
+  @override
+  Widget build(BuildContext context) {
+    final fields = ModelConfig(model.getInstanceType()).listFields();
     return ListTile(
-      title: _buildRow(model, dismissable: dismissable),
+      title: _buildRow(fields),
       onTap: () => context.push(model.getInstanceType().path(), extra: model),
     );
   }
 
-  Row _buildRow(Model model, {bool dismissable = false}) {
-    List<String> values = [];
-
-    for (final field in fields) {
-      values.add(model.toMap()[field].toString());
-    }
-
+  Row _buildRow(List values) {
     List<Widget> children = [];
     for (final value in values) {
       children.add(Expanded(
