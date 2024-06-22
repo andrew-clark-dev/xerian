@@ -23,13 +23,12 @@ import 'ModelProvider.dart';
 import 'package:amplify_core/amplify_core.dart' as amplify_core;
 
 
-/** This is an auto generated class representing the Tag type in your schema. */
-class Tag extends amplify_core.Model {
-  static const classType = const _TagModelType();
+/** This is an auto generated class representing the Dashboard type in your schema. */
+class Dashboard extends amplify_core.Model {
+  static const classType = const _DashboardModelType();
   final String id;
-  final String? _modelId;
-  final String? _key;
-  final String? _value;
+  final String? _email;
+  final String? _config;
   final amplify_core.TemporalDateTime? _createdAt;
   final amplify_core.TemporalDateTime? _updatedAt;
 
@@ -40,22 +39,18 @@ class Tag extends amplify_core.Model {
   @override
   String getId() => id;
   
-  TagModelIdentifier get modelIdentifier {
-      return TagModelIdentifier(
+  DashboardModelIdentifier get modelIdentifier {
+      return DashboardModelIdentifier(
         id: id
       );
   }
   
-  String? get modelId {
-    return _modelId;
+  String? get email {
+    return _email;
   }
   
-  String? get key {
-    return _key;
-  }
-  
-  String? get value {
-    return _value;
+  String? get config {
+    return _config;
   }
   
   amplify_core.TemporalDateTime? get createdAt {
@@ -66,14 +61,13 @@ class Tag extends amplify_core.Model {
     return _updatedAt;
   }
   
-  const Tag._internal({required this.id, modelId, key, value, createdAt, updatedAt}): _modelId = modelId, _key = key, _value = value, _createdAt = createdAt, _updatedAt = updatedAt;
+  const Dashboard._internal({required this.id, email, config, createdAt, updatedAt}): _email = email, _config = config, _createdAt = createdAt, _updatedAt = updatedAt;
   
-  factory Tag({String? id, String? modelId, String? key, String? value}) {
-    return Tag._internal(
+  factory Dashboard({String? id, String? email, String? config}) {
+    return Dashboard._internal(
       id: id == null ? amplify_core.UUID.getUUID() : id,
-      modelId: modelId,
-      key: key,
-      value: value);
+      email: email,
+      config: config);
   }
   
   bool equals(Object other) {
@@ -83,11 +77,10 @@ class Tag extends amplify_core.Model {
   @override
   bool operator ==(Object other) {
     if (identical(other, this)) return true;
-    return other is Tag &&
+    return other is Dashboard &&
       id == other.id &&
-      _modelId == other._modelId &&
-      _key == other._key &&
-      _value == other._value;
+      _email == other._email &&
+      _config == other._config;
   }
   
   @override
@@ -97,11 +90,10 @@ class Tag extends amplify_core.Model {
   String toString() {
     var buffer = new StringBuffer();
     
-    buffer.write("Tag {");
+    buffer.write("Dashboard {");
     buffer.write("id=" + "$id" + ", ");
-    buffer.write("modelId=" + "$_modelId" + ", ");
-    buffer.write("key=" + "$_key" + ", ");
-    buffer.write("value=" + "$_value" + ", ");
+    buffer.write("email=" + "$_email" + ", ");
+    buffer.write("config=" + "$_config" + ", ");
     buffer.write("createdAt=" + (_createdAt != null ? _createdAt.format() : "null") + ", ");
     buffer.write("updatedAt=" + (_updatedAt != null ? _updatedAt.format() : "null"));
     buffer.write("}");
@@ -109,56 +101,50 @@ class Tag extends amplify_core.Model {
     return buffer.toString();
   }
   
-  Tag copyWith({String? modelId, String? key, String? value}) {
-    return Tag._internal(
+  Dashboard copyWith({String? email, String? config}) {
+    return Dashboard._internal(
       id: id,
-      modelId: modelId ?? this.modelId,
-      key: key ?? this.key,
-      value: value ?? this.value);
+      email: email ?? this.email,
+      config: config ?? this.config);
   }
   
-  Tag copyWithModelFieldValues({
-    ModelFieldValue<String?>? modelId,
-    ModelFieldValue<String?>? key,
-    ModelFieldValue<String?>? value
+  Dashboard copyWithModelFieldValues({
+    ModelFieldValue<String?>? email,
+    ModelFieldValue<String?>? config
   }) {
-    return Tag._internal(
+    return Dashboard._internal(
       id: id,
-      modelId: modelId == null ? this.modelId : modelId.value,
-      key: key == null ? this.key : key.value,
-      value: value == null ? this.value : value.value
+      email: email == null ? this.email : email.value,
+      config: config == null ? this.config : config.value
     );
   }
   
-  Tag.fromJson(Map<String, dynamic> json)  
+  Dashboard.fromJson(Map<String, dynamic> json)  
     : id = json['id'],
-      _modelId = json['modelId'],
-      _key = json['key'],
-      _value = json['value'],
+      _email = json['email'],
+      _config = json['config'],
       _createdAt = json['createdAt'] != null ? amplify_core.TemporalDateTime.fromString(json['createdAt']) : null,
       _updatedAt = json['updatedAt'] != null ? amplify_core.TemporalDateTime.fromString(json['updatedAt']) : null;
   
   Map<String, dynamic> toJson() => {
-    'id': id, 'modelId': _modelId, 'key': _key, 'value': _value, 'createdAt': _createdAt?.format(), 'updatedAt': _updatedAt?.format()
+    'id': id, 'email': _email, 'config': _config, 'createdAt': _createdAt?.format(), 'updatedAt': _updatedAt?.format()
   };
   
   Map<String, Object?> toMap() => {
     'id': id,
-    'modelId': _modelId,
-    'key': _key,
-    'value': _value,
+    'email': _email,
+    'config': _config,
     'createdAt': _createdAt,
     'updatedAt': _updatedAt
   };
 
-  static final amplify_core.QueryModelIdentifier<TagModelIdentifier> MODEL_IDENTIFIER = amplify_core.QueryModelIdentifier<TagModelIdentifier>();
+  static final amplify_core.QueryModelIdentifier<DashboardModelIdentifier> MODEL_IDENTIFIER = amplify_core.QueryModelIdentifier<DashboardModelIdentifier>();
   static final ID = amplify_core.QueryField(fieldName: "id");
-  static final MODELID = amplify_core.QueryField(fieldName: "modelId");
-  static final KEY = amplify_core.QueryField(fieldName: "key");
-  static final VALUE = amplify_core.QueryField(fieldName: "value");
+  static final EMAIL = amplify_core.QueryField(fieldName: "email");
+  static final CONFIG = amplify_core.QueryField(fieldName: "config");
   static var schema = amplify_core.Model.defineSchema(define: (amplify_core.ModelSchemaDefinition modelSchemaDefinition) {
-    modelSchemaDefinition.name = "Tag";
-    modelSchemaDefinition.pluralName = "Tags";
+    modelSchemaDefinition.name = "Dashboard";
+    modelSchemaDefinition.pluralName = "Dashboards";
     
     modelSchemaDefinition.authRules = [
       amplify_core.AuthRule(
@@ -174,19 +160,13 @@ class Tag extends amplify_core.Model {
     modelSchemaDefinition.addField(amplify_core.ModelFieldDefinition.id());
     
     modelSchemaDefinition.addField(amplify_core.ModelFieldDefinition.field(
-      key: Tag.MODELID,
+      key: Dashboard.EMAIL,
       isRequired: false,
       ofType: amplify_core.ModelFieldType(amplify_core.ModelFieldTypeEnum.string)
     ));
     
     modelSchemaDefinition.addField(amplify_core.ModelFieldDefinition.field(
-      key: Tag.KEY,
-      isRequired: false,
-      ofType: amplify_core.ModelFieldType(amplify_core.ModelFieldTypeEnum.string)
-    ));
-    
-    modelSchemaDefinition.addField(amplify_core.ModelFieldDefinition.field(
-      key: Tag.VALUE,
+      key: Dashboard.CONFIG,
       isRequired: false,
       ofType: amplify_core.ModelFieldType(amplify_core.ModelFieldTypeEnum.string)
     ));
@@ -207,29 +187,29 @@ class Tag extends amplify_core.Model {
   });
 }
 
-class _TagModelType extends amplify_core.ModelType<Tag> {
-  const _TagModelType();
+class _DashboardModelType extends amplify_core.ModelType<Dashboard> {
+  const _DashboardModelType();
   
   @override
-  Tag fromJson(Map<String, dynamic> jsonData) {
-    return Tag.fromJson(jsonData);
+  Dashboard fromJson(Map<String, dynamic> jsonData) {
+    return Dashboard.fromJson(jsonData);
   }
   
   @override
   String modelName() {
-    return 'Tag';
+    return 'Dashboard';
   }
 }
 
 /**
  * This is an auto generated class representing the model identifier
- * of [Tag] in your schema.
+ * of [Dashboard] in your schema.
  */
-class TagModelIdentifier implements amplify_core.ModelIdentifier<Tag> {
+class DashboardModelIdentifier implements amplify_core.ModelIdentifier<Dashboard> {
   final String id;
 
-  /** Create an instance of TagModelIdentifier using [id] the primary key. */
-  const TagModelIdentifier({
+  /** Create an instance of DashboardModelIdentifier using [id] the primary key. */
+  const DashboardModelIdentifier({
     required this.id});
   
   @override
@@ -247,7 +227,7 @@ class TagModelIdentifier implements amplify_core.ModelIdentifier<Tag> {
   String serializeAsString() => serializeAsMap().values.join('#');
   
   @override
-  String toString() => 'TagModelIdentifier(id: $id)';
+  String toString() => 'DashboardModelIdentifier(id: $id)';
   
   @override
   bool operator ==(Object other) {
@@ -255,7 +235,7 @@ class TagModelIdentifier implements amplify_core.ModelIdentifier<Tag> {
       return true;
     }
     
-    return other is TagModelIdentifier &&
+    return other is DashboardModelIdentifier &&
       id == other.id;
   }
   

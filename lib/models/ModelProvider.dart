@@ -21,37 +21,20 @@
 
 import 'package:amplify_core/amplify_core.dart' as amplify_core;
 import 'Account.dart';
-import 'Counter.dart';
-import 'Group.dart';
-import 'Item.dart';
-import 'Journal.dart';
-import 'Refund.dart';
-import 'Sale.dart';
-import 'Tag.dart';
+import 'Dashboard.dart';
+import 'Settings.dart';
 
 export 'Account.dart';
-export 'AccountAdprefs.dart';
+export 'AccountComunicationPreferences.dart';
 export 'AccountStatus.dart';
-export 'Counter.dart';
-export 'Group.dart';
-export 'GroupType.dart';
-export 'Item.dart';
-export 'ItemQuality.dart';
-export 'ItemStatus.dart';
-export 'Journal.dart';
-export 'Refund.dart';
-export 'RefundPaymentType.dart';
-export 'RefundStatus.dart';
-export 'Sale.dart';
-export 'SalePaymentType.dart';
-export 'SaleStatus.dart';
-export 'Tag.dart';
+export 'Dashboard.dart';
+export 'Settings.dart';
 
 class ModelProvider implements amplify_core.ModelProviderInterface {
   @override
-  String version = "e958a6d3535f25262f01660a59f6cc02";
+  String version = "b3d8b6470fd1b7fb5619c386cdafba33";
   @override
-  List<amplify_core.ModelSchema> modelSchemas = [Account.schema, Counter.schema, Group.schema, Item.schema, Journal.schema, Refund.schema, Sale.schema, Tag.schema];
+  List<amplify_core.ModelSchema> modelSchemas = [Account.schema, Dashboard.schema, Settings.schema];
   @override
   List<amplify_core.ModelSchema> customTypeSchemas = [];
   static final ModelProvider _instance = ModelProvider();
@@ -62,20 +45,10 @@ class ModelProvider implements amplify_core.ModelProviderInterface {
     switch(modelName) {
       case "Account":
         return Account.classType;
-      case "Counter":
-        return Counter.classType;
-      case "Group":
-        return Group.classType;
-      case "Item":
-        return Item.classType;
-      case "Journal":
-        return Journal.classType;
-      case "Refund":
-        return Refund.classType;
-      case "Sale":
-        return Sale.classType;
-      case "Tag":
-        return Tag.classType;
+      case "Dashboard":
+        return Dashboard.classType;
+      case "Settings":
+        return Settings.classType;
       default:
         throw Exception("Failed to find model in model provider for model name: " + modelName);
     }

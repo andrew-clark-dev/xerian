@@ -1,23 +1,25 @@
-import 'package:xerian/pages/account/account_list_view.dart';
+import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:flutter/material.dart';
-
 import 'package:go_router/go_router.dart';
-import 'package:xerian/pages/admin/admin_settings.dart';
-import 'package:xerian/pages/dashboard/dashboard_view.dart';
-import 'package:xerian/pages/item/item_form.dart';
-import 'package:xerian/pages/item/item_list_view.dart';
-
-import '../models/Group.dart';
-import '../services/route_path.dart';
+import 'package:xerian/models/ModelProvider.dart';
+import 'package:xerian/services/model_extensions.dart';
 
 class AppDrawer extends StatelessWidget {
   const AppDrawer({super.key});
 
-  ListTile _listTile(BuildContext context, String path, String title) {
+  ListTile _listTile(BuildContext context, ModelType modelType) {
     return ListTile(
-        title: Text(title),
+        title: Text(modelType.schema().pluralName!),
         onTap: () {
-          context.go(path);
+          context.go(modelType.listPath());
+        });
+  }
+
+  ListTile _viewTile(BuildContext context, ModelType modelType) {
+    return ListTile(
+        title: Text(modelType.schema().name),
+        onTap: () {
+          context.go(modelType.path());
         });
   }
 
@@ -27,24 +29,9 @@ class AppDrawer extends StatelessWidget {
       child: ListView(
         padding: EdgeInsets.zero,
         children: <Widget>[
-          const DrawerHeader(
-            decoration: BoxDecoration(
-              color: Colors.blue,
-            ),
-            child: Text('Drawer Header'),
-          ),
-          _listTile(context, DashboardView().path, 'Dashboard'),
-          _listTile(context, const ItemListView().path, 'Items'),
-          ListTile(
-            title: const Text('Sales'),
-            onTap: () {
-              context.go('/sales');
-            },
-          ),
-          _listTile(context, const AccountListView().path, 'Accounts'),
-          _listTile(context, RoutePath.listPath(Group.classType), 'Categories'),
-          _listTile(context, const ItemForm().path, 'Add item'),
-          _listTile(context, const AdminSettings().path, 'Administration'),
+          _viewTile(context, Dashboard.classType),
+          _listTile(context, Account.classType),
+          // _listTile(context, const AdminSettings().path, 'Administration'),
         ],
       ),
     );

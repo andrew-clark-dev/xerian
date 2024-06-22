@@ -14,7 +14,7 @@ class LoginScreen extends StatelessWidget implements Routable {
     return Authenticator(
       child: MaterialApp(
         builder: Authenticator.builder(),
-        home: DashboardView(),
+        home: const DashboardView(),
       ),
     );
   }

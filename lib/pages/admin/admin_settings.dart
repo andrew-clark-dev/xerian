@@ -1,15 +1,7 @@
-import 'dart:convert';
-
-import 'package:amplify_api/amplify_api.dart';
-import 'package:amplify_flutter/amplify_flutter.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:logging/logging.dart';
 import 'package:settings_ui/settings_ui.dart';
-import 'package:xerian/models/ModelProvider.dart';
 
-import '../../services/extended_model_queries.dart';
 import '../routable.dart';
 
 final Logger log = Logger("AdminSettings");
@@ -51,7 +43,7 @@ class AdminSettings extends StatelessWidget implements Routable {
                   description: const Text('Import accounts from excel sheet.'),
                   onPressed: (_) {}),
               SettingsTile.navigation(
-                onPressed: (_) async => processFile(),
+                onPressed: (_) async => null,
                 leading: const Icon(Icons.warning_amber),
                 title: const Text('Set ad preferences'),
                 description: const Text(
@@ -64,46 +56,46 @@ class AdminSettings extends StatelessWidget implements Routable {
     );
   }
 
-  Future<void> processFile() async {
-    NumberFormat formatter = NumberFormat("000000");
+  // Future<void> processFile() async {
+  //   NumberFormat formatter = NumberFormat("000000");
 
-    var i = 0;
+  //   var i = 0;
 
-    var result = await FilePicker.platform.pickFiles();
-    if (result != null) {
-      var content = result.files.single.bytes!;
-      var lines = LineSplitter.split(const Utf8Decoder().convert(content));
-      for (var line in lines) {
-        var key = line.split(',')[0].trim();
-        if (key.isNotEmpty) {
-          var number = formatter.format(int.parse(key));
-          i += 1;
+  //   var result = await FilePicker.platform.pickFiles();
+  //   if (result != null) {
+  //     var content = result.files.single.bytes!;
+  //     var lines = LineSplitter.split(const Utf8Decoder().convert(content));
+  //     for (var line in lines) {
+  //       var key = line.split(',')[0].trim();
+  //       if (key.isNotEmpty) {
+  //         var number = formatter.format(int.parse(key));
+  //         i += 1;
 
-          final request = ExtendedModelQueries.listBy<Account>(
-              Account.classType, Account.schema.indexes!.first, number);
+  //         final request = ExtendedModelQueries.listBy<Account>(
+  //             Account.classType, Account.schema.indexes!.first, number);
 
-          final incresponse =
-              await Amplify.API.query(request: request).response;
+  //         final incresponse =
+  //             await Amplify.API.query(request: request).response;
 
-          var items = incresponse.data!.items;
+  //         var items = incresponse.data!.items;
 
-          if (items.isEmpty) {
-            log.warning('$i - Number - $number not found');
-          } else {
-            Account account = items.first!;
-            if (account.phoneNumber != null &&
-                account.isMobile == true &&
-                account.adprefs != AccountAdprefs.promoSms) {
-              final update = account.copyWith(adprefs: AccountAdprefs.promoSms);
-              final request = ModelMutations.update(update);
-              await Amplify.API.mutate(request: request).response;
-              safePrint('$i - Number - $number updated');
-            } else {
-              safePrint('$i - Number - $number NOT updated');
-            }
-          }
-        }
-      }
-    }
-  }
+  //         if (items.isEmpty) {
+  //           log.warning('$i - Number - $number not found');
+  //         } else {
+  //           Account account = items.first!;
+  //           if (account.phoneNumber != null &&
+  //               account.isMobile == true &&
+  //               account.adprefs != AccountAdprefs.promoSms) {
+  //             final update = account.copyWith(adprefs: AccountAdprefs.promoSms);
+  //             final request = ModelMutations.update(update);
+  //             await Amplify.API.mutate(request: request).response;
+  //             safePrint('$i - Number - $number updated');
+  //           } else {
+  //             safePrint('$i - Number - $number NOT updated');
+  //           }
+  //         }
+  //       }
+  //     }
+  //   }
+  // }
 }

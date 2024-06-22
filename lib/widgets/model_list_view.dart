@@ -1,19 +1,17 @@
 import 'package:logging/logging.dart';
 import 'package:amplify_core/amplify_core.dart';
 import 'package:flutter/material.dart';
-import 'package:xerian/models/ModelProvider.dart';
 import 'package:xerian/widgets/model_list_tile.dart';
 
-import '../pages/routable.dart';
 import '../services/api.dart';
-import '../services/route_path.dart';
+import '../services/model_extensions.dart';
 import '../services/row_service.dart';
 import 'app_drawer.dart';
 import 'package:go_router/go_router.dart';
 
 const limit = 20;
 
-class ModelListView extends StatefulWidget implements Routable {
+class ModelListView extends StatefulWidget {
   final Logger log = Logger("ModelListView");
 
   final ModelType modelType;
@@ -26,9 +24,6 @@ class ModelListView extends StatefulWidget implements Routable {
   @override
   // ignore: library_private_types_in_public_api,
   _ModelListViewState createState() => _ModelListViewState();
-
-  @override
-  String get path => '/${modelType.modelName().toLowerCase()}list';
 }
 
 class _ModelListViewState extends State<ModelListView> {
@@ -55,14 +50,7 @@ class _ModelListViewState extends State<ModelListView> {
     loading = true;
 
     try {
-      final queryPredicate = Group.TYPE.eq(GroupType.color);
-
-      // final query = filter == null
-      //     ? null
-      //     : const QueryPredicateOperation(
-      //         "type", EqualQueryOperator<String>(""));
-      // EqualQueryOperator<Model>(menu!.controller!.value as Model));
-      page = (await api.fetch(page, query: queryPredicate))!;
+      page = (await api.fetch(page))!;
       setState(() {
         models += page!.items;
       });
@@ -73,7 +61,7 @@ class _ModelListViewState extends State<ModelListView> {
     }
   }
 
-  NotificationListener listener(TileService tileService) {
+  NotificationListener listener(ModelListTile modelListTile) {
     return NotificationListener<ScrollNotification>(
       onNotification: (notification) {
         if (notification is ScrollEndNotification &&
@@ -96,7 +84,7 @@ class _ModelListViewState extends State<ModelListView> {
           itemBuilder: (context, index) {
             if (index < models.length) {
               // you can have here your custom widgets for displaying posts or what
-              return tileService.dismissible(models[index]!);
+              return modelListTile.tile(models[index]!);
             } else {
               return loading
                   ? const Center(
@@ -110,11 +98,11 @@ class _ModelListViewState extends State<ModelListView> {
 
   @override
   Widget build(BuildContext context) {
-    final tileService = TileService(widget.fields, context);
+    final modelListTile = ModelListTile(widget.fields, context);
     return Scaffold(
         floatingActionButton: FloatingActionButton(
           // Navigate to the page to create new budget entries
-          onPressed: () => context.push(RoutePath.path(widget.modelType)),
+          onPressed: () => context.push(widget.modelType.path()),
           child: const Icon(Icons.add),
         ),
         appBar: AppBar(
@@ -130,7 +118,7 @@ class _ModelListViewState extends State<ModelListView> {
                 Theme.of(context).textTheme.titleMedium,
               ),
               const Divider(),
-              Expanded(child: listener(tileService))
+              Expanded(child: listener(modelListTile))
             ])));
   }
 }

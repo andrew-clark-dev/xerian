@@ -23,11 +23,12 @@ import 'ModelProvider.dart';
 import 'package:amplify_core/amplify_core.dart' as amplify_core;
 
 
-/** This is an auto generated class representing the Counter type in your schema. */
-class Counter extends amplify_core.Model {
-  static const classType = const _CounterModelType();
+/** This is an auto generated class representing the Settings type in your schema. */
+class Settings extends amplify_core.Model {
+  static const classType = const _SettingsModelType();
   final String id;
-  final int? _count;
+  final String? _email;
+  final String? _config;
   final amplify_core.TemporalDateTime? _createdAt;
   final amplify_core.TemporalDateTime? _updatedAt;
 
@@ -38,14 +39,18 @@ class Counter extends amplify_core.Model {
   @override
   String getId() => id;
   
-  CounterModelIdentifier get modelIdentifier {
-      return CounterModelIdentifier(
+  SettingsModelIdentifier get modelIdentifier {
+      return SettingsModelIdentifier(
         id: id
       );
   }
   
-  int? get count {
-    return _count;
+  String? get email {
+    return _email;
+  }
+  
+  String? get config {
+    return _config;
   }
   
   amplify_core.TemporalDateTime? get createdAt {
@@ -56,12 +61,13 @@ class Counter extends amplify_core.Model {
     return _updatedAt;
   }
   
-  const Counter._internal({required this.id, count, createdAt, updatedAt}): _count = count, _createdAt = createdAt, _updatedAt = updatedAt;
+  const Settings._internal({required this.id, email, config, createdAt, updatedAt}): _email = email, _config = config, _createdAt = createdAt, _updatedAt = updatedAt;
   
-  factory Counter({String? id, int? count}) {
-    return Counter._internal(
+  factory Settings({String? id, String? email, String? config}) {
+    return Settings._internal(
       id: id == null ? amplify_core.UUID.getUUID() : id,
-      count: count);
+      email: email,
+      config: config);
   }
   
   bool equals(Object other) {
@@ -71,9 +77,10 @@ class Counter extends amplify_core.Model {
   @override
   bool operator ==(Object other) {
     if (identical(other, this)) return true;
-    return other is Counter &&
+    return other is Settings &&
       id == other.id &&
-      _count == other._count;
+      _email == other._email &&
+      _config == other._config;
   }
   
   @override
@@ -83,9 +90,10 @@ class Counter extends amplify_core.Model {
   String toString() {
     var buffer = new StringBuffer();
     
-    buffer.write("Counter {");
+    buffer.write("Settings {");
     buffer.write("id=" + "$id" + ", ");
-    buffer.write("count=" + (_count != null ? _count.toString() : "null") + ", ");
+    buffer.write("email=" + "$_email" + ", ");
+    buffer.write("config=" + "$_config" + ", ");
     buffer.write("createdAt=" + (_createdAt != null ? _createdAt.format() : "null") + ", ");
     buffer.write("updatedAt=" + (_updatedAt != null ? _updatedAt.format() : "null"));
     buffer.write("}");
@@ -93,44 +101,50 @@ class Counter extends amplify_core.Model {
     return buffer.toString();
   }
   
-  Counter copyWith({int? count}) {
-    return Counter._internal(
+  Settings copyWith({String? email, String? config}) {
+    return Settings._internal(
       id: id,
-      count: count ?? this.count);
+      email: email ?? this.email,
+      config: config ?? this.config);
   }
   
-  Counter copyWithModelFieldValues({
-    ModelFieldValue<int?>? count
+  Settings copyWithModelFieldValues({
+    ModelFieldValue<String?>? email,
+    ModelFieldValue<String?>? config
   }) {
-    return Counter._internal(
+    return Settings._internal(
       id: id,
-      count: count == null ? this.count : count.value
+      email: email == null ? this.email : email.value,
+      config: config == null ? this.config : config.value
     );
   }
   
-  Counter.fromJson(Map<String, dynamic> json)  
+  Settings.fromJson(Map<String, dynamic> json)  
     : id = json['id'],
-      _count = (json['count'] as num?)?.toInt(),
+      _email = json['email'],
+      _config = json['config'],
       _createdAt = json['createdAt'] != null ? amplify_core.TemporalDateTime.fromString(json['createdAt']) : null,
       _updatedAt = json['updatedAt'] != null ? amplify_core.TemporalDateTime.fromString(json['updatedAt']) : null;
   
   Map<String, dynamic> toJson() => {
-    'id': id, 'count': _count, 'createdAt': _createdAt?.format(), 'updatedAt': _updatedAt?.format()
+    'id': id, 'email': _email, 'config': _config, 'createdAt': _createdAt?.format(), 'updatedAt': _updatedAt?.format()
   };
   
   Map<String, Object?> toMap() => {
     'id': id,
-    'count': _count,
+    'email': _email,
+    'config': _config,
     'createdAt': _createdAt,
     'updatedAt': _updatedAt
   };
 
-  static final amplify_core.QueryModelIdentifier<CounterModelIdentifier> MODEL_IDENTIFIER = amplify_core.QueryModelIdentifier<CounterModelIdentifier>();
+  static final amplify_core.QueryModelIdentifier<SettingsModelIdentifier> MODEL_IDENTIFIER = amplify_core.QueryModelIdentifier<SettingsModelIdentifier>();
   static final ID = amplify_core.QueryField(fieldName: "id");
-  static final COUNT = amplify_core.QueryField(fieldName: "count");
+  static final EMAIL = amplify_core.QueryField(fieldName: "email");
+  static final CONFIG = amplify_core.QueryField(fieldName: "config");
   static var schema = amplify_core.Model.defineSchema(define: (amplify_core.ModelSchemaDefinition modelSchemaDefinition) {
-    modelSchemaDefinition.name = "Counter";
-    modelSchemaDefinition.pluralName = "Counters";
+    modelSchemaDefinition.name = "Settings";
+    modelSchemaDefinition.pluralName = "Settings";
     
     modelSchemaDefinition.authRules = [
       amplify_core.AuthRule(
@@ -146,9 +160,15 @@ class Counter extends amplify_core.Model {
     modelSchemaDefinition.addField(amplify_core.ModelFieldDefinition.id());
     
     modelSchemaDefinition.addField(amplify_core.ModelFieldDefinition.field(
-      key: Counter.COUNT,
+      key: Settings.EMAIL,
       isRequired: false,
-      ofType: amplify_core.ModelFieldType(amplify_core.ModelFieldTypeEnum.int)
+      ofType: amplify_core.ModelFieldType(amplify_core.ModelFieldTypeEnum.string)
+    ));
+    
+    modelSchemaDefinition.addField(amplify_core.ModelFieldDefinition.field(
+      key: Settings.CONFIG,
+      isRequired: false,
+      ofType: amplify_core.ModelFieldType(amplify_core.ModelFieldTypeEnum.string)
     ));
     
     modelSchemaDefinition.addField(amplify_core.ModelFieldDefinition.nonQueryField(
@@ -167,29 +187,29 @@ class Counter extends amplify_core.Model {
   });
 }
 
-class _CounterModelType extends amplify_core.ModelType<Counter> {
-  const _CounterModelType();
+class _SettingsModelType extends amplify_core.ModelType<Settings> {
+  const _SettingsModelType();
   
   @override
-  Counter fromJson(Map<String, dynamic> jsonData) {
-    return Counter.fromJson(jsonData);
+  Settings fromJson(Map<String, dynamic> jsonData) {
+    return Settings.fromJson(jsonData);
   }
   
   @override
   String modelName() {
-    return 'Counter';
+    return 'Settings';
   }
 }
 
 /**
  * This is an auto generated class representing the model identifier
- * of [Counter] in your schema.
+ * of [Settings] in your schema.
  */
-class CounterModelIdentifier implements amplify_core.ModelIdentifier<Counter> {
+class SettingsModelIdentifier implements amplify_core.ModelIdentifier<Settings> {
   final String id;
 
-  /** Create an instance of CounterModelIdentifier using [id] the primary key. */
-  const CounterModelIdentifier({
+  /** Create an instance of SettingsModelIdentifier using [id] the primary key. */
+  const SettingsModelIdentifier({
     required this.id});
   
   @override
@@ -207,7 +227,7 @@ class CounterModelIdentifier implements amplify_core.ModelIdentifier<Counter> {
   String serializeAsString() => serializeAsMap().values.join('#');
   
   @override
-  String toString() => 'CounterModelIdentifier(id: $id)';
+  String toString() => 'SettingsModelIdentifier(id: $id)';
   
   @override
   bool operator ==(Object other) {
@@ -215,7 +235,7 @@ class CounterModelIdentifier implements amplify_core.ModelIdentifier<Counter> {
       return true;
     }
     
-    return other is CounterModelIdentifier &&
+    return other is SettingsModelIdentifier &&
       id == other.id;
   }
   
