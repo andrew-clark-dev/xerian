@@ -15,4 +15,8 @@ extension ModelTypeExtensions on ModelType {
 extension ModelFieldExtensions on ModelField {
   ModelFieldTypeEnum fieldType() => type.fieldType;
   bool isString() => fieldType() == ModelFieldTypeEnum.string;
+  bool isText() => !{ModelFieldTypeEnum.bool, ModelFieldTypeEnum.enumeration}
+      .contains(fieldType());
+  bool isBool() => fieldType() == ModelFieldTypeEnum.bool;
+  bool isEnum() => fieldType() == ModelFieldTypeEnum.enumeration;
 }

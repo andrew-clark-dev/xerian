@@ -1,11 +1,14 @@
 import 'package:amplify_core/amplify_core.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:xerian/models/Account.dart';
+import 'package:logging/logging.dart';
+import 'package:xerian/models/ModelProvider.dart';
 import 'package:xerian/services/model_extensions.dart';
 import 'package:xerian/widgets/model_list_view.dart';
 import 'package:xerian/widgets/model_view.dart';
 import 'package:change_case/change_case.dart';
+
+final Logger log = Logger("ModelConfig");
 
 class ModelConfig {
   final ModelType modelType;
@@ -25,6 +28,19 @@ class ModelConfig {
       ]
     }
   };
+
+  static final modelTypeConfig = {
+    Account.classType: {
+      'status': AccountStatus.values,
+      'comunicationPreferences': AccountComunicationPreferences.values
+    }
+  };
+
+  List<String> enumValues(String fieldName) {
+    log.info(
+        modelTypeConfig[modelType]![fieldName]!.map((v) => v.name).toList());
+    return modelTypeConfig[modelType]![fieldName]!.map((v) => v.name).toList();
+  }
 
   List<List<String>> _get(String name) {
     return modelConfig[modelType]![name]!;
