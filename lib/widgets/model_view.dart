@@ -122,19 +122,22 @@ class _ModelViewState extends State<ModelView> {
               child: Form(
                 key: _formKey,
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: _fields.map((f) => formField(f)).toList(),
-                  // const SizedBox(height: 20),
-                  // ElevatedButton(
-                  //   onPressed: () {
-                  //     if (_formKey.currentState?.validate() ?? false) {
-                  //       // Form is valid, process the data
-                  //       _submitForm(ScaffoldMessenger.of(context));
-                  //     }
-                  //   },
-                  //   child: const Text('Submit'),
-                  // ),
-                ),
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Column(
+                        children: _fields.map((f) => formField(f)).toList(),
+                      ),
+                      const SizedBox(height: 20),
+                      ElevatedButton(
+                        onPressed: () {
+                          if (_formKey.currentState?.validate() ?? false) {
+                            // Form is valid, process the data
+                            _submitForm(ScaffoldMessenger.of(context));
+                          }
+                        },
+                        child: Text(_titleText),
+                      ),
+                    ]),
               ),
             ),
           ),
