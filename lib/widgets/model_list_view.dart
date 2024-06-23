@@ -107,7 +107,7 @@ class _ModelListViewState extends State<ModelListView> {
         body: Padding(
             padding: const EdgeInsets.only(top: 25),
             child: Column(children: [
-              ModelListTile.buildRow(ModelConfig(modelType).listTitles(),
+              ModelListTile.buildRow(ModelConfig(modelType).listTitleNames(),
                   style: Theme.of(context).textTheme.titleMedium),
               const Divider(),
               Expanded(child: listener())

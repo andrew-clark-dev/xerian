@@ -1,11 +1,12 @@
 import 'package:amplify_api/amplify_api.dart';
 import 'package:amplify_flutter/amplify_flutter.dart';
+import 'package:change_case/change_case.dart';
+import 'package:xerian/model_config.dart';
 import 'package:xerian/models/ModelProvider.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:form_validation/form_validation.dart';
 import 'package:xerian/services/model_extensions.dart';
-import 'package:xerian/widgets/model_form_field.dart';
 
 class ModelView extends StatefulWidget {
   final Model? model;
@@ -23,11 +24,14 @@ class ModelView extends StatefulWidget {
 
 class _ModelViewState extends State<ModelView> {
   final _formKey = GlobalKey<FormState>();
-  late final ModelSchema modelSchema = widget.modelType.schema();
-  late final String _titleText;
 
-  late final ModelFormFieldFactory _modelFormFieldFactory;
-
+  late final _controllers = <String, TextEditingController>{};
+  late final _booleanState = <String, bool>{};
+  late final _enumState = <String, String?>{};
+  late final ModelConfig _config;
+  late final Model? _model;
+  late final List<ModelField> _fields;
+  String _titleText = 'Create ';
   final NumberFormat formatter = NumberFormat("00000000");
 //  final CounterService counter = CounterService(Account.classType);
 
@@ -38,13 +42,29 @@ class _ModelViewState extends State<ModelView> {
   @override
   void initState() {
     super.initState();
-    _modelFormFieldFactory =
-        ModelFormFieldFactory(widget.modelType, model: widget.model);
+    _config = ModelConfig(widget.modelType);
+    _model = widget.model;
+    _fields = _config.viewFields();
+    for (var value in _fields) {
+      if (value.isText()) _controllers[value.name] = TextEditingController();
+      if (value.isBool()) _booleanState[value.name] = false;
+      if (value.isEnum()) _enumState[value.name] = null;
+    }
 
-    if (widget.model != null) {
-      _titleText = 'Update ${modelSchema.name}';
-    } else {
-      _titleText = 'Create ${modelSchema.name}';
+    if (_model != null) {
+      _titleText = 'Update ';
+      final json = _model.toJson();
+      for (var value in _fields) {
+        if (value.isText()) {
+          _controllers[value.name]!.text = (json[value.name] ?? '') as String;
+        }
+        if (value.isBool()) {
+          _booleanState[value.name] = (json[value.name] ?? false) as bool;
+        }
+        if (value.isEnum()) {
+          _enumState[value.name] = (json[value.name] ?? '') as String;
+        }
+      }
     }
   }
 
@@ -90,7 +110,7 @@ class _ModelViewState extends State<ModelView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(_titleText),
+        title: Text(_titleText + _config.modelType.modelName()),
       ),
       body: Align(
         alignment: Alignment.topCenter,
@@ -103,7 +123,7 @@ class _ModelViewState extends State<ModelView> {
                 key: _formKey,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: _modelFormFieldFactory.formFields(),
+                  children: _fields.map((f) => formField(f)).toList(),
                   // const SizedBox(height: 20),
                   // ElevatedButton(
                   //   onPressed: () {
@@ -121,5 +141,74 @@ class _ModelViewState extends State<ModelView> {
         ),
       ),
     );
+  }
+
+  FormField formField(ModelField field) {
+    switch (field.fieldType()) {
+      case ModelFieldTypeEnum.bool:
+        return switcher(field);
+      case ModelFieldTypeEnum.enumeration:
+        return dropDown(field);
+      default:
+        return text(field);
+    }
+  }
+
+  TextFormField text(ModelField value) => TextFormField(
+      controller: _controllers[value.name],
+      decoration: InputDecoration(
+        labelText: value.name.toCapitalCase(),
+      ));
+
+  DropdownButtonFormField dropDown(ModelField value) =>
+      DropdownButtonFormField<String?>(
+          decoration: InputDecoration(
+            labelText: value.name.toCapitalCase(),
+          ),
+          value: _enumState[value.name]! == '' ? null : _enumState[value.name]!,
+          hint: const Text('Select an option'),
+          onChanged: (String? enumValue) {
+            setState(() {
+              _enumState[value.name] = enumValue!;
+            });
+          },
+          validator: (String? enumValue) {
+            if (enumValue == null) {
+              return 'Please select a value';
+            }
+            return null;
+          },
+          items: _config
+              .enumValues(value.name)
+              .map<DropdownMenuItem<String>>((String value) {
+            return DropdownMenuItem<String>(
+              value: value,
+              child: Text(value),
+            );
+          }).toList());
+
+  FormField switcher(ModelField value) {
+    return FormField(
+        key: null,
+        initialValue: false,
+        builder: (FormFieldState<dynamic> field) {
+          return InputDecorator(
+              decoration: InputDecoration(
+                labelText: value.name.toCapitalCase(),
+              ),
+              textAlign: TextAlign.left,
+              child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Switch(
+                    // This bool value toggles the switch.
+                    value: _booleanState[value.name]!,
+                    activeColor: Colors.red,
+                    onChanged: (bool b) {
+                      setState(() {
+                        _booleanState[value.name] = b;
+                      });
+                    },
+                  )));
+        });
   }
 }

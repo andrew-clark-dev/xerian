@@ -1,4 +1,5 @@
 import 'package:amplify_core/amplify_core.dart';
+import 'package:xerian/model_config.dart';
 import 'package:xerian/models/ModelProvider.dart';
 
 extension ModelTypeExtensions on ModelType {
@@ -19,4 +20,8 @@ extension ModelFieldExtensions on ModelField {
       .contains(fieldType());
   bool isBool() => fieldType() == ModelFieldTypeEnum.bool;
   bool isEnum() => fieldType() == ModelFieldTypeEnum.enumeration;
+}
+
+extension ModelExtensions on Model {
+  List<ModelField> viewFields() => ModelConfig(getInstanceType()).viewFields();
 }

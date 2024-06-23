@@ -10,6 +10,9 @@ import 'package:change_case/change_case.dart';
 
 final Logger log = Logger("ModelConfig");
 
+const autosetFields = ['number', 'sku'];
+const hideFields = ['id', 'original'];
+
 class ModelConfig {
   final ModelType modelType;
 
@@ -42,16 +45,26 @@ class ModelConfig {
     return modelTypeConfig[modelType]![fieldName]!.map((v) => v.name).toList();
   }
 
-  List<List<String>> _get(String name) {
-    return modelConfig[modelType]![name]!;
+  List<List<String>>? _get(String name) {
+    return modelConfig[modelType]?[name];
   }
 
-  List<String> listFields() {
-    return _get('listFields').map((d) => d[0]).toList();
+  List<ModelField> viewFields() {
+    final hide = _get('hideFields')?.map((d) => d[0]).toList() ?? hideFields;
+    return modelType
+        .schema()
+        .fields!
+        .values
+        .where((v) => !hide.contains(v.name))
+        .toList();
   }
 
-  List<String> listTitles() {
-    return _get('listFields').map((d) {
+  List<String> listFieldNames() {
+    return _get('listFields')!.map((d) => d[0]).toList();
+  }
+
+  List<String> listTitleNames() {
+    return _get('listFields')!.map((d) {
       if (d.length > 1) {
         return d[1];
       } else {
@@ -62,7 +75,7 @@ class ModelConfig {
 
   List<String> values(Model model) {
     List<String> result = [];
-    for (final field in listFields()) {
+    for (final field in listFieldNames()) {
       result.add(model.toMap()[field].toString());
     }
     return result;
@@ -72,7 +85,7 @@ class ModelConfig {
     return GoRoute(
       path: modelType.listPath(),
       builder: (BuildContext context, GoRouterState state) {
-        return ModelListView(modelType, listFields());
+        return ModelListView(modelType, listFieldNames());
       },
     );
   }
