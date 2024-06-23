@@ -62,7 +62,7 @@ class _ModelViewState extends State<ModelView> {
           _booleanState[value.name] = (json[value.name] ?? false) as bool;
         }
         if (value.isEnum()) {
-          _enumState[value.name] = (json[value.name] ?? '') as String;
+          _enumState[value.name] = json[value.name]?.toString();
         }
       }
     }
@@ -168,7 +168,7 @@ class _ModelViewState extends State<ModelView> {
           decoration: InputDecoration(
             labelText: value.name.toCapitalCase(),
           ),
-          value: _enumState[value.name]! == '' ? null : _enumState[value.name]!,
+          value: _enumState[value.name],
           hint: const Text('Select an option'),
           onChanged: (String? enumValue) {
             setState(() {
