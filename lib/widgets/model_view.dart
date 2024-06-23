@@ -24,6 +24,7 @@ class ModelView extends StatefulWidget {
 
 class _ModelViewState extends State<ModelView> {
   final _formKey = GlobalKey<FormState>();
+  final DateFormat dateFormatter = DateFormat('yyyy-MM-dd HH:mm:ss');
 
   late final _controllers = <String, TextEditingController>{};
   late final _booleanState = <String, bool>{};
@@ -70,9 +71,9 @@ class _ModelViewState extends State<ModelView> {
           // case ModelFieldTypeEnum.double:
           //   _controllers[field.name]!.text =
           //       (json[field.name] ?? '0.00') as String;
-          // case ModelFieldTypeEnum.dateTime:
-          //   _controllers[field.name]!.text =
-          //       ((json[field.name] ?? '') as String);
+          case ModelFieldTypeEnum.dateTime:
+            _controllers[field.name]!.text = dateFormatter.format(
+                (json[field.name] as TemporalDateTime).getDateTimeInUtc());
           default:
             _controllers[field.name]!.text =
                 json[field.name]?.toString() ?? 'None';
