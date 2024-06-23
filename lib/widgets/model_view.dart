@@ -202,16 +202,18 @@ class _ModelViewState extends State<ModelView> {
               textAlign: TextAlign.left,
               child: Align(
                   alignment: Alignment.centerLeft,
-                  child: Switch(
-                    // This bool value toggles the switch.
-                    value: _booleanState[value.name]!,
-                    activeColor: Colors.red,
-                    onChanged: (bool b) {
-                      setState(() {
-                        _booleanState[value.name] = b;
-                      });
-                    },
-                  )));
+                  child: Transform.scale(
+                      scale: 0.8,
+                      child: Switch(
+                        // This bool value toggles the switch.
+                        value: _booleanState[value.name]!,
+                        activeColor: Colors.red,
+                        onChanged: (bool b) {
+                          setState(() {
+                            _booleanState[value.name] = b;
+                          });
+                        },
+                      ))));
         });
   }
 }
