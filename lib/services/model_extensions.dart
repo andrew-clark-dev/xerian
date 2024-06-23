@@ -18,8 +18,17 @@ extension ModelFieldExtensions on ModelField {
   bool isString() => fieldType() == ModelFieldTypeEnum.string;
   bool isText() => !{ModelFieldTypeEnum.bool, ModelFieldTypeEnum.enumeration}
       .contains(fieldType());
+  bool isDate() => !{ModelFieldTypeEnum.date, ModelFieldTypeEnum.dateTime}
+      .contains(fieldType());
+  bool isDouble() => fieldType() == ModelFieldTypeEnum.double;
+  bool isInt() => fieldType() == ModelFieldTypeEnum.int;
   bool isBool() => fieldType() == ModelFieldTypeEnum.bool;
   bool isEnum() => fieldType() == ModelFieldTypeEnum.enumeration;
+  bool isAutoSet() {
+    if (isReadOnly) return true;
+    if (ModelConfig.autosetFields.contains(name)) return true;
+    return false;
+  }
 }
 
 extension ModelExtensions on Model {

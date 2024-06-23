@@ -105,7 +105,7 @@ class _ModelListViewState extends State<ModelListView> {
         ),
         drawer: const AppDrawer(), // Add the drawer here
         body: Padding(
-            padding: const EdgeInsets.only(top: 25),
+            padding: const EdgeInsets.all(25),
             child: Column(children: [
               ModelListTile.buildRow(ModelConfig(modelType).listTitleNames(),
                   style: Theme.of(context).textTheme.titleMedium),

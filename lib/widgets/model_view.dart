@@ -45,24 +45,37 @@ class _ModelViewState extends State<ModelView> {
     _config = ModelConfig(widget.modelType);
     _model = widget.model;
     _fields = _config.viewFields();
-    for (var value in _fields) {
-      if (value.isText()) _controllers[value.name] = TextEditingController();
-      if (value.isBool()) _booleanState[value.name] = false;
-      if (value.isEnum()) _enumState[value.name] = null;
+    for (var field in _fields) {
+      switch (field.fieldType()) {
+        case ModelFieldTypeEnum.bool:
+          _booleanState[field.name] = false;
+        case ModelFieldTypeEnum.enumeration:
+          _enumState[field.name] = null;
+        default:
+          _controllers[field.name] = TextEditingController();
+      }
     }
 
     if (_model != null) {
       _titleText = 'Update ';
-      final json = _model.toJson();
-      for (var value in _fields) {
-        if (value.isText()) {
-          _controllers[value.name]!.text = (json[value.name] ?? '') as String;
-        }
-        if (value.isBool()) {
-          _booleanState[value.name] = (json[value.name] ?? false) as bool;
-        }
-        if (value.isEnum()) {
-          _enumState[value.name] = json[value.name]?.toString();
+      final json = _model.toMap();
+      for (var field in _fields) {
+        switch (field.fieldType()) {
+          case ModelFieldTypeEnum.bool:
+            _booleanState[field.name] = (json[field.name] ?? false) as bool;
+          case ModelFieldTypeEnum.enumeration:
+            _enumState[field.name] = json[field.name] == null
+                ? null
+                : (json[field.name] as Enum).name;
+          // case ModelFieldTypeEnum.double:
+          //   _controllers[field.name]!.text =
+          //       (json[field.name] ?? '0.00') as String;
+          // case ModelFieldTypeEnum.dateTime:
+          //   _controllers[field.name]!.text =
+          //       ((json[field.name] ?? '') as String);
+          default:
+            _controllers[field.name]!.text =
+                json[field.name]?.toString() ?? 'None';
         }
       }
     }
@@ -117,7 +130,7 @@ class _ModelViewState extends State<ModelView> {
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 800),
           child: Padding(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(25),
             child: SingleChildScrollView(
               child: Form(
                 key: _formKey,
@@ -157,11 +170,15 @@ class _ModelViewState extends State<ModelView> {
     }
   }
 
-  TextFormField text(ModelField value) => TextFormField(
-      controller: _controllers[value.name],
+  TextFormField text(ModelField field) => TextFormField(
+      controller: _controllers[field.name],
       decoration: InputDecoration(
-        labelText: value.name.toCapitalCase(),
-      ));
+        labelText: field.name.toCapitalCase(),
+      ),
+      readOnly: field.isAutoSet(),
+      style: field.isAutoSet()
+          ? const TextStyle(color: Colors.deepPurpleAccent)
+          : null);
 
   DropdownButtonFormField dropDown(ModelField value) =>
       DropdownButtonFormField<String?>(
@@ -207,7 +224,6 @@ class _ModelViewState extends State<ModelView> {
                       child: Switch(
                         // This bool value toggles the switch.
                         value: _booleanState[value.name]!,
-                        activeColor: Colors.red,
                         onChanged: (bool b) {
                           setState(() {
                             _booleanState[value.name] = b;

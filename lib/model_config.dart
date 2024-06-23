@@ -10,10 +10,10 @@ import 'package:change_case/change_case.dart';
 
 final Logger log = Logger("ModelConfig");
 
-const autosetFields = ['number', 'sku'];
-const hideFields = ['id', 'original'];
-
 class ModelConfig {
+  static const autosetFields = ['number', 'sku', 'balance'];
+  static const hideFields = ['id', 'original'];
+
   final ModelType modelType;
 
   ModelConfig(this.modelType);
