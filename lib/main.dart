@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:logging/logging.dart';
 import 'package:go_router/go_router.dart';
 
@@ -11,8 +10,10 @@ import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:xerian/amplify_config_service.dart';
 import 'package:xerian/models/ModelProvider.dart';
 import 'package:xerian/pages/dashboard/dashboard_view.dart';
+import 'package:xerian/pages/settings/settings_view.dart';
 import 'package:xerian/services/model_extensions.dart';
-
+import 'package:flutter_settings_screens/flutter_settings_screens.dart'
+    as flutter_settings_screens;
 import 'pages/login/login_screen.dart';
 
 import 'model_config.dart';
@@ -22,37 +23,38 @@ Future<void> main() async {
     Logger.root.level = Level.ALL;
     WidgetsFlutterBinding.ensureInitialized();
     await _configureAmplify();
+    await flutter_settings_screens.Settings.init();
     runApp(
       MaterialApp(
         title: 'Encore Shop',
         theme: ThemeData(
           useMaterial3: true,
 
-          // Define the default brightness and colors.
-          colorScheme: ColorScheme.fromSeed(
-            seedColor: Colors.purple,
-            // ···
-            brightness: Brightness.dark,
-          ),
+          // // Define the default brightness and colors.
+          // colorScheme: ColorScheme.fromSeed(
+          //   seedColor: Colors.purple,
+          //   // ···
+          //   brightness: Brightness.dark,
+          // ),
 
-          // Define the default `TextTheme`. Use this to specify the default
-          // text styling for headlines, titles, bodies of text, and more.
-          textTheme: TextTheme(
-            displayLarge: const TextStyle(
-              fontSize: 72,
-              fontWeight: FontWeight.bold,
-            ),
-            // ···
-            titleLarge: GoogleFonts.oswald(
-              fontSize: 30,
-              fontStyle: FontStyle.italic,
-            ),
-            bodyMedium: GoogleFonts.merriweather(),
-            displaySmall: GoogleFonts.pacifico(),
-          ).apply(
-            bodyColor: Colors.pink,
-            displayColor: Colors.pink,
-          ),
+          // // Define the default `TextTheme`. Use this to specify the default
+          // // text styling for headlines, titles, bodies of text, and more.
+          // textTheme: TextTheme(
+          //   displayLarge: const TextStyle(
+          //     fontSize: 72,
+          //     fontWeight: FontWeight.bold,
+          //   ),
+          //   // ···
+          //   titleLarge: GoogleFonts.oswald(
+          //     fontSize: 30,
+          //     fontStyle: FontStyle.italic,
+          //   ),
+          //   bodyMedium: GoogleFonts.merriweather(),
+          //   displaySmall: GoogleFonts.pacifico(),
+          // ).apply(
+          //   bodyColor: Colors.pink,
+          //   displayColor: Colors.pink,
+          // ),
         ),
         home: EncoreShopApp(),
       ),
@@ -88,6 +90,7 @@ class EncoreShopApp extends StatelessWidget {
       routes: <RouteBase>[
         ModelConfig(Login.classType).route(const LoginScreen()),
         ModelConfig(Dashboard.classType).route(const DashboardView()),
+        ModelConfig(Settings.classType).route(const SettingsView()),
         ModelConfig(Account.classType).listRoute(),
         ModelConfig(Account.classType).viewRoute(),
       ],

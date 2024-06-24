@@ -2,6 +2,7 @@ import 'package:logging/logging.dart';
 import 'package:amplify_core/amplify_core.dart';
 import 'package:flutter/material.dart';
 import 'package:xerian/model_config.dart';
+import 'package:xerian/widgets/model_app_bar.dart';
 import 'package:xerian/widgets/model_list_tile.dart';
 
 import '../services/api.dart';
@@ -25,14 +26,14 @@ class ModelListView extends StatefulWidget {
 }
 
 class _ModelListViewState extends State<ModelListView> {
-  late final Api api;
-  late final ModelType modelType;
+  late final Api _api;
+  late final ModelType _modelType;
 
   @override
   void initState() {
     super.initState();
-    modelType = widget.modelType;
-    api = Api(modelType);
+    _modelType = widget.modelType;
+    _api = Api(_modelType);
     _fetchMore();
   }
 
@@ -46,7 +47,7 @@ class _ModelListViewState extends State<ModelListView> {
     loading = true;
 
     try {
-      page = (await api.fetch(page))!;
+      page = (await _api.fetch(page))!;
       setState(() {
         models += page!.items;
       });
@@ -97,17 +98,15 @@ class _ModelListViewState extends State<ModelListView> {
     return Scaffold(
         floatingActionButton: FloatingActionButton(
           // Navigate to the page to create new models
-          onPressed: () => context.push(modelType.path()),
+          onPressed: () => context.push(_modelType.path()),
           child: const Icon(Icons.add),
         ),
-        appBar: AppBar(
-          title: Text(modelType.schema().pluralName!),
-        ),
+        appBar: ModelAppBar(_modelType, plural: true),
         drawer: const AppDrawer(), // Add the drawer here
         body: Padding(
             padding: const EdgeInsets.all(25),
             child: Column(children: [
-              ModelListTile.buildRow(ModelConfig(modelType).listTitleNames(),
+              ModelListTile.buildRow(ModelConfig(_modelType).listTitleNames(),
                   style: Theme.of(context).textTheme.titleMedium),
               const Divider(),
               Expanded(child: listener())

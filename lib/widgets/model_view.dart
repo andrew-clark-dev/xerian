@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:form_validation/form_validation.dart';
 import 'package:xerian/services/model_extensions.dart';
+import 'package:xerian/widgets/model_app_bar.dart';
 
 class ModelView extends StatefulWidget {
   final Model? model;
@@ -29,6 +30,7 @@ class _ModelViewState extends State<ModelView> {
   late final _controllers = <String, TextEditingController>{};
   late final _booleanState = <String, bool>{};
   late final _enumState = <String, String?>{};
+  late final ModelType _modelType;
   late final ModelConfig _config;
   late final Model? _model;
   late final List<ModelField> _fields;
@@ -43,7 +45,8 @@ class _ModelViewState extends State<ModelView> {
   @override
   void initState() {
     super.initState();
-    _config = ModelConfig(widget.modelType);
+    _modelType = widget.modelType;
+    _config = ModelConfig(_modelType);
     _model = widget.model;
     _fields = _config.viewFields();
     for (var field in _fields) {
@@ -123,9 +126,7 @@ class _ModelViewState extends State<ModelView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(_titleText + _config.modelType.modelName()),
-      ),
+      appBar: ModelAppBar(_modelType),
       body: Align(
         alignment: Alignment.topCenter,
         child: ConstrainedBox(
