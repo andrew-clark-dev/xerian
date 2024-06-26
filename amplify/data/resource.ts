@@ -21,6 +21,14 @@ const schema = a.schema({
       config: a.json(),
     }),
 
+  SyncInfo: a
+    .model({
+      modelType: a.string(),
+      user: a.string(),
+      timestamp: a.datetime(),
+      info: a.json(),
+    }),
+
   Account: a
     .model({
       number: a.string().required(),
