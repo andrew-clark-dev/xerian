@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 import 'package:amplify_auth_cognito/amplify_auth_cognito.dart';
 import 'package:amplify_api/amplify_api.dart';
@@ -21,6 +22,8 @@ import 'model_config.dart';
 Future<void> main() async {
   try {
     Logger.root.level = Level.ALL;
+    await dotenv.load(fileName: "assets/.env");
+
     WidgetsFlutterBinding.ensureInitialized();
     await _configureAmplify();
     await flutter_settings_screens.Settings.init();
