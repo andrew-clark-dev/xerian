@@ -1,6 +1,8 @@
+import 'package:amplify_api/amplify_api.dart';
+import 'package:amplify_core/amplify_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_settings_screens/flutter_settings_screens.dart';
-import 'package:xerian/services/sync_service.dart';
+import 'package:xerian/models/ModelProvider.dart';
 
 class SettingsView extends StatefulWidget {
   const SettingsView({super.key});
@@ -10,6 +12,17 @@ class SettingsView extends StatefulWidget {
 }
 
 class _SettingsViewState extends State<SettingsView> {
+  Future<void> request() async {
+    final BackendRequest backendRequest = BackendRequest(
+        requestType: BackendRequestRequestType.modelsync,
+        modelType: Account.classType.toString(),
+        payload: "");
+
+    final request = ModelMutations.create(backendRequest);
+
+    await Amplify.API.mutate(request: request).response;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -50,7 +63,7 @@ class _SettingsViewState extends State<SettingsView> {
                             SimpleSettingsTile(
                               title: 'Custom Settings',
                               subtitle: 'Tap to execute custom callback',
-                              onTap: () => SyncSevice.syncAccount(),
+                              onTap: () => request(),
                             ),
                           ],
                         ),

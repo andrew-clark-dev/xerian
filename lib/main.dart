@@ -1,4 +1,3 @@
-import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
@@ -76,23 +75,7 @@ Future<void> _configureAmplify() async {
         options: APIPluginOptions(modelProvider: ModelProvider.instance));
     final storage = AmplifyStorageS3();
     await Amplify.addPlugins([auth, api, storage]);
-
-//    final config = await AmplifyConfigService.getConfigFromJson();
-//    final AmplifyOutputs amplifyOutput = AmplifyOutputs.fromJson(jsonDecode(amplifyConfig));
-
-    var json = jsonDecode(amplifyConfig);
-
-    Map<String, dynamic> restApiConfig = {
-      'sync-account': {
-        'aws_region': 'eu-central-1',
-        'url':
-            'https://gd8etxduk1.execute-api.eu-central-1.amazonaws.com/dev/sync-account',
-        'authorization_type': 'AMAZON_COGNITO_USER_POOLS'
-      }
-    };
-    json['rest_api'] = restApiConfig;
-
-    await Amplify.configure(jsonEncode(json));
+    await Amplify.configure(amplifyConfig);
 
     safePrint('Successfully configured');
   } on Exception catch (e) {

@@ -21,8 +21,8 @@ main() {
     json['rest_api'] = restApiConfig;
 
     final AmplifyOutputs amplifyOutput = AmplifyOutputs.fromJson(json);
-    print(amplifyOutput.custom);
-    print(amplifyOutput.props[5]);
+    safePrint(amplifyOutput.custom);
+    safePrint(amplifyOutput.props[5]);
 
     expect(amplifyOutput, isNotNull);
   });
