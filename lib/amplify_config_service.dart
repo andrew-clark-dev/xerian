@@ -101,6 +101,17 @@ class AmplifyConfigService {
               data['data']['default_authorization_type']))
     };
 
+    final customApis = data['custom']['API'];
+
+    customApis.forEach((key, customApi) {
+      endpoints[customApi['apiName']!] = AWSApiConfig(
+          endpointType: EndpointType.rest,
+          endpoint: customApi['endpoint']!,
+          region: customApi['region']!,
+          authorizationType: toAPIAuthorizationType(
+              data['data']['default_authorization_type']));
+    });
+
     AWSApiPluginConfig awsApiPluginConfig = AWSApiPluginConfig(endpoints);
 
     ApiConfig apiConfig =

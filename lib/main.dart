@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
 import 'package:go_router/go_router.dart';
@@ -8,7 +10,7 @@ import 'package:amplify_api/amplify_api.dart';
 import 'package:amplify_storage_s3/amplify_storage_s3.dart';
 import 'package:amplify_flutter/amplify_flutter.dart';
 
-import 'package:xerian/amplify_config_service.dart';
+import 'package:xerian/amplify_outputs.dart';
 import 'package:xerian/models/ModelProvider.dart';
 import 'package:xerian/pages/dashboard/dashboard_view.dart';
 import 'package:xerian/pages/settings/settings_view.dart';
@@ -75,8 +77,23 @@ Future<void> _configureAmplify() async {
     final storage = AmplifyStorageS3();
     await Amplify.addPlugins([auth, api, storage]);
 
-    final config = await AmplifyConfigService.getConfigFromJson();
-    await Amplify.configure(config);
+//    final config = await AmplifyConfigService.getConfigFromJson();
+//    final AmplifyOutputs amplifyOutput = AmplifyOutputs.fromJson(jsonDecode(amplifyConfig));
+
+    var json = jsonDecode(amplifyConfig);
+
+    Map<String, dynamic> restApiConfig = {
+      'sync-account': {
+        'aws_region': 'eu-central-1',
+        'url':
+            'https://gd8etxduk1.execute-api.eu-central-1.amazonaws.com/dev/sync-account',
+        'authorization_type': 'AMAZON_COGNITO_USER_POOLS'
+      }
+    };
+    json['rest_api'] = restApiConfig;
+
+    await Amplify.configure(jsonEncode(json));
+
     safePrint('Successfully configured');
   } on Exception catch (e) {
     safePrint('Error configuring Amplify: $e');

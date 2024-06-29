@@ -1,6 +1,6 @@
-import 'package:amplify_core/amplify_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_settings_screens/flutter_settings_screens.dart';
+import 'package:xerian/services/sync_service.dart';
 
 class SettingsView extends StatefulWidget {
   const SettingsView({super.key});
@@ -50,7 +50,7 @@ class _SettingsViewState extends State<SettingsView> {
                             SimpleSettingsTile(
                               title: 'Custom Settings',
                               subtitle: 'Tap to execute custom callback',
-                              onTap: () => safePrint('Custom action'),
+                              onTap: () => SyncSevice.syncAccount(),
                             ),
                           ],
                         ),

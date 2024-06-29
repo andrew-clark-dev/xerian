@@ -3,7 +3,9 @@ import { Function, IEventSource, LayerVersion } from 'aws-cdk-lib/aws-lambda';
 import { IBucket } from 'aws-cdk-lib/aws-s3';
 import { ITable } from 'aws-cdk-lib/aws-dynamodb';
 import { Code, Runtime } from 'aws-cdk-lib/aws-lambda';
-import { Duration, Stack } from 'aws-cdk-lib';
+import { Duration, Stack, aws_events } from 'aws-cdk-lib';
+import { IEventBus } from 'aws-cdk-lib/aws-events';
+import { Effect, PolicyDocument, PolicyStatement, Role, ServicePrincipal } from 'aws-cdk-lib/aws-iam';
 
 export function backendFunction(
     stack: Stack,
@@ -49,4 +51,109 @@ export function backendFunction(
     }
 
     return lambdaFunction
+}
+/**
+ * 
+ * @param stack https://docs.amplify.aws/flutter/build-a-backend/data/custom-business-logic/connect-eventbridge-datasource/
+ * @param graphqlApiArn 
+ * @param attrGraphQlEndpointArn 
+ * @param environment 
+ * @param tables 
+ * @param buckets 
+ * @param eventSource 
+ * @returns IEventBus
+ */
+export function createEventBus(
+    stack: Stack,
+    graphqlApiArn: string,
+    attrGraphQlEndpointArn: string,
+): IEventBus {
+    const name = "XerianEventBus"
+    console.log(`Creating eventbus - ${name}`);
+
+    // Reference or create an EventBridge EventBus
+    const eventBus = aws_events.EventBus.fromEventBusName(
+        stack,
+        name,
+        "default"
+    );
+
+    // Create a policy statement to allow invoking the AppSync API's mutations
+    const policyStatement = new PolicyStatement({
+        effect: Effect.ALLOW,
+        actions: ["appsync:GraphQL"],
+        resources: [`${graphqlApiArn}/types/Mutation/*`],
+    });
+
+    // Create a role for the EventBus to assume
+    const eventBusRole = new Role(stack, "AppSyncInvokeRole", {
+        assumedBy: new ServicePrincipal("events.amazonaws.com"),
+        inlinePolicies: {
+            PolicyStatement: new PolicyDocument({
+                statements: [policyStatement],
+            }),
+        },
+    });
+
+    // Create an EventBridge rule to route events to the AppSync API
+    const rule = new aws_events.CfnRule(stack, "EventRule", {
+        eventBusName: eventBus.eventBusName,
+        name: "broadcastBackendRequest",
+        eventPattern: {
+            source: ["amplify.backend-requests"],
+            /* The shape of the event pattern must match EventBridge's event message structure.
+            So, this field must be spelled as "detail-type". Otherwise, events will not trigger the rule.
+        
+            https://docs.aws.amazon.com/AmazonS3/latest/userguide/ev-events.html
+            */
+            ["detail-type"]: ["BackendRequest"],
+            detail: {
+                eventId: [{ exists: true }],
+                requestType: ["MODELSYNC", "REPORT", "UNDEFINED"],
+                modelType: [{ exists: true }],
+                payload: [{ exists: true }],
+            },
+        },
+        targets: [
+            {
+                id: "backendRequestReceiver",
+                arn: attrGraphQlEndpointArn,
+                roleArn: eventBusRole.roleArn,
+                appSyncParameters: {
+                    graphQlOperation:
+                        `
+mutation PublishBackendRequestFromEventBridge(
+    $eventId: String!
+    $requestType: String!
+    $modelType: String!
+    $payload: String!
+) {
+publishBackendRequestFromEventBridge(eventId: $eventId, requestType: $requestType, modelType: $modelType, $payload: payload) {
+    eventId
+    requestType
+    modelType
+    payload
+}
+}`
+                    ,
+                },
+                inputTransformer: {
+                    inputPathsMap: {
+                        eventId: "$.detail.eventId",
+                        requestType: "$.detail.requestType",
+                        modelType: "$.detail.modelType",
+                        payload: "$.detail.payload",
+                    },
+                    inputTemplate: JSON.stringify({
+                        eventId: "<eventId>",
+                        requestType: "<requestType>",
+                        modelType: "<modelType>",
+                        payload: "<payload>",
+                    }),
+                },
+            },
+        ],
+    })
+    return eventBus;
+
 }

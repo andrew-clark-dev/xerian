@@ -21,6 +21,33 @@ const schema = a.schema({
       config: a.json(),
     }),
 
+  BackendRequestType: a.enum(["ModelSync", "Report", "Notification", "Undefined"]),
+  BackendRequest: a.customType({
+    eventId: a.id().required(),
+    requestType: a.ref("BackendRequestType").required(),
+    modelType: a.string().required(),
+    payload: a.json().required(),
+  }),
+
+
+  publishBackendRequestToEventBridge: a
+    .mutation()
+    .arguments({
+      eventId: a.id().required(),
+      requestType: a.string().required(),
+      modelType: a.string().required(),
+      payload: a.json().required(),
+    })
+    .returns(a.ref("BackendRequest"))
+    .authorization((allow) => [allow.authenticated()])
+    .handler(
+      a.handler.custom({
+        dataSource: "XerianEventBridgeDataSource",
+        entry: "./publishBackendRequestToEventBridge.js",
+      })
+    ),
+
+
   SyncInfo: a
     .model({
       modelType: a.string(),
