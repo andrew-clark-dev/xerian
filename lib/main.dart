@@ -1,33 +1,68 @@
+
+import 'package:flutter/material.dart';
+import 'package:logging/logging.dart';
+import 'package:go_router/go_router.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+
 import 'package:amplify_auth_cognito/amplify_auth_cognito.dart';
 import 'package:amplify_api/amplify_api.dart';
 import 'package:amplify_storage_s3/amplify_storage_s3.dart';
-
 import 'package:amplify_flutter/amplify_flutter.dart';
-import 'package:flutter/material.dart';
-import 'package:xerian/amplify_config_service.dart';
-import 'package:logging/logging.dart';
 
-import 'package:go_router/go_router.dart';
+import 'package:xerian/amplify_outputs.dart';
 import 'package:xerian/models/ModelProvider.dart';
-import 'package:xerian/pages/admin/admin_settings.dart';
-import 'package:xerian/pages/group/group_list_view.dart';
-import 'package:xerian/pages/group/group_view.dart';
-import 'package:xerian/pages/item/item_form.dart';
-
-import 'pages/account/account_list_view.dart';
-import 'pages/account/account_view.dart';
-import 'pages/dashboard/dashboard_view.dart';
-import 'pages/item/item_list_view.dart';
-import 'pages/item/item_view.dart';
+import 'package:xerian/pages/dashboard/dashboard_view.dart';
+import 'package:xerian/pages/settings/settings_view.dart';
+import 'package:xerian/services/model_extensions.dart';
+import 'package:flutter_settings_screens/flutter_settings_screens.dart'
+    as flutter_settings_screens;
 import 'pages/login/login_screen.dart';
-import 'pages/routable.dart';
+
+import 'model_config.dart';
 
 Future<void> main() async {
   try {
     Logger.root.level = Level.ALL;
+    await dotenv.load(fileName: "assets/.env");
+
     WidgetsFlutterBinding.ensureInitialized();
     await _configureAmplify();
-    runApp(const Xerian());
+    await flutter_settings_screens.Settings.init();
+    runApp(
+      MaterialApp(
+        title: 'Encore Shop',
+        theme: ThemeData(
+          useMaterial3: true,
+
+          // // Define the default brightness and colors.
+          // colorScheme: ColorScheme.fromSeed(
+          //   seedColor: Colors.purple,
+          //   // ···
+          //   brightness: Brightness.dark,
+          // ),
+
+          // // Define the default `TextTheme`. Use this to specify the default
+          // // text styling for headlines, titles, bodies of text, and more.
+          // textTheme: TextTheme(
+          //   displayLarge: const TextStyle(
+          //     fontSize: 72,
+          //     fontWeight: FontWeight.bold,
+          //   ),
+          //   // ···
+          //   titleLarge: GoogleFonts.oswald(
+          //     fontSize: 30,
+          //     fontStyle: FontStyle.italic,
+          //   ),
+          //   bodyMedium: GoogleFonts.merriweather(),
+          //   displaySmall: GoogleFonts.pacifico(),
+          // ).apply(
+          //   bodyColor: Colors.pink,
+          //   displayColor: Colors.pink,
+          // ),
+        ),
+        home: EncoreShopApp(),
+      ),
+    );
   } on AmplifyException catch (e) {
     runApp(Text("Error configuring Amplify: ${e.message}"));
   }
@@ -40,55 +75,54 @@ Future<void> _configureAmplify() async {
         options: APIPluginOptions(modelProvider: ModelProvider.instance));
     final storage = AmplifyStorageS3();
     await Amplify.addPlugins([auth, api, storage]);
+    await Amplify.configure(amplifyConfig);
 
-    final config = await AmplifyConfigService.getConfigFromJson2();
-    await Amplify.configure(config);
     safePrint('Successfully configured');
   } on Exception catch (e) {
     safePrint('Error configuring Amplify: $e');
   }
 }
 
-GoRoute _route(Routable page) {
-  return GoRoute(
-    path: page.path,
-    builder: (BuildContext context, GoRouterState state) {
-      return page;
-    },
-  );
-}
-
-GoRoute _routeExtra(RoutableExtra prototype) {
-  return GoRoute(
-    path: prototype.path,
-    builder: (BuildContext context, GoRouterState state) {
-      if (state.extra != null) {
-        return prototype.extra(state.extra!);
-      }
-      return prototype;
-    },
-  );
-}
-
-/// The route configuration.
-final GoRouter _router = GoRouter(
-  routes: <RouteBase>[
-    _route(const LoginScreen()),
-    _route(DashboardView()),
-    _routeExtra(const AccountView()),
-    _route(const AccountListView()),
-    _routeExtra(const ItemView()),
-    _route(const ItemListView()),
-    _route(const ItemForm()),
-    _routeExtra(const GroupView()),
-    _route(GroupListView()),
-    _route(const AdminSettings()),
-  ],
-);
-
-class Xerian extends StatelessWidget {
+class EncoreShopApp extends StatelessWidget {
   /// Constructs a [EncoreShopApp]
-  const Xerian({super.key});
+  EncoreShopApp({super.key});
+
+  /// The route configuration.
+  late final GoRouter _router = GoRouter(
+      initialLocation: Dashboard.classType.path(), // start at the dashboard
+      routes: <RouteBase>[
+        ModelConfig(Login.classType).route(const LoginScreen()),
+        ModelConfig(Dashboard.classType).route(const DashboardView()),
+        ModelConfig(Settings.classType).route(const SettingsView()),
+        ModelConfig(Account.classType).listRoute(),
+        ModelConfig(Account.classType).viewRoute(),
+      ],
+
+      // redirect to the login page if the user is not logged in
+      redirect: (BuildContext context, GoRouterState state) async {
+        // if the user is not logged in, they need to login
+        final loggedIn = await isAuthorized();
+        final loggingIn = state.path == Login.classType.path();
+        if (!loggedIn) return loggingIn ? null : Login.classType.path();
+
+        // if the user is logged in but still on the login page, send them to
+        // the home page
+        if (loggingIn) return '/';
+
+        // no need to redirect at all
+        return null;
+      });
+
+  Future<bool> isAuthorized() async {
+    try {
+      final result = await Amplify.Auth.fetchAuthSession();
+      safePrint('User is signed in: ${result.isSignedIn}');
+      return result.isSignedIn;
+    } on AuthException catch (e) {
+      safePrint('Error retrieving auth session: ${e.message}');
+      return false;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {

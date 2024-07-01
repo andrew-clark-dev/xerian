@@ -2,12 +2,12 @@ import { defineBackend } from '@aws-amplify/backend';
 import { auth } from './auth/resource';
 import { data } from './data/resource';
 import { storage } from './storage/resource';
-
-import { algoliaSearchInjest, importFunction } from './custom-resources/resource'
-import { opensearchDomain } from './custom-resources/resource'
-import { opensearchPipeline } from './custom-resources/resource'
-import { Stack } from 'aws-cdk-lib';
-
+import { backendFunction, createEventBus } from './custom-resources/resource';
+import { Stack } from 'aws-cdk-lib/core';
+import { ITable } from 'aws-cdk-lib/aws-dynamodb';
+import { EventbridgeToLambdaProps, EventbridgeToLambda } from '@aws-solutions-constructs/aws-eventbridge-lambda';
+import { uiEvent } from './functions/eventbridge/resource';
+import { aws_events } from 'aws-cdk-lib';
 /**
  * @see https://docs.amplify.aws/react/build-a-backend/ to add storage, functions, and more
  */
@@ -15,53 +15,52 @@ const backend = defineBackend({
   auth,
   data,
   storage,
-});
-
-/**
- * @see https://docs.amplify.aws/flutter/build-a-backend/data/custom-business-logic/search-and-aggregate-queries/ 
- * Connect to Amazon OpenSearch for search and aggregate queries
-*/
-
-const searchStack = backend.createStack('amplifySearch');
-
-// const osDomain = opensearchDomain(searchStack)
+  uiEvent,
+})
 
 const dataStack = Stack.of(backend.data);
+const eventStack = backend.createStack("event-stack");
 
-// opensearchPipeline(dataStack,
-//   'account',
-//   osDomain,
-//   backend.data.resources.tables['Account'],
-//   backend.data.resources.cfnResources.amplifyDynamoDbTables['Account'],
-//   backend.storage.resources.bucket
-// )
-
-// opensearchPipeline(dataStack,
-//   'item',
-//   osDomain,
-//   backend.data.resources.tables['Item'],
-//   backend.data.resources.cfnResources.amplifyDynamoDbTables['Item'],
-//   backend.storage.resources.bucket
-// )
-
-// opensearchPipeline(dataStack,
-//   'sale',
-//   osDomain,
-//   backend.data.resources.tables['Sale'],
-//   backend.data.resources.cfnResources.amplifyDynamoDbTables['Sale'],
-//   backend.storage.resources.bucket
-// )
+const accountTable: ITable = backend.data.resources.tables['Account']
+const syncTable: ITable = backend.data.resources.tables['SyncInfo']
 
 
-// const osDataSource = backend.data.addOpenSearchDataSource("osDataSource", osDomain);
+var env: { [key: string]: string } = {
+  ACCOUNT_TABLE: accountTable.tableName,
+  SYNC_TABLE: syncTable.tableName,
+}
 
 // /**
 //  * @see https://docs.amplify.aws/gen1/flutter/tools/cli/custom/cdk/ Use CDK to add custom AWS resources
 //  */
-const customStack = backend.createStack('amplifyCustom');
+const syncAccountFunction = backendFunction(dataStack, 'sync-account', env, [accountTable, syncTable])
+const truncateTableFunction = backendFunction(dataStack, 'truncate-table', env, [accountTable, syncTable])
 
-const accountImport = importFunction(customStack, 'account', backend.data.resources.tables['Account'])
-const itemImport = importFunction(customStack, 'item', backend.data.resources.tables['Item'])
-const saleImport = importFunction(customStack, 'sale', backend.data.resources.tables['Sale'])
-const groupImport = importFunction(customStack, 'group', backend.data.resources.tables['Group'])
-// const searchLayer = algoliaSearchInjest(customStack)
+// Reference or create an EventBridge EventBus
+const eventBus = aws_events.EventBus.fromEventBusName(
+  eventStack,
+  "event-bus",
+  "default"
+);
+
+eventBus.grantPutEventsTo(syncAccountFunction)
+
+syncAccountFunction
+
+const constructProps: EventbridgeToLambdaProps = {
+  existingLambdaObj: syncAccountFunction,
+  eventRuleProps: {
+    eventBus: eventBus,
+    eventPattern: {
+      source: ['amplify.frontend'],
+      detailType: ['modelsync']
+    }
+  },
+};
+
+const eventbridgeToLambda = new EventbridgeToLambda(dataStack, 'modelsync-lambda', constructProps);
+
+
+// Add the EventBridge data source
+// const eventBus = createEventBus(eventStack, backend.data.resources.graphqlApi.arn, backend.data.resources.cfnResources.cfnGraphqlApi.attrGraphQlEndpointArn)
+backend.data.addEventBridgeDataSource("EventBridgeDataSource", eventBus);

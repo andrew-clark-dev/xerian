@@ -21,39 +21,35 @@
 
 import 'package:amplify_core/amplify_core.dart' as amplify_core;
 import 'Account.dart';
-import 'Counter.dart';
-import 'Group.dart';
-import 'Item.dart';
-import 'Journal.dart';
-import 'Refund.dart';
-import 'Sale.dart';
-import 'Tag.dart';
+import 'Dashboard.dart';
+import 'Login.dart';
+import 'Settings.dart';
+import 'SyncInfo.dart';
+import 'ClientRequestToEventBridgeResponse.dart';
+import 'EventBridgeEntry.dart';
+import 'EventBridgeResponse.dart';
+import 'ServerEvent.dart';
 
 export 'Account.dart';
-export 'AccountAdprefs.dart';
+export 'AccountComunicationPreferences.dart';
 export 'AccountStatus.dart';
-export 'Counter.dart';
-export 'Group.dart';
-export 'GroupType.dart';
-export 'Item.dart';
-export 'ItemQuality.dart';
-export 'ItemStatus.dart';
-export 'Journal.dart';
-export 'Refund.dart';
-export 'RefundPaymentType.dart';
-export 'RefundStatus.dart';
-export 'Sale.dart';
-export 'SalePaymentType.dart';
-export 'SaleStatus.dart';
-export 'Tag.dart';
+export 'ClientRequestToEventBridgeResponse.dart';
+export 'Dashboard.dart';
+export 'EventBridgeEntry.dart';
+export 'EventBridgeResponse.dart';
+export 'Login.dart';
+export 'ServerEvent.dart';
+export 'ServerEventType.dart';
+export 'Settings.dart';
+export 'SyncInfo.dart';
 
 class ModelProvider implements amplify_core.ModelProviderInterface {
   @override
-  String version = "e958a6d3535f25262f01660a59f6cc02";
+  String version = "d164d080d171df15f54ee5f12678d04c";
   @override
-  List<amplify_core.ModelSchema> modelSchemas = [Account.schema, Counter.schema, Group.schema, Item.schema, Journal.schema, Refund.schema, Sale.schema, Tag.schema];
+  List<amplify_core.ModelSchema> modelSchemas = [Account.schema, Dashboard.schema, Login.schema, Settings.schema, SyncInfo.schema];
   @override
-  List<amplify_core.ModelSchema> customTypeSchemas = [];
+  List<amplify_core.ModelSchema> customTypeSchemas = [ClientRequestToEventBridgeResponse.schema, EventBridgeEntry.schema, EventBridgeResponse.schema, ServerEvent.schema];
   static final ModelProvider _instance = ModelProvider();
 
   static ModelProvider get instance => _instance;
@@ -62,20 +58,14 @@ class ModelProvider implements amplify_core.ModelProviderInterface {
     switch(modelName) {
       case "Account":
         return Account.classType;
-      case "Counter":
-        return Counter.classType;
-      case "Group":
-        return Group.classType;
-      case "Item":
-        return Item.classType;
-      case "Journal":
-        return Journal.classType;
-      case "Refund":
-        return Refund.classType;
-      case "Sale":
-        return Sale.classType;
-      case "Tag":
-        return Tag.classType;
+      case "Dashboard":
+        return Dashboard.classType;
+      case "Login":
+        return Login.classType;
+      case "Settings":
+        return Settings.classType;
+      case "SyncInfo":
+        return SyncInfo.classType;
       default:
         throw Exception("Failed to find model in model provider for model name: " + modelName);
     }

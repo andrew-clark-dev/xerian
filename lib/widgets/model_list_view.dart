@@ -1,47 +1,39 @@
 import 'package:logging/logging.dart';
 import 'package:amplify_core/amplify_core.dart';
 import 'package:flutter/material.dart';
-import 'package:xerian/models/ModelProvider.dart';
+import 'package:xerian/model_config.dart';
+import 'package:xerian/widgets/model_app_bar.dart';
 import 'package:xerian/widgets/model_list_tile.dart';
 
-import '../pages/routable.dart';
 import '../services/api.dart';
-import '../services/route_path.dart';
-import '../services/row_service.dart';
+import '../services/model_extensions.dart';
 import 'app_drawer.dart';
 import 'package:go_router/go_router.dart';
 
 const limit = 20;
 
-class ModelListView extends StatefulWidget implements Routable {
+class ModelListView extends StatefulWidget {
   final Logger log = Logger("ModelListView");
 
   final ModelType modelType;
   final List<String> fields;
 
-  final DropDownFilter? filter;
-
-  ModelListView(this.modelType, this.fields, {super.key, this.filter});
+  ModelListView(this.modelType, this.fields, {super.key});
 
   @override
   // ignore: library_private_types_in_public_api,
   _ModelListViewState createState() => _ModelListViewState();
-
-  @override
-  String get path => '/${modelType.modelName().toLowerCase()}list';
 }
 
 class _ModelListViewState extends State<ModelListView> {
-  late Api api;
-  late DropDownFilter? filter;
-  late DropdownMenu? menu;
+  late final Api _api;
+  late final ModelType _modelType;
 
   @override
   void initState() {
     super.initState();
-    filter = widget.filter;
-    menu = filter?.menu();
-    api = Api(widget.modelType);
+    _modelType = widget.modelType;
+    _api = Api(_modelType);
     _fetchMore();
   }
 
@@ -55,14 +47,7 @@ class _ModelListViewState extends State<ModelListView> {
     loading = true;
 
     try {
-      final queryPredicate = Group.TYPE.eq(GroupType.color);
-
-      // final query = filter == null
-      //     ? null
-      //     : const QueryPredicateOperation(
-      //         "type", EqualQueryOperator<String>(""));
-      // EqualQueryOperator<Model>(menu!.controller!.value as Model));
-      page = (await api.fetch(page, query: queryPredicate))!;
+      page = (await _api.fetch(page))!;
       setState(() {
         models += page!.items;
       });
@@ -73,7 +58,7 @@ class _ModelListViewState extends State<ModelListView> {
     }
   }
 
-  NotificationListener listener(TileService tileService) {
+  NotificationListener listener() {
     return NotificationListener<ScrollNotification>(
       onNotification: (notification) {
         if (notification is ScrollEndNotification &&
@@ -96,7 +81,7 @@ class _ModelListViewState extends State<ModelListView> {
           itemBuilder: (context, index) {
             if (index < models.length) {
               // you can have here your custom widgets for displaying posts or what
-              return tileService.dismissible(models[index]!);
+              return ModelListTile(models[index]!);
             } else {
               return loading
                   ? const Center(
@@ -110,44 +95,21 @@ class _ModelListViewState extends State<ModelListView> {
 
   @override
   Widget build(BuildContext context) {
-    final tileService = TileService(widget.fields, context);
     return Scaffold(
         floatingActionButton: FloatingActionButton(
-          // Navigate to the page to create new budget entries
-          onPressed: () => context.push(RoutePath.path(widget.modelType)),
+          // Navigate to the page to create new models
+          onPressed: () => context.push(_modelType.path()),
           child: const Icon(Icons.add),
         ),
-        appBar: AppBar(
-          title: Text(widget.modelType.modelName().capitalized),
-        ),
+        appBar: ModelAppBar(_modelType, plural: true),
         drawer: const AppDrawer(), // Add the drawer here
         body: Padding(
-            padding: const EdgeInsets.only(top: 25),
+            padding: const EdgeInsets.all(25),
             child: Column(children: [
-              if (filter != null) filter!.menu(),
-              RowService.buildRow(
-                widget.fields,
-                Theme.of(context).textTheme.titleMedium,
-              ),
+              ModelListTile.buildRow(ModelConfig(_modelType).listTitleNames(),
+                  style: Theme.of(context).textTheme.titleMedium),
               const Divider(),
-              Expanded(child: listener(tileService))
+              Expanded(child: listener())
             ])));
-  }
-}
-
-class DropDownFilter<T extends Enum> {
-  final TextEditingController controller = TextEditingController();
-
-  final List<T> values;
-
-  DropDownFilter(this.values);
-
-  DropdownMenu menu() {
-    return DropdownMenu(
-        controller: controller,
-        dropdownMenuEntries: (this
-            .values
-            .map((e) => DropdownMenuEntry<T>(value: e, label: (e as Enum).name))
-            .toList()));
   }
 }

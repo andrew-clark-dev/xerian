@@ -1,71 +1,38 @@
-import 'package:amplify_api/amplify_api.dart';
 import 'package:amplify_core/amplify_core.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:logging/logging.dart';
+import 'package:xerian/model_config.dart';
 
-import '../services/route_path.dart';
+import '../services/model_extensions.dart';
 
-class TileService {
-  final Logger log = Logger("TileService");
+class ModelListTile extends ListTile {
+  final Logger log = Logger("ModelListTile");
 
-  final List<String> fields;
+  final Model model;
 
-  final BuildContext context;
+  ModelListTile(this.model, {super.key});
 
-  TileService(this.fields, this.context);
-
-  ListTile tile(Model model, {bool dismissable = false}) {
+  @override
+  Widget build(BuildContext context) {
+    final fields = ModelConfig(model.getInstanceType()).values(model);
     return ListTile(
-      title: _buildRow(model, dismissable: dismissable),
-      onTap: () =>
-          context.push(RoutePath.path(model.getInstanceType()), extra: model),
+      title: buildRow(fields),
+      onTap: () => context.push(model.getInstanceType().path(), extra: model),
     );
   }
 
-  Row _buildRow(Model model, {bool dismissable = false}) {
-    List<String> values = [];
-
-    for (final field in fields) {
-      values.add(model.toMap()[field].toString());
-    }
-
+  static Row buildRow(List values, {TextStyle? style}) {
     List<Widget> children = [];
     for (final value in values) {
       children.add(Expanded(
-        child: Text(value, textAlign: TextAlign.left),
+        child: Text(
+          value,
+          textAlign: TextAlign.left,
+          style: style,
+        ),
       ));
     }
-    if (!dismissable) {
-      children.add(Expanded(
-          child: ElevatedButton(
-              onPressed: () async => _deleteModel(model),
-              child: const Icon(Icons.delete))));
-    }
     return Row(children: children);
-  }
-
-  _deleteModel(Model model) async {
-    final request = ModelMutations.delete<Model>(model);
-    final response = await Amplify.API.mutate(request: request).response;
-    log.info(
-        'Delete ${model.getInstanceType().modelName()} response: $response');
-  }
-
-  Dismissible dismissible(Model model) {
-    return Dismissible(
-        key: const ValueKey(Model),
-        background: const ColoredBox(
-          color: Colors.red,
-          child: Padding(
-            padding: EdgeInsets.only(right: 10),
-            child: Align(
-              alignment: Alignment.centerRight,
-              child: Icon(Icons.delete, color: Colors.white),
-            ),
-          ),
-        ),
-        onDismissed: (_) => _deleteModel(model),
-        child: tile(model, dismissable: true));
   }
 }

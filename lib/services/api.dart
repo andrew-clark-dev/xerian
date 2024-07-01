@@ -30,23 +30,4 @@ class Api {
       rethrow;
     }
   }
-
-  Future<List<Model?>> query(QueryPredicate<Model> query) async {
-    try {
-      var request = ModelQueries.list(modelType, where: query);
-      var data = (await Amplify.API.query(request: request).response).data!;
-      var result = data.items;
-      while (data.hasNextResult) {
-        data = (await Amplify.API
-                .query(request: data.requestForNextResult!)
-                .response)
-            .data!;
-        result.addAll(data.items);
-      }
-      return result;
-    } on ApiException catch (e) {
-      log.severe('Query failed: $e');
-      rethrow;
-    }
-  }
 }

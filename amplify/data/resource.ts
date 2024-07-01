@@ -1,31 +1,91 @@
 import { type ClientSchema, a, defineData } from "@aws-amplify/backend";
+import { uiEvent } from "../functions/eventbridge/resource";
 
 const schema = a.schema({
 
   // Models
-
-  Counter: a
+  Login: a
     .model({
-      count: a.integer(),
-    })
-    .authorization((allow) => [allow.authenticated()]),
+      email: a.email(),
+      config: a.json(),
+    }),
+
+  Dashboard: a
+    .model({
+      email: a.email(),
+      config: a.json(),
+    }),
+
+  Settings: a
+    .model({
+      email: a.email(),
+      config: a.json(),
+    }),
 
 
-  incrementCounter: a
+  EventBridgeEntry: a.customType({
+    errorCode: a.string(),
+    errorMessage: a.string(),
+    eventId: a.string()
+  }),
+
+  EventBridgeResponse: a.customType({
+    entries: a.ref("EventBridgeEntry").array(),
+    failedEntryCount: a.integer()
+  }),
+
+  ClientRequestToEventBridgeResponse: a.customType({
+    statusCode: a.integer(),
+    headers: a.json(),
+    body: a.string()
+  }),
+
+  publishClientRequestToEventBridge: a
     .mutation()
-    // arguments that this query accepts
     .arguments({
-      id: a.id(),
+      source: a.string().required(),
+      detailType: a.string().required(),
+      payload: a.json().required(),
     })
-    // return type of the query
-    .returns(a.ref("Counter"))
-    // only allow signed-in users to call this API
+    .returns(a.ref("ClientRequestToEventBridgeResponse"))
+    .authorization((allow) => [allow.authenticated()])
+    .handler(
+      a.handler.function(uiEvent)
+    ),
+
+  ServerEventType: a.enum(["modelsync", "report", "notification", "undefined"]),
+  ServerEvent: a.customType({
+    eventId: a.id().required(),
+    eventType: a.ref("ServerEventType").required(),
+    modelType: a.string().required(),
+    payload: a.string().required(),
+  }),
+
+  publishServerEventToEventBridge: a
+    .mutation()
+    .arguments({
+      eventId: a.id().required(),
+      eventType: a.string().required(),
+      modelType: a.string().required(),
+      payload: a.string().required(),
+    })
+    .returns(a.ref("ServerEvent"))
+    .authorization((allow) => [allow.authenticated()])
     .handler(
       a.handler.custom({
-        dataSource: a.ref("Counter"),
-        entry: "./increment-counter.js",
+        dataSource: "EventBridgeDataSource",
+        entry: "./publishToEventBridge.js",
       })
     ),
+
+
+  SyncInfo: a
+    .model({
+      modelType: a.string(),
+      user: a.string(),
+      timestamp: a.datetime(),
+      info: a.json(),
+    }),
 
   Account: a
     .model({
@@ -40,118 +100,14 @@ const schema = a.schema({
       state: a.string(),
       postcode: a.string(),
       balance: a.float(),
-      adprefs: a.enum(["promoSms", "none", "all"]),
+      comunicationPreferences: a.enum(["sms", "email", "none", "all"]),
       status: a.enum(["active", "inactive", "suspended"]),
       original: a.json(),
-      // 1. Create reference fields to both ends of
-      //    the many-to-many relationship
-      // items: a.hasMany("Item", "accountId"),
-      // sales: a.hasMany("Sale", "accountId"),
-      // refunds: a.hasMany("Refund", "accountId"),
-      // 2. Create relationship fields to both ends of
-      //    the many-to-many relationship using their
-      //    respective reference fields
-      // items: a.hasMany("Item", "accountId"), // setup relationships between types
     })
     .secondaryIndexes((index) => [index("number")]),
-
-  searchAccounts: a
-    .query()
-    .arguments({ matchString: a.string() })
-    .returns(a.ref("Account").array())
-    .handler(
-      a.handler.custom({
-        entry: "./searchAccountResolver.js",
-        dataSource: "osDataSource",
-      })
-    ),
-
-  Item: a
-    .model({
-      sku: a.integer().required(),
-      account: a.string(),
-      deparment: a.string(),
-      brand: a.string(),
-      color: a.string(),
-      size: a.string(),
-      description: a.string().required(),
-      details: a.string(),
-      images: a.url().array(), // fields can be arrays,
-      quality: a.enum(["asNew", "good", "marked"]),
-      split: a.integer(),
-      status: a.enum(["tagged", "hungOut", "sold", "toDonate", "donated"]),
-      original: a.json(),
-    }),
-
-  searchItems: a
-    .query()
-    .arguments({ matchString: a.string() })
-    .returns(a.ref("Item").array())
-    .handler(
-      a.handler.custom({
-        entry: "./searchItemResolver.js",
-        dataSource: "osDataSource",
-      })
-    ),
-
-  Sale: a
-    .model({
-      number: a.integer().required(),
-      item: a.string().required(),
-      account: a.string().required(),
-      status: a.enum(["parked", "finalized"]),
-      finalized: a.datetime(),
-      total: a.float(),
-      subtotal: a.float(),
-      paymentType: a.enum(["cash", "card", "giftCard", "accountCredit"]),
-      original: a.json(),
-    }),
-
-  searchSales: a
-    .query()
-    .arguments({ matchString: a.string() })
-    .returns(a.ref("Sale").array())
-    .handler(
-      a.handler.custom({
-        entry: "./searchSaleResolver.js",
-        dataSource: "osDataSource",
-      })
-    ),
-
-  Group: a
-    .model({
-      type: a.enum(["category", "color", "brand", "size"]),
-      value: a.string().required(),
-      alternatives: a.string().array(),
-    }),
-
-  Refund: a
-    .model({
-      number: a.integer(),
-      status: a.enum(["parked", "finalized"]),
-      finalized: a.datetime(),
-      total: a.float(),
-      subtotal: a.float(),
-      paymentType: a.enum(["cash", "accountCredit"]),
-    }),
-
-  Journal: a
-    .model({
-      modelId: a.id().required(),
-      timestamp: a.datetime().required(),
-      action: a.string(),
-      before: a.json(),
-      after: a.json(),
-    }),
-
-  Tag: a
-    .model({
-      modelId: a.id(),
-      key: a.string(),
-      value: a.string(),
-    }),
-
 })
+
+
   // Default is to allow access to authenticated users
   .authorization((allow) => [allow.authenticated()]);
 
