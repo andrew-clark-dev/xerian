@@ -7,5 +7,5 @@ log.info(f'Running - {os.getenv('AWS_LAMBDA_FUNCTION_NAME')}')
 
 
 def handler(event, context):
-    print("Event: " + event)
+    print(event)
 

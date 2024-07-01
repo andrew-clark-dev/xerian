@@ -1,0 +1,16 @@
+{
+    "version": "0",
+    "id": "0aff3c33-f32b-fc72-662a-fb36c84234aa",
+    "detail-type": "ServerEvent",
+    "source": "amplify.server-events",
+    "account": "211125666545",
+    "time": "2024-06-30T15: 50: 35Z",
+    "region": "eu-central-1",
+    "resources": [],
+    "detail": {
+        "eventId": "UUID.getUUID()",
+        "eventType": "MODELSYNC",
+        "modelType": "Account.classType.modelName()",
+        "payload": "{}"
+    }
+}

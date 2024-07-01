@@ -1,4 +1,3 @@
-import 'package:amplify_api/amplify_api.dart';
 import 'package:amplify_core/amplify_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_settings_screens/flutter_settings_screens.dart';
@@ -13,14 +12,22 @@ class SettingsView extends StatefulWidget {
 
 class _SettingsViewState extends State<SettingsView> {
   Future<void> request() async {
-    final BackendRequest backendRequest = BackendRequest(
-        requestType: BackendRequestRequestType.modelsync,
-        modelType: Account.classType.toString(),
-        payload: "");
+    safePrint(ServerEventType.modelsync.name.toUpperCase());
+    safePrint(Account.classType.modelName());
 
-    final request = ModelMutations.create(backendRequest);
+    final serverEventRequest = GraphQLRequest<String>(
+      document: graphQLDocument,
+      variables: <String, String>{
+        "source": "amplify.server-events",
+        "detailType": "ServerEvent",
+        "payload": "{'name: 'andrew'}",
+      },
+    );
 
-    await Amplify.API.mutate(request: request).response;
+    final response =
+        await Amplify.API.query(request: serverEventRequest).response;
+
+    safePrint(response);
   }
 
   @override
@@ -73,3 +80,33 @@ class _SettingsViewState extends State<SettingsView> {
             )));
   }
 }
+
+class ServerEventResponse {
+  final ServerEvent serverEvent;
+
+  ServerEventResponse({required this.serverEvent});
+
+  factory ServerEventResponse.fromJson(Map<String, dynamic> json) {
+    return ServerEventResponse(
+      serverEvent: ServerEvent.fromJson(json['serverEvent']),
+    );
+  }
+}
+
+const graphQLDocument = '''
+mutation PublishClientRequestToEventBridge(
+  \$source: String!
+  \$detailType: String!
+  \$payload: String!
+) {
+  publishClientRequestToEventBridge(
+    source: \$source
+    detailType: \$detailType
+    payload: \$payload
+  ) {
+    source
+    detailType
+    payload
+  }
+}
+''';

@@ -21,29 +21,35 @@
 
 import 'package:amplify_core/amplify_core.dart' as amplify_core;
 import 'Account.dart';
-import 'BackendRequest.dart';
 import 'Dashboard.dart';
 import 'Login.dart';
 import 'Settings.dart';
 import 'SyncInfo.dart';
+import 'ClientRequestToEventBridgeResponse.dart';
+import 'EventBridgeEntry.dart';
+import 'EventBridgeResponse.dart';
+import 'ServerEvent.dart';
 
 export 'Account.dart';
 export 'AccountComunicationPreferences.dart';
 export 'AccountStatus.dart';
-export 'BackendRequest.dart';
-export 'BackendRequestRequestType.dart';
+export 'ClientRequestToEventBridgeResponse.dart';
 export 'Dashboard.dart';
+export 'EventBridgeEntry.dart';
+export 'EventBridgeResponse.dart';
 export 'Login.dart';
+export 'ServerEvent.dart';
+export 'ServerEventType.dart';
 export 'Settings.dart';
 export 'SyncInfo.dart';
 
 class ModelProvider implements amplify_core.ModelProviderInterface {
   @override
-  String version = "860414502337b053bc6c15aa3c35e392";
+  String version = "d164d080d171df15f54ee5f12678d04c";
   @override
-  List<amplify_core.ModelSchema> modelSchemas = [Account.schema, BackendRequest.schema, Dashboard.schema, Login.schema, Settings.schema, SyncInfo.schema];
+  List<amplify_core.ModelSchema> modelSchemas = [Account.schema, Dashboard.schema, Login.schema, Settings.schema, SyncInfo.schema];
   @override
-  List<amplify_core.ModelSchema> customTypeSchemas = [];
+  List<amplify_core.ModelSchema> customTypeSchemas = [ClientRequestToEventBridgeResponse.schema, EventBridgeEntry.schema, EventBridgeResponse.schema, ServerEvent.schema];
   static final ModelProvider _instance = ModelProvider();
 
   static ModelProvider get instance => _instance;
@@ -52,8 +58,6 @@ class ModelProvider implements amplify_core.ModelProviderInterface {
     switch(modelName) {
       case "Account":
         return Account.classType;
-      case "BackendRequest":
-        return BackendRequest.classType;
       case "Dashboard":
         return Dashboard.classType;
       case "Login":
