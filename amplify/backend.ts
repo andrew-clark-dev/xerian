@@ -2,14 +2,11 @@ import { defineBackend } from '@aws-amplify/backend';
 import { auth } from './auth/resource';
 import { data } from './data/resource';
 import { storage } from './storage/resource';
-import { backendFunction, createEventBus } from './custom-resources/resource';
 import { Stack } from 'aws-cdk-lib/core';
 import { ITable } from 'aws-cdk-lib/aws-dynamodb';
 import { EventbridgeToLambdaProps, EventbridgeToLambda } from '@aws-solutions-constructs/aws-eventbridge-lambda';
-import { aws_events } from 'aws-cdk-lib';
-import { LogGroup } from 'aws-cdk-lib/aws-logs';
-import { CloudWatchLogGroup } from 'aws-cdk-lib/aws-events-targets';
-import { eventBridge } from './custom-resources/eventbridge/resource';
+import { backendFunction } from './custom-resources/function/resource';
+import { configureEventBridge, eventbridgeToLambda } from './custom-resources/eventbridge/resource';
 
 /**
  * @see https://docs.amplify.aws/react/build-a-backend/ to add storage, functions, and more
@@ -38,28 +35,9 @@ var env: { [key: string]: string } = {
 const syncAccountFunction = backendFunction(dataStack, 'sync-account', env, [accountTable, syncTable])
 const truncateTableFunction = backendFunction(dataStack, 'truncate-table', env, [accountTable, syncTable])
 
-const eventBus = eventBridge(eventStack, "event-bus")
+const eventBus = configureEventBridge(eventStack, "event-bus")
 
 // Add the EventBridge data source
 const eventBridgeDataSource = backend.data.addEventBridgeDataSource("EventBridgeDataSource", eventBus);
 
-
-// eventBus.grantPutEventsTo(syncAccountFunction)
-
-// const constructProps: EventbridgeToLambdaProps = {
-//   existingLambdaObj: syncAccountFunction,
-//   eventRuleProps: {
-//     eventBus: eventBus,
-//     eventPattern: {
-//       source: ['amplify.frontend'],
-//       detailType: ['modelsync']
-//     }
-//   },
-// };
-
-// const eventbridgeToLambda = new EventbridgeToLambda(dataStack, 'modelsync-lambda', constructProps);
-
-
-// // Add the EventBridge data source
-// // const eventBus = createEventBus(eventStack, backend.data.resources.graphqlApi.arn, backend.data.resources.cfnResources.cfnGraphqlApi.attrGraphQlEndpointArn)
-// backend.data.addEventBridgeDataSource("EventBridgeDataSource", eventBus);
+const accountSyncBridge = eventbridgeToLambda(dataStack, eventBus, syncAccountFunction, 'frontend.account.sync.request')

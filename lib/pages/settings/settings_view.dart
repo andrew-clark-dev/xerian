@@ -22,7 +22,10 @@ class _SettingsViewState extends State<SettingsView> {
 
     final clientRequest = GraphQLRequest<String>(
       document: graphQLDocument,
-      variables: <String, String>{"source": "example", "payload": "a payload"},
+      variables: <String, String>{
+        "source": "frontend.account.sync.request",
+        "payload": "a payload"
+      },
     );
 
     final response = await Amplify.API.mutate(request: clientRequest).response;
