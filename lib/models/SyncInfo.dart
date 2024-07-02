@@ -108,10 +108,10 @@ class SyncInfo extends amplify_core.Model {
     buffer.write("id=" + "$id" + ", ");
     buffer.write("modelType=" + "$_modelType" + ", ");
     buffer.write("user=" + "$_user" + ", ");
-    buffer.write("timestamp=" + (_timestamp != null ? _timestamp!.format() : "null") + ", ");
+    buffer.write("timestamp=" + (_timestamp != null ? _timestamp.format() : "null") + ", ");
     buffer.write("info=" + "$_info" + ", ");
-    buffer.write("createdAt=" + (_createdAt != null ? _createdAt!.format() : "null") + ", ");
-    buffer.write("updatedAt=" + (_updatedAt != null ? _updatedAt!.format() : "null"));
+    buffer.write("createdAt=" + (_createdAt != null ? _createdAt.format() : "null") + ", ");
+    buffer.write("updatedAt=" + (_updatedAt != null ? _updatedAt.format() : "null"));
     buffer.write("}");
     
     return buffer.toString();

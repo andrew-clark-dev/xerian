@@ -16,8 +16,6 @@ export function backendFunction(
     eventSource?: IEventSource,
 ): Function {
     console.log(`Creating function - ${functionName}`);
-    console.log(`With environment - `);
-    for (const name in environment) { console.log(`${name} = ${environment[name]}`) }
 
     const lambdaFunction = new Function(
         stack,
@@ -37,12 +35,10 @@ export function backendFunction(
 
     tables.forEach((table) => {
         table.grantFullAccess(lambdaFunction)
-        console.log(`Grant access to table - ${table}`)
     })
 
     buckets?.forEach((bucket) => {
         bucket.grantReadWrite(lambdaFunction)
-        console.log(`Grant access to bucket - ${bucket}`)
     })
 
     if (eventSource) {

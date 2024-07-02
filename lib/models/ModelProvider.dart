@@ -25,31 +25,22 @@ import 'Dashboard.dart';
 import 'Login.dart';
 import 'Settings.dart';
 import 'SyncInfo.dart';
-import 'ClientRequestToEventBridgeResponse.dart';
-import 'EventBridgeEntry.dart';
-import 'EventBridgeResponse.dart';
-import 'ServerEvent.dart';
 
 export 'Account.dart';
 export 'AccountComunicationPreferences.dart';
 export 'AccountStatus.dart';
-export 'ClientRequestToEventBridgeResponse.dart';
 export 'Dashboard.dart';
-export 'EventBridgeEntry.dart';
-export 'EventBridgeResponse.dart';
 export 'Login.dart';
-export 'ServerEvent.dart';
-export 'ServerEventType.dart';
 export 'Settings.dart';
 export 'SyncInfo.dart';
 
 class ModelProvider implements amplify_core.ModelProviderInterface {
   @override
-  String version = "d164d080d171df15f54ee5f12678d04c";
+  String version = "9d5d266ede707809f6a02fb3f6184893";
   @override
   List<amplify_core.ModelSchema> modelSchemas = [Account.schema, Dashboard.schema, Login.schema, Settings.schema, SyncInfo.schema];
   @override
-  List<amplify_core.ModelSchema> customTypeSchemas = [ClientRequestToEventBridgeResponse.schema, EventBridgeEntry.schema, EventBridgeResponse.schema, ServerEvent.schema];
+  List<amplify_core.ModelSchema> customTypeSchemas = [];
   static final ModelProvider _instance = ModelProvider();
 
   static ModelProvider get instance => _instance;

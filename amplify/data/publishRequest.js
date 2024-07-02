@@ -1,5 +1,3 @@
-import { util } from '@aws-appsync/utils';
-
 /**
  * Sends an event to Event Bridge
  * @param {import('@aws-appsync/utils').Context} ctx the context
@@ -10,14 +8,15 @@ export function request(ctx) {
         operation: 'PutEvents',
         events: [
             {
-                source: 'amplify.server-events',
-                detail: {...ctx.args},
-                detailType: 'ServerEvent',
+                source: ctx.args.source,
+                detail: {payload: ctx.args.payload},
+                detailType: 'ClientRequest',
                 time: util.time.nowISO8601(),
             },
         ],
     };
 }
+
 
 /**
  * Process the response

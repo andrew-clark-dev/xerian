@@ -1,5 +1,4 @@
 import { type ClientSchema, a, defineData } from "@aws-amplify/backend";
-import { uiEvent } from "../functions/eventbridge/resource";
 
 const schema = a.schema({
 
@@ -22,62 +21,18 @@ const schema = a.schema({
       config: a.json(),
     }),
 
-
-  EventBridgeEntry: a.customType({
-    errorCode: a.string(),
-    errorMessage: a.string(),
-    eventId: a.string()
-  }),
-
-  EventBridgeResponse: a.customType({
-    entries: a.ref("EventBridgeEntry").array(),
-    failedEntryCount: a.integer()
-  }),
-
-  ClientRequestToEventBridgeResponse: a.customType({
-    statusCode: a.integer(),
-    headers: a.json(),
-    body: a.string()
-  }),
-
-  publishClientRequestToEventBridge: a
+  publishRequest: a
     .mutation()
     .arguments({
       source: a.string().required(),
-      detailType: a.string().required(),
-      payload: a.json().required(),
-    })
-    .returns(a.ref("ClientRequestToEventBridgeResponse"))
-    .authorization((allow) => [allow.authenticated()])
-    .handler(
-      a.handler.function(uiEvent)
-    ),
-
-  ServerEventType: a.enum(["modelsync", "report", "notification", "undefined"]),
-  ServerEvent: a.customType({
-    eventId: a.id().required(),
-    eventType: a.ref("ServerEventType").required(),
-    modelType: a.string().required(),
-    payload: a.string().required(),
-  }),
-
-  publishServerEventToEventBridge: a
-    .mutation()
-    .arguments({
-      eventId: a.id().required(),
-      eventType: a.string().required(),
-      modelType: a.string().required(),
       payload: a.string().required(),
     })
-    .returns(a.ref("ServerEvent"))
+    .returns(a.json())
     .authorization((allow) => [allow.authenticated()])
-    .handler(
-      a.handler.custom({
-        dataSource: "EventBridgeDataSource",
-        entry: "./publishToEventBridge.js",
-      })
-    ),
-
+    .handler(a.handler.custom({
+      dataSource: "EventBridgeDataSource",
+      entry: './publishRequest.js'
+    })),
 
   SyncInfo: a
     .model({

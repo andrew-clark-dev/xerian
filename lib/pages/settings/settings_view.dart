@@ -3,6 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_settings_screens/flutter_settings_screens.dart';
 import 'package:xerian/models/ModelProvider.dart';
 
+const graphQLDocument = '''
+mutation PublishRequest (\$source: String!, \$payload: String!) {
+  publishRequest(source: \$source, payload: \$payload)
+}
+''';
+
 class SettingsView extends StatefulWidget {
   const SettingsView({super.key});
 
@@ -12,20 +18,14 @@ class SettingsView extends StatefulWidget {
 
 class _SettingsViewState extends State<SettingsView> {
   Future<void> request() async {
-    safePrint(ServerEventType.modelsync.name.toUpperCase());
     safePrint(Account.classType.modelName());
 
-    final serverEventRequest = GraphQLRequest<String>(
+    final clientRequest = GraphQLRequest<String>(
       document: graphQLDocument,
-      variables: <String, String>{
-        "source": "amplify.server-events",
-        "detailType": "ServerEvent",
-        "payload": "{'name: 'andrew'}",
-      },
+      variables: <String, String>{"source": "example", "payload": "a payload"},
     );
 
-    final response =
-        await Amplify.API.query(request: serverEventRequest).response;
+    final response = await Amplify.API.mutate(request: clientRequest).response;
 
     safePrint(response);
   }
@@ -80,33 +80,3 @@ class _SettingsViewState extends State<SettingsView> {
             )));
   }
 }
-
-class ServerEventResponse {
-  final ServerEvent serverEvent;
-
-  ServerEventResponse({required this.serverEvent});
-
-  factory ServerEventResponse.fromJson(Map<String, dynamic> json) {
-    return ServerEventResponse(
-      serverEvent: ServerEvent.fromJson(json['serverEvent']),
-    );
-  }
-}
-
-const graphQLDocument = '''
-mutation PublishClientRequestToEventBridge(
-  \$source: String!
-  \$detailType: String!
-  \$payload: String!
-) {
-  publishClientRequestToEventBridge(
-    source: \$source
-    detailType: \$detailType
-    payload: \$payload
-  ) {
-    source
-    detailType
-    payload
-  }
-}
-''';
