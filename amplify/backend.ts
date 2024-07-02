@@ -7,6 +7,10 @@ import { Stack } from 'aws-cdk-lib/core';
 import { ITable } from 'aws-cdk-lib/aws-dynamodb';
 import { EventbridgeToLambdaProps, EventbridgeToLambda } from '@aws-solutions-constructs/aws-eventbridge-lambda';
 import { aws_events } from 'aws-cdk-lib';
+import { LogGroup } from 'aws-cdk-lib/aws-logs';
+import { CloudWatchLogGroup } from 'aws-cdk-lib/aws-events-targets';
+import { eventBridge } from './custom-resources/eventbridge/resource';
+
 /**
  * @see https://docs.amplify.aws/react/build-a-backend/ to add storage, functions, and more
  */
@@ -34,13 +38,7 @@ var env: { [key: string]: string } = {
 const syncAccountFunction = backendFunction(dataStack, 'sync-account', env, [accountTable, syncTable])
 const truncateTableFunction = backendFunction(dataStack, 'truncate-table', env, [accountTable, syncTable])
 
-
-// Reference or create an EventBridge EventBus
-const eventBus = aws_events.EventBus.fromEventBusName(
-  eventStack,
-  "event-bus",
-  "default"
-);
+const eventBus = eventBridge(eventStack, "event-bus")
 
 // Add the EventBridge data source
 const eventBridgeDataSource = backend.data.addEventBridgeDataSource("EventBridgeDataSource", eventBus);
