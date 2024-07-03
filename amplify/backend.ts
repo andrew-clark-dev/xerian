@@ -4,7 +4,6 @@ import { data } from './data/resource';
 import { storage } from './storage/resource';
 import { Stack } from 'aws-cdk-lib/core';
 import { ITable } from 'aws-cdk-lib/aws-dynamodb';
-import { EventbridgeToLambdaProps, EventbridgeToLambda } from '@aws-solutions-constructs/aws-eventbridge-lambda';
 import { backendFunction } from './custom-resources/function/resource';
 import { configureEventBridge, eventbridgeToLambda } from './custom-resources/eventbridge/resource';
 
