@@ -10,7 +10,7 @@ export const auth = defineAuth({
     email: true,
   },
 
-  groups: ["ADMINS"],
+  groups: ["ADMINS", "MANAGERS"],
 
 
   access: (allow) => [
