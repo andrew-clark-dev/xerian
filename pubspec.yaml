@@ -59,6 +59,7 @@ dependencies:
   aws_lambda_api: ^2.0.0
   flutter_dotenv: ^5.1.0
   http: ^1.2.1
+  aws_client: ^0.6.0
 dev_dependencies:
   flutter_test:
     sdk: flutter
