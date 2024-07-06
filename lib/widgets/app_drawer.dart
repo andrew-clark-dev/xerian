@@ -2,7 +2,7 @@ import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:xerian/models/ModelProvider.dart';
-import 'package:xerian/services/model_extensions.dart';
+import 'package:xerian/extensions/model_extensions.dart';
 
 class AppDrawer extends StatelessWidget {
   const AppDrawer({super.key});

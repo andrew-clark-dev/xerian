@@ -6,7 +6,7 @@ import 'package:xerian/models/ModelProvider.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:form_validation/form_validation.dart';
-import 'package:xerian/services/model_extensions.dart';
+import 'package:xerian/extensions/model_extensions.dart';
 import 'package:xerian/widgets/model_app_bar.dart';
 
 class ModelView extends StatefulWidget {

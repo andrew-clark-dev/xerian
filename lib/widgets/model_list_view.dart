@@ -6,7 +6,7 @@ import 'package:xerian/widgets/model_app_bar.dart';
 import 'package:xerian/widgets/model_list_tile.dart';
 
 import '../services/api.dart';
-import '../services/model_extensions.dart';
+import '../extensions/model_extensions.dart';
 import 'app_drawer.dart';
 import 'package:go_router/go_router.dart';
 

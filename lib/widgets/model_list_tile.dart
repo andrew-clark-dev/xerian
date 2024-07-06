@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:logging/logging.dart';
 import 'package:xerian/model_config.dart';
 
-import '../services/model_extensions.dart';
+import '../extensions/model_extensions.dart';
 
 class ModelListTile extends ListTile {
   final Logger log = Logger("ModelListTile");

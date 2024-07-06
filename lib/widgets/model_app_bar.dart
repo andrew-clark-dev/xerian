@@ -2,7 +2,7 @@ import 'package:amplify_core/amplify_core.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:xerian/models/Settings.dart';
-import 'package:xerian/services/model_extensions.dart';
+import 'package:xerian/extensions/model_extensions.dart';
 
 class ModelAppBar extends AppBar {
   final ModelType modelType;

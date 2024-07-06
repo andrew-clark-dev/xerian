@@ -15,4 +15,20 @@ extension AuthExtensions on AuthCategory {
         expiration: credentials.expiration);
     return awsClientCredentials;
   }
+
+  Future<bool> hasAdminPrivilages() async {
+    try {
+      final CognitoAuthSession session =
+          await getPlugin(AmplifyAuthCognito.pluginKey).fetchAuthSession();
+
+      final JsonWebToken idToken = session.userPoolTokensResult.value.idToken;
+
+      safePrint("Current user's id token: $idToken");
+
+      return idToken.groups.contains('ADMINS');
+    } on AuthException catch (e) {
+      safePrint('Error retrieving auth session: ${e.message}');
+      rethrow;
+    }
+  }
 }

@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
 import 'package:go_router/go_router.dart';
@@ -13,7 +12,7 @@ import 'package:xerian/amplify_outputs.dart';
 import 'package:xerian/models/ModelProvider.dart';
 import 'package:xerian/pages/dashboard/dashboard_view.dart';
 import 'package:xerian/pages/settings/settings_view.dart';
-import 'package:xerian/services/model_extensions.dart';
+import 'package:xerian/extensions/model_extensions.dart';
 import 'package:flutter_settings_screens/flutter_settings_screens.dart'
     as flutter_settings_screens;
 import 'pages/login/login_screen.dart';
