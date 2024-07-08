@@ -2,6 +2,7 @@ import 'package:amplify_core/amplify_core.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:logging/logging.dart';
+import 'package:xerian/extensions/model_extensions.dart';
 import 'package:xerian/widgets/model_ui_config.dart';
 
 class ModelListTileFactory {
@@ -15,13 +16,15 @@ class ModelListTileFactory {
 
   ListTile tile(Model model, {TextStyle? style}) {
     return ModelListTile(
-        model, row(config.listFieldValues(model), style: style), config.path());
+        model,
+        _row(config.listFieldValues(model), style: style),
+        config.modelType.viewPath);
   }
 
   Row titleRow({TextStyle? style}) =>
-      row(config.listFieldTitleNames, style: style);
+      _row(config.listFieldTitleNames, style: style);
 
-  Row row(List<String> values, {TextStyle? style}) {
+  Row _row(List<String> values, {TextStyle? style}) {
     List<Widget> children = [];
 
     for (final value in values) {

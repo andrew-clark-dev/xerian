@@ -1,13 +1,13 @@
 import 'package:amplify_api/amplify_api.dart';
 import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:change_case/change_case.dart';
-import 'package:xerian/model_config.dart';
 import 'package:xerian/models/ModelProvider.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:form_validation/form_validation.dart';
 import 'package:xerian/extensions/model_extensions.dart';
 import 'package:xerian/widgets/model_app_bar.dart';
+import 'package:xerian/widgets/model_ui_config.dart';
 
 class ModelView extends StatefulWidget {
   final Model? model;
@@ -30,10 +30,9 @@ class _ModelViewState extends State<ModelView> {
   late final _controllers = <String, TextEditingController>{};
   late final _booleanState = <String, bool>{};
   late final _enumState = <String, String?>{};
-  late final ModelType _modelType;
-  late final ModelConfig _config;
-  late final Model? _model;
-  late final List<ModelField> _fields;
+
+  late final ModelUiConfig config;
+  late final Model? model;
   String _titleText = 'Create ';
   final NumberFormat formatter = NumberFormat("00000000");
 //  final CounterService counter = CounterService(Account.classType);
@@ -45,11 +44,9 @@ class _ModelViewState extends State<ModelView> {
   @override
   void initState() {
     super.initState();
-    _modelType = widget.modelType;
-    _config = ModelConfig(_modelType);
-    _model = widget.model;
-    _fields = _config.viewFields();
-    for (var field in _fields) {
+    model = widget.model;
+    config = ModelUiConfig.config(widget.modelType);
+    for (var field in config.viewModelFields) {
       switch (field.fieldType()) {
         case ModelFieldTypeEnum.bool:
           _booleanState[field.name] = false;
@@ -60,10 +57,10 @@ class _ModelViewState extends State<ModelView> {
       }
     }
 
-    if (_model != null) {
+    if (model != null) {
       _titleText = 'Update ';
-      final json = _model.toMap();
-      for (var field in _fields) {
+      final json = model!.toMap();
+      for (var field in config.viewModelFields) {
         switch (field.fieldType()) {
           case ModelFieldTypeEnum.bool:
             _booleanState[field.name] = (json[field.name] ?? false) as bool;
@@ -126,7 +123,7 @@ class _ModelViewState extends State<ModelView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: ModelAppBar(_modelType),
+      appBar: ModelAppBar(config.modelType),
       body: Align(
         alignment: Alignment.topCenter,
         child: ConstrainedBox(
@@ -140,7 +137,9 @@ class _ModelViewState extends State<ModelView> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Column(
-                        children: _fields.map((f) => formField(f)).toList(),
+                        children: config.viewModelFields
+                            .map((f) => formField(f))
+                            .toList(),
                       ),
                       const SizedBox(height: 20),
                       ElevatedButton(
@@ -200,7 +199,7 @@ class _ModelViewState extends State<ModelView> {
             }
             return null;
           },
-          items: _config
+          items: config
               .enumValues(value.name)
               .map<DropdownMenuItem<String>>((String value) {
             return DropdownMenuItem<String>(

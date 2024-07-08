@@ -1,9 +1,9 @@
 import 'package:amplify_core/amplify_core.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:xerian/model_config.dart';
 import 'package:xerian/models/ModelProvider.dart';
 import 'package:xerian/widgets/model_list_view.dart';
+import 'package:xerian/widgets/model_ui_config.dart';
 import 'package:xerian/widgets/model_view.dart';
 
 extension ModelTypeExtensions on ModelType {
@@ -55,7 +55,7 @@ extension ModelFieldExtensions on ModelField {
   bool isEnum() => fieldType() == ModelFieldTypeEnum.enumeration;
   bool isAutoSet() {
     if (isReadOnly) return true;
-    if (ModelConfig.autosetFields.contains(name)) return true;
+    if (ModelUiConfig.autosetFields.contains(name)) return true;
     return false;
   }
 }

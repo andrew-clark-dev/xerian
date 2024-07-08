@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_settings_screens/flutter_settings_screens.dart'
+    as flutter_settings_screens;
 
 import 'package:amplify_auth_cognito/amplify_auth_cognito.dart';
 import 'package:amplify_api/amplify_api.dart';
@@ -9,15 +11,12 @@ import 'package:amplify_storage_s3/amplify_storage_s3.dart';
 import 'package:amplify_flutter/amplify_flutter.dart';
 
 import 'package:xerian/amplify_outputs.dart';
+import 'package:xerian/extensions/model_extensions.dart';
+
 import 'package:xerian/models/ModelProvider.dart';
 import 'package:xerian/pages/dashboard/dashboard_view.dart';
 import 'package:xerian/pages/settings/settings_view.dart';
-import 'package:xerian/extensions/model_extensions.dart';
-import 'package:flutter_settings_screens/flutter_settings_screens.dart'
-    as flutter_settings_screens;
-import 'pages/login/login_screen.dart';
-
-import 'model_config.dart';
+import 'package:xerian/pages/login/login_screen.dart';
 
 Future<void> main() async {
   try {
@@ -105,8 +104,8 @@ class EncoreShopApp extends StatelessWidget {
         if (!loggedIn) return loggingIn ? null : Login.classType.viewPath;
 
         // if the user is logged in but still on the login page, send them to
-        // the home page
-        if (loggingIn) return '/';
+        // the dashboard
+        if (loggingIn) return Dashboard.classType.viewPath;
 
         // no need to redirect at all
         return null;

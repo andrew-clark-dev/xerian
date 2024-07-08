@@ -69,10 +69,8 @@ class ModelUiConfig {
   ModelField modelField(String name) =>
       schema.fields!.values.firstWhere((f) => f.name == name);
 
-  List<String> enumValuesForField(String fieldName) {
-    return viewFields.firstWhere((e) => e.name == fieldName).values?.toList() ??
-        [];
-  }
+  List<String> enumValuesForField(String fieldName) =>
+      viewFields.firstWhere((e) => e.name == fieldName).values?.toList() ?? [];
 
   List<String> get listFieldNames =>
       listFields.map((f) => f.displayName).toList();
@@ -92,26 +90,12 @@ class ModelUiConfig {
   List<String> listFieldValues(Model model) =>
       listFields.map((f) => model.toMap()[f.name].toString()).toList();
 
-  String path() => '/${modelType.modelName().toLowerCase()}';
+  List<ModelField> get viewModelFields => schema.fields!.values
+      .where((v) => viewFieldNames.contains(v.name))
+      .toList();
 
-  // List<ModelField> viewFields() {
-  //   final hide = _get('hideFields')?.map((d) => d[0]).toList() ?? hideFields;
-  //   return modelType
-  //       .schema()
-  //       .fields!
-  //       .values
-  //       .where((v) => !hide.contains(v.name))
-  //       .toList();
-  // }
-
-  //   GoRoute listRoute() {
-  //   return GoRoute(
-  //     path: listPath(),
-  //     builder: (BuildContext context, GoRouterState state) {
-  //       return ModelListView(this, listFieldNames());
-  //     },
-  //   );
-  // }
+  List<String> enumValues(String fieldName) =>
+      viewFields.firstWhere((f) => f.name == fieldName).values ?? [];
 }
 
 @JsonSerializable()
