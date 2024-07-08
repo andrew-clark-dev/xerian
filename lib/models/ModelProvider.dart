@@ -25,6 +25,7 @@ import 'Dashboard.dart';
 import 'Login.dart';
 import 'Settings.dart';
 import 'SyncInfo.dart';
+import 'User.dart';
 
 export 'Account.dart';
 export 'AccountComunicationPreferences.dart';
@@ -33,12 +34,13 @@ export 'Dashboard.dart';
 export 'Login.dart';
 export 'Settings.dart';
 export 'SyncInfo.dart';
+export 'User.dart';
 
 class ModelProvider implements amplify_core.ModelProviderInterface {
   @override
-  String version = "9d5d266ede707809f6a02fb3f6184893";
+  String version = "30b91a4e4882b9b1e9a1303f4ceaca3f";
   @override
-  List<amplify_core.ModelSchema> modelSchemas = [Account.schema, Dashboard.schema, Login.schema, Settings.schema, SyncInfo.schema];
+  List<amplify_core.ModelSchema> modelSchemas = [Account.schema, Dashboard.schema, Login.schema, Settings.schema, SyncInfo.schema, User.schema];
   @override
   List<amplify_core.ModelSchema> customTypeSchemas = [];
   static final ModelProvider _instance = ModelProvider();
@@ -57,6 +59,8 @@ class ModelProvider implements amplify_core.ModelProviderInterface {
         return Settings.classType;
       case "SyncInfo":
         return SyncInfo.classType;
+      case "User":
+        return User.classType;
       default:
         throw Exception("Failed to find model in model provider for model name: " + modelName);
     }

@@ -30,7 +30,7 @@ class SyncInfo extends amplify_core.Model {
   final String? _modelType;
   final String? _user;
   final amplify_core.TemporalDateTime? _timestamp;
-  final String? _info;
+  final String? _metadata;
   final amplify_core.TemporalDateTime? _createdAt;
   final amplify_core.TemporalDateTime? _updatedAt;
 
@@ -59,8 +59,8 @@ class SyncInfo extends amplify_core.Model {
     return _timestamp;
   }
   
-  String? get info {
-    return _info;
+  String? get metadata {
+    return _metadata;
   }
   
   amplify_core.TemporalDateTime? get createdAt {
@@ -71,15 +71,15 @@ class SyncInfo extends amplify_core.Model {
     return _updatedAt;
   }
   
-  const SyncInfo._internal({required this.id, modelType, user, timestamp, info, createdAt, updatedAt}): _modelType = modelType, _user = user, _timestamp = timestamp, _info = info, _createdAt = createdAt, _updatedAt = updatedAt;
+  const SyncInfo._internal({required this.id, modelType, user, timestamp, metadata, createdAt, updatedAt}): _modelType = modelType, _user = user, _timestamp = timestamp, _metadata = metadata, _createdAt = createdAt, _updatedAt = updatedAt;
   
-  factory SyncInfo({String? id, String? modelType, String? user, amplify_core.TemporalDateTime? timestamp, String? info}) {
+  factory SyncInfo({String? id, String? modelType, String? user, amplify_core.TemporalDateTime? timestamp, String? metadata}) {
     return SyncInfo._internal(
       id: id == null ? amplify_core.UUID.getUUID() : id,
       modelType: modelType,
       user: user,
       timestamp: timestamp,
-      info: info);
+      metadata: metadata);
   }
   
   bool equals(Object other) {
@@ -94,7 +94,7 @@ class SyncInfo extends amplify_core.Model {
       _modelType == other._modelType &&
       _user == other._user &&
       _timestamp == other._timestamp &&
-      _info == other._info;
+      _metadata == other._metadata;
   }
   
   @override
@@ -109,7 +109,7 @@ class SyncInfo extends amplify_core.Model {
     buffer.write("modelType=" + "$_modelType" + ", ");
     buffer.write("user=" + "$_user" + ", ");
     buffer.write("timestamp=" + (_timestamp != null ? _timestamp.format() : "null") + ", ");
-    buffer.write("info=" + "$_info" + ", ");
+    buffer.write("metadata=" + "$_metadata" + ", ");
     buffer.write("createdAt=" + (_createdAt != null ? _createdAt.format() : "null") + ", ");
     buffer.write("updatedAt=" + (_updatedAt != null ? _updatedAt.format() : "null"));
     buffer.write("}");
@@ -117,27 +117,27 @@ class SyncInfo extends amplify_core.Model {
     return buffer.toString();
   }
   
-  SyncInfo copyWith({String? modelType, String? user, amplify_core.TemporalDateTime? timestamp, String? info}) {
+  SyncInfo copyWith({String? modelType, String? user, amplify_core.TemporalDateTime? timestamp, String? metadata}) {
     return SyncInfo._internal(
       id: id,
       modelType: modelType ?? this.modelType,
       user: user ?? this.user,
       timestamp: timestamp ?? this.timestamp,
-      info: info ?? this.info);
+      metadata: metadata ?? this.metadata);
   }
   
   SyncInfo copyWithModelFieldValues({
     ModelFieldValue<String?>? modelType,
     ModelFieldValue<String?>? user,
     ModelFieldValue<amplify_core.TemporalDateTime?>? timestamp,
-    ModelFieldValue<String?>? info
+    ModelFieldValue<String?>? metadata
   }) {
     return SyncInfo._internal(
       id: id,
       modelType: modelType == null ? this.modelType : modelType.value,
       user: user == null ? this.user : user.value,
       timestamp: timestamp == null ? this.timestamp : timestamp.value,
-      info: info == null ? this.info : info.value
+      metadata: metadata == null ? this.metadata : metadata.value
     );
   }
   
@@ -146,12 +146,12 @@ class SyncInfo extends amplify_core.Model {
       _modelType = json['modelType'],
       _user = json['user'],
       _timestamp = json['timestamp'] != null ? amplify_core.TemporalDateTime.fromString(json['timestamp']) : null,
-      _info = json['info'],
+      _metadata = json['metadata'],
       _createdAt = json['createdAt'] != null ? amplify_core.TemporalDateTime.fromString(json['createdAt']) : null,
       _updatedAt = json['updatedAt'] != null ? amplify_core.TemporalDateTime.fromString(json['updatedAt']) : null;
   
   Map<String, dynamic> toJson() => {
-    'id': id, 'modelType': _modelType, 'user': _user, 'timestamp': _timestamp?.format(), 'info': _info, 'createdAt': _createdAt?.format(), 'updatedAt': _updatedAt?.format()
+    'id': id, 'modelType': _modelType, 'user': _user, 'timestamp': _timestamp?.format(), 'metadata': _metadata, 'createdAt': _createdAt?.format(), 'updatedAt': _updatedAt?.format()
   };
   
   Map<String, Object?> toMap() => {
@@ -159,7 +159,7 @@ class SyncInfo extends amplify_core.Model {
     'modelType': _modelType,
     'user': _user,
     'timestamp': _timestamp,
-    'info': _info,
+    'metadata': _metadata,
     'createdAt': _createdAt,
     'updatedAt': _updatedAt
   };
@@ -169,7 +169,7 @@ class SyncInfo extends amplify_core.Model {
   static final MODELTYPE = amplify_core.QueryField(fieldName: "modelType");
   static final USER = amplify_core.QueryField(fieldName: "user");
   static final TIMESTAMP = amplify_core.QueryField(fieldName: "timestamp");
-  static final INFO = amplify_core.QueryField(fieldName: "info");
+  static final METADATA = amplify_core.QueryField(fieldName: "metadata");
   static var schema = amplify_core.Model.defineSchema(define: (amplify_core.ModelSchemaDefinition modelSchemaDefinition) {
     modelSchemaDefinition.name = "SyncInfo";
     modelSchemaDefinition.pluralName = "SyncInfos";
@@ -206,7 +206,7 @@ class SyncInfo extends amplify_core.Model {
     ));
     
     modelSchemaDefinition.addField(amplify_core.ModelFieldDefinition.field(
-      key: SyncInfo.INFO,
+      key: SyncInfo.METADATA,
       isRequired: false,
       ofType: amplify_core.ModelFieldType(amplify_core.ModelFieldTypeEnum.string)
     ));

@@ -23,11 +23,14 @@ import 'ModelProvider.dart';
 import 'package:amplify_core/amplify_core.dart' as amplify_core;
 
 
-/** This is an auto generated class representing the Login type in your schema. */
-class Login extends amplify_core.Model {
-  static const classType = const _LoginModelType();
+/** This is an auto generated class representing the User type in your schema. */
+class User extends amplify_core.Model {
+  static const classType = const _UserModelType();
   final String id;
   final String? _email;
+  final bool? _isAdmin;
+  final bool? _isManage;
+  final String? _imageUrl;
   final String? _metadata;
   final amplify_core.TemporalDateTime? _createdAt;
   final amplify_core.TemporalDateTime? _updatedAt;
@@ -39,14 +42,35 @@ class Login extends amplify_core.Model {
   @override
   String getId() => id;
   
-  LoginModelIdentifier get modelIdentifier {
-      return LoginModelIdentifier(
+  UserModelIdentifier get modelIdentifier {
+      return UserModelIdentifier(
         id: id
       );
   }
   
-  String? get email {
-    return _email;
+  String get email {
+    try {
+      return _email!;
+    } catch(e) {
+      throw amplify_core.AmplifyCodeGenModelException(
+          amplify_core.AmplifyExceptionMessages.codeGenRequiredFieldForceCastExceptionMessage,
+          recoverySuggestion:
+            amplify_core.AmplifyExceptionMessages.codeGenRequiredFieldForceCastRecoverySuggestion,
+          underlyingException: e.toString()
+          );
+    }
+  }
+  
+  bool? get isAdmin {
+    return _isAdmin;
+  }
+  
+  bool? get isManage {
+    return _isManage;
+  }
+  
+  String? get imageUrl {
+    return _imageUrl;
   }
   
   String? get metadata {
@@ -61,12 +85,15 @@ class Login extends amplify_core.Model {
     return _updatedAt;
   }
   
-  const Login._internal({required this.id, email, metadata, createdAt, updatedAt}): _email = email, _metadata = metadata, _createdAt = createdAt, _updatedAt = updatedAt;
+  const User._internal({required this.id, required email, isAdmin, isManage, imageUrl, metadata, createdAt, updatedAt}): _email = email, _isAdmin = isAdmin, _isManage = isManage, _imageUrl = imageUrl, _metadata = metadata, _createdAt = createdAt, _updatedAt = updatedAt;
   
-  factory Login({String? id, String? email, String? metadata}) {
-    return Login._internal(
+  factory User({String? id, required String email, bool? isAdmin, bool? isManage, String? imageUrl, String? metadata}) {
+    return User._internal(
       id: id == null ? amplify_core.UUID.getUUID() : id,
       email: email,
+      isAdmin: isAdmin,
+      isManage: isManage,
+      imageUrl: imageUrl,
       metadata: metadata);
   }
   
@@ -77,9 +104,12 @@ class Login extends amplify_core.Model {
   @override
   bool operator ==(Object other) {
     if (identical(other, this)) return true;
-    return other is Login &&
+    return other is User &&
       id == other.id &&
       _email == other._email &&
+      _isAdmin == other._isAdmin &&
+      _isManage == other._isManage &&
+      _imageUrl == other._imageUrl &&
       _metadata == other._metadata;
   }
   
@@ -90,9 +120,12 @@ class Login extends amplify_core.Model {
   String toString() {
     var buffer = new StringBuffer();
     
-    buffer.write("Login {");
+    buffer.write("User {");
     buffer.write("id=" + "$id" + ", ");
     buffer.write("email=" + "$_email" + ", ");
+    buffer.write("isAdmin=" + (_isAdmin != null ? _isAdmin.toString() : "null") + ", ");
+    buffer.write("isManage=" + (_isManage != null ? _isManage.toString() : "null") + ", ");
+    buffer.write("imageUrl=" + "$_imageUrl" + ", ");
     buffer.write("metadata=" + "$_metadata" + ", ");
     buffer.write("createdAt=" + (_createdAt != null ? _createdAt.format() : "null") + ", ");
     buffer.write("updatedAt=" + (_updatedAt != null ? _updatedAt.format() : "null"));
@@ -101,54 +134,75 @@ class Login extends amplify_core.Model {
     return buffer.toString();
   }
   
-  Login copyWith({String? email, String? metadata}) {
-    return Login._internal(
+  User copyWith({String? email, bool? isAdmin, bool? isManage, String? imageUrl, String? metadata}) {
+    return User._internal(
       id: id,
       email: email ?? this.email,
+      isAdmin: isAdmin ?? this.isAdmin,
+      isManage: isManage ?? this.isManage,
+      imageUrl: imageUrl ?? this.imageUrl,
       metadata: metadata ?? this.metadata);
   }
   
-  Login copyWithModelFieldValues({
-    ModelFieldValue<String?>? email,
+  User copyWithModelFieldValues({
+    ModelFieldValue<String>? email,
+    ModelFieldValue<bool?>? isAdmin,
+    ModelFieldValue<bool?>? isManage,
+    ModelFieldValue<String?>? imageUrl,
     ModelFieldValue<String?>? metadata
   }) {
-    return Login._internal(
+    return User._internal(
       id: id,
       email: email == null ? this.email : email.value,
+      isAdmin: isAdmin == null ? this.isAdmin : isAdmin.value,
+      isManage: isManage == null ? this.isManage : isManage.value,
+      imageUrl: imageUrl == null ? this.imageUrl : imageUrl.value,
       metadata: metadata == null ? this.metadata : metadata.value
     );
   }
   
-  Login.fromJson(Map<String, dynamic> json)  
+  User.fromJson(Map<String, dynamic> json)  
     : id = json['id'],
       _email = json['email'],
+      _isAdmin = json['isAdmin'],
+      _isManage = json['isManage'],
+      _imageUrl = json['imageUrl'],
       _metadata = json['metadata'],
       _createdAt = json['createdAt'] != null ? amplify_core.TemporalDateTime.fromString(json['createdAt']) : null,
       _updatedAt = json['updatedAt'] != null ? amplify_core.TemporalDateTime.fromString(json['updatedAt']) : null;
   
   Map<String, dynamic> toJson() => {
-    'id': id, 'email': _email, 'metadata': _metadata, 'createdAt': _createdAt?.format(), 'updatedAt': _updatedAt?.format()
+    'id': id, 'email': _email, 'isAdmin': _isAdmin, 'isManage': _isManage, 'imageUrl': _imageUrl, 'metadata': _metadata, 'createdAt': _createdAt?.format(), 'updatedAt': _updatedAt?.format()
   };
   
   Map<String, Object?> toMap() => {
     'id': id,
     'email': _email,
+    'isAdmin': _isAdmin,
+    'isManage': _isManage,
+    'imageUrl': _imageUrl,
     'metadata': _metadata,
     'createdAt': _createdAt,
     'updatedAt': _updatedAt
   };
 
-  static final amplify_core.QueryModelIdentifier<LoginModelIdentifier> MODEL_IDENTIFIER = amplify_core.QueryModelIdentifier<LoginModelIdentifier>();
+  static final amplify_core.QueryModelIdentifier<UserModelIdentifier> MODEL_IDENTIFIER = amplify_core.QueryModelIdentifier<UserModelIdentifier>();
   static final ID = amplify_core.QueryField(fieldName: "id");
   static final EMAIL = amplify_core.QueryField(fieldName: "email");
+  static final ISADMIN = amplify_core.QueryField(fieldName: "isAdmin");
+  static final ISMANAGE = amplify_core.QueryField(fieldName: "isManage");
+  static final IMAGEURL = amplify_core.QueryField(fieldName: "imageUrl");
   static final METADATA = amplify_core.QueryField(fieldName: "metadata");
   static var schema = amplify_core.Model.defineSchema(define: (amplify_core.ModelSchemaDefinition modelSchemaDefinition) {
-    modelSchemaDefinition.name = "Login";
-    modelSchemaDefinition.pluralName = "Logins";
+    modelSchemaDefinition.name = "User";
+    modelSchemaDefinition.pluralName = "Users";
     
     modelSchemaDefinition.authRules = [
       amplify_core.AuthRule(
-        authStrategy: amplify_core.AuthStrategy.PRIVATE,
+        authStrategy: amplify_core.AuthStrategy.GROUPS,
+        groupClaim: "cognito:groups",
+        groups: const [ "ADMINS" ],
+        provider: amplify_core.AuthRuleProvider.USERPOOLS,
         operations: const [
           amplify_core.ModelOperation.CREATE,
           amplify_core.ModelOperation.UPDATE,
@@ -160,13 +214,31 @@ class Login extends amplify_core.Model {
     modelSchemaDefinition.addField(amplify_core.ModelFieldDefinition.id());
     
     modelSchemaDefinition.addField(amplify_core.ModelFieldDefinition.field(
-      key: Login.EMAIL,
+      key: User.EMAIL,
+      isRequired: true,
+      ofType: amplify_core.ModelFieldType(amplify_core.ModelFieldTypeEnum.string)
+    ));
+    
+    modelSchemaDefinition.addField(amplify_core.ModelFieldDefinition.field(
+      key: User.ISADMIN,
+      isRequired: false,
+      ofType: amplify_core.ModelFieldType(amplify_core.ModelFieldTypeEnum.bool)
+    ));
+    
+    modelSchemaDefinition.addField(amplify_core.ModelFieldDefinition.field(
+      key: User.ISMANAGE,
+      isRequired: false,
+      ofType: amplify_core.ModelFieldType(amplify_core.ModelFieldTypeEnum.bool)
+    ));
+    
+    modelSchemaDefinition.addField(amplify_core.ModelFieldDefinition.field(
+      key: User.IMAGEURL,
       isRequired: false,
       ofType: amplify_core.ModelFieldType(amplify_core.ModelFieldTypeEnum.string)
     ));
     
     modelSchemaDefinition.addField(amplify_core.ModelFieldDefinition.field(
-      key: Login.METADATA,
+      key: User.METADATA,
       isRequired: false,
       ofType: amplify_core.ModelFieldType(amplify_core.ModelFieldTypeEnum.string)
     ));
@@ -187,29 +259,29 @@ class Login extends amplify_core.Model {
   });
 }
 
-class _LoginModelType extends amplify_core.ModelType<Login> {
-  const _LoginModelType();
+class _UserModelType extends amplify_core.ModelType<User> {
+  const _UserModelType();
   
   @override
-  Login fromJson(Map<String, dynamic> jsonData) {
-    return Login.fromJson(jsonData);
+  User fromJson(Map<String, dynamic> jsonData) {
+    return User.fromJson(jsonData);
   }
   
   @override
   String modelName() {
-    return 'Login';
+    return 'User';
   }
 }
 
 /**
  * This is an auto generated class representing the model identifier
- * of [Login] in your schema.
+ * of [User] in your schema.
  */
-class LoginModelIdentifier implements amplify_core.ModelIdentifier<Login> {
+class UserModelIdentifier implements amplify_core.ModelIdentifier<User> {
   final String id;
 
-  /** Create an instance of LoginModelIdentifier using [id] the primary key. */
-  const LoginModelIdentifier({
+  /** Create an instance of UserModelIdentifier using [id] the primary key. */
+  const UserModelIdentifier({
     required this.id});
   
   @override
@@ -227,7 +299,7 @@ class LoginModelIdentifier implements amplify_core.ModelIdentifier<Login> {
   String serializeAsString() => serializeAsMap().values.join('#');
   
   @override
-  String toString() => 'LoginModelIdentifier(id: $id)';
+  String toString() => 'UserModelIdentifier(id: $id)';
   
   @override
   bool operator ==(Object other) {
@@ -235,7 +307,7 @@ class LoginModelIdentifier implements amplify_core.ModelIdentifier<Login> {
       return true;
     }
     
-    return other is LoginModelIdentifier &&
+    return other is UserModelIdentifier &&
       id == other.id;
   }
   

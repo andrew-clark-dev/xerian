@@ -7,8 +7,18 @@ const schema = a.schema({
   Login: a
     .model({
       email: a.email(),
-      config: a.json(),
+      metadata: a.json(),
     }),
+
+  User: a
+    .model({
+      email: a.email().required(),
+      isAdmin: a.boolean().default(false),
+      isManage: a.boolean().default(false),
+      imageUrl: a.url(),
+      metadata: a.json(),
+    }).authorization((allow) => [allow.group("ADMINS")]),
+
 
   addUserToGroup: a
     .mutation()
@@ -23,13 +33,13 @@ const schema = a.schema({
   Dashboard: a
     .model({
       email: a.email(),
-      config: a.json(),
+      metadata: a.json(),
     }),
 
   Settings: a
     .model({
       email: a.email(),
-      config: a.json(),
+      metadata: a.json(),
     }),
 
   publishRequest: a
@@ -50,7 +60,7 @@ const schema = a.schema({
       modelType: a.string(),
       user: a.string(),
       timestamp: a.datetime(),
-      info: a.json(),
+      metadata: a.json(),
     }),
 
   Account: a
@@ -69,6 +79,7 @@ const schema = a.schema({
       comunicationPreferences: a.enum(["sms", "email", "none", "all"]),
       status: a.enum(["active", "inactive", "suspended"]),
       original: a.json(),
+      metadata: a.json(),
     })
     .secondaryIndexes((index) => [index("number")]),
 })
