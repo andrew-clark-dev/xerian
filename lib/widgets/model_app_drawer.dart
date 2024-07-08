@@ -4,8 +4,8 @@ import 'package:go_router/go_router.dart';
 import 'package:xerian/models/ModelProvider.dart';
 import 'package:xerian/extensions/model_extensions.dart';
 
-class AppDrawer extends StatelessWidget {
-  const AppDrawer({super.key});
+class ModelAppDrawer extends StatelessWidget {
+  const ModelAppDrawer({super.key});
 
   ListTile _listTile(BuildContext context, ModelType modelType) {
     return ListTile(
@@ -31,6 +31,7 @@ class AppDrawer extends StatelessWidget {
         children: <Widget>[
           _viewTile(context, Dashboard.classType),
           _listTile(context, Account.classType),
+          _listTile(context, User.classType),
           // _listTile(context, const AdminSettings().path, 'Administration'),
         ],
       ),

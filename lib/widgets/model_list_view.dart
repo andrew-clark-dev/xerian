@@ -6,7 +6,7 @@ import 'package:xerian/widgets/model_list_tile_factory.dart';
 
 import '../services/api.dart';
 import '../extensions/model_extensions.dart';
-import 'app_drawer.dart';
+import 'model_app_drawer.dart';
 import 'package:go_router/go_router.dart';
 
 const limit = 20;
@@ -104,7 +104,7 @@ class _ModelListViewState extends State<ModelListView> {
           child: const Icon(Icons.add),
         ),
         appBar: ModelAppBar(_modelType, plural: true),
-        drawer: const AppDrawer(), // Add the drawer here
+        drawer: const ModelAppDrawer(), // Add the drawer here
         body: Padding(
             padding: const EdgeInsets.all(25),
             child: Column(children: [

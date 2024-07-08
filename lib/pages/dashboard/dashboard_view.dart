@@ -1,5 +1,5 @@
 import 'package:xerian/models/ModelProvider.dart';
-import 'package:xerian/widgets/app_drawer.dart';
+import 'package:xerian/widgets/model_app_drawer.dart';
 import 'package:flutter/material.dart';
 import 'package:xerian/widgets/model_app_bar.dart';
 
@@ -11,7 +11,7 @@ class DashboardView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: ModelAppBar(Dashboard.classType),
-        drawer: const AppDrawer(), // Add the drawer here
+        drawer: const ModelAppDrawer(), // Add the drawer here
 
         body: const Center(
           child: Column(children: [

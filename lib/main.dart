@@ -94,6 +94,8 @@ class EncoreShopApp extends StatelessWidget {
         Settings.classType.route(page: const SettingsView()),
         Account.classType.route(),
         Account.classType.route(isList: true),
+        User.classType.route(),
+        User.classType.route(isList: true),
       ],
 
       // redirect to the login page if the user is not logged in
