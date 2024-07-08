@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:logging/logging.dart';
 import 'package:xerian/models/ModelProvider.dart';
-import 'package:xerian/services/model_extensions.dart';
+import 'package:xerian/extensions/model_extensions.dart';
 import 'package:xerian/widgets/model_list_view.dart';
 import 'package:xerian/widgets/model_view.dart';
 import 'package:change_case/change_case.dart';
@@ -51,10 +51,7 @@ class ModelConfig {
 
   List<ModelField> viewFields() {
     final hide = _get('hideFields')?.map((d) => d[0]).toList() ?? hideFields;
-    return modelType
-        .schema()
-        .fields!
-        .values
+    return modelType.schema.fields!.values
         .where((v) => !hide.contains(v.name))
         .toList();
   }
@@ -83,16 +80,16 @@ class ModelConfig {
 
   GoRoute listRoute() {
     return GoRoute(
-      path: modelType.listPath(),
+      path: modelType.listPath,
       builder: (BuildContext context, GoRouterState state) {
-        return ModelListView(modelType, listFieldNames());
+        return ModelListView(modelType);
       },
     );
   }
 
   GoRoute viewRoute() {
     return GoRoute(
-      path: modelType.path(),
+      path: modelType.viewPath,
       builder: (BuildContext context, GoRouterState state) {
         if (state.extra == null) {
           return ModelView(modelType);
@@ -104,7 +101,7 @@ class ModelConfig {
 
   GoRoute route(Widget page) {
     return GoRoute(
-      path: modelType.path(),
+      path: modelType.viewPath,
       builder: (BuildContext context, GoRouterState state) {
         return page;
       },

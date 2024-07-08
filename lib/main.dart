@@ -88,21 +88,21 @@ class EncoreShopApp extends StatelessWidget {
 
   /// The route configuration.
   late final GoRouter _router = GoRouter(
-      initialLocation: Dashboard.classType.path(), // start at the dashboard
+      initialLocation: Dashboard.classType.viewPath, // start at the dashboard
       routes: <RouteBase>[
-        ModelConfig(Login.classType).route(const LoginScreen()),
-        ModelConfig(Dashboard.classType).route(const DashboardView()),
-        ModelConfig(Settings.classType).route(const SettingsView()),
-        ModelConfig(Account.classType).listRoute(),
-        ModelConfig(Account.classType).viewRoute(),
+        Login.classType.route(page: const LoginScreen()),
+        Dashboard.classType.route(page: const DashboardView()),
+        Settings.classType.route(page: const SettingsView()),
+        Account.classType.route(),
+        Account.classType.route(isList: true),
       ],
 
       // redirect to the login page if the user is not logged in
       redirect: (BuildContext context, GoRouterState state) async {
         // if the user is not logged in, they need to login
         final loggedIn = await isAuthorized();
-        final loggingIn = state.path == Login.classType.path();
-        if (!loggedIn) return loggingIn ? null : Login.classType.path();
+        final loggingIn = state.path == Login.classType.viewPath;
+        if (!loggedIn) return loggingIn ? null : Login.classType.viewPath;
 
         // if the user is logged in but still on the login page, send them to
         // the home page

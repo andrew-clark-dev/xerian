@@ -9,17 +9,17 @@ class AppDrawer extends StatelessWidget {
 
   ListTile _listTile(BuildContext context, ModelType modelType) {
     return ListTile(
-        title: Text(modelType.schema().pluralName!),
+        title: Text(modelType.schema.pluralName!),
         onTap: () {
-          context.go(modelType.listPath());
+          context.go(modelType.listPath);
         });
   }
 
   ListTile _viewTile(BuildContext context, ModelType modelType) {
     return ListTile(
-        title: Text(modelType.schema().name),
+        title: Text(modelType.schema.name),
         onTap: () {
-          context.go(modelType.path());
+          context.go(modelType.viewPath);
         });
   }
 

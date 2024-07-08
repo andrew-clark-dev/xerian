@@ -2,8 +2,8 @@ import 'package:amplify_authenticator/amplify_authenticator.dart';
 import 'package:flutter/material.dart';
 import 'package:xerian/pages/dashboard/dashboard_view.dart';
 
-class LoginScreen extends StatelessWidget {
-  const LoginScreen({super.key});
+class SignupScreen extends StatelessWidget {
+  const SignupScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +20,7 @@ class LoginScreen extends StatelessWidget {
                     // flutter logo
                     const Center(child: FlutterLogo(size: 100)),
                     // prebuilt sign in form from amplify_authenticator package
-                    SignInForm(),
+                    SignUpForm(),
                   ],
                 ),
               ),

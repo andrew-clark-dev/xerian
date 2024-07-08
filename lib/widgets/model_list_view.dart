@@ -1,9 +1,8 @@
 import 'package:logging/logging.dart';
 import 'package:amplify_core/amplify_core.dart';
 import 'package:flutter/material.dart';
-import 'package:xerian/model_config.dart';
 import 'package:xerian/widgets/model_app_bar.dart';
-import 'package:xerian/widgets/model_list_tile.dart';
+import 'package:xerian/widgets/model_list_tile_factory.dart';
 
 import '../services/api.dart';
 import '../extensions/model_extensions.dart';
@@ -16,9 +15,8 @@ class ModelListView extends StatefulWidget {
   final Logger log = Logger("ModelListView");
 
   final ModelType modelType;
-  final List<String> fields;
 
-  ModelListView(this.modelType, this.fields, {super.key});
+  ModelListView(this.modelType, {super.key});
 
   @override
   // ignore: library_private_types_in_public_api,
@@ -59,6 +57,8 @@ class _ModelListViewState extends State<ModelListView> {
   }
 
   NotificationListener listener() {
+    ModelListTileFactory tileFactory = ModelListTileFactory(_modelType);
+
     return NotificationListener<ScrollNotification>(
       onNotification: (notification) {
         if (notification is ScrollEndNotification &&
@@ -81,7 +81,7 @@ class _ModelListViewState extends State<ModelListView> {
           itemBuilder: (context, index) {
             if (index < models.length) {
               // you can have here your custom widgets for displaying posts or what
-              return ModelListTile(models[index]!);
+              return tileFactory.tile(models[index]!);
             } else {
               return loading
                   ? const Center(
@@ -95,10 +95,12 @@ class _ModelListViewState extends State<ModelListView> {
 
   @override
   Widget build(BuildContext context) {
+    ModelListTileFactory tileFactory = ModelListTileFactory(_modelType);
+
     return Scaffold(
         floatingActionButton: FloatingActionButton(
           // Navigate to the page to create new models
-          onPressed: () => context.push(_modelType.path()),
+          onPressed: () => context.push(_modelType.viewPath),
           child: const Icon(Icons.add),
         ),
         appBar: ModelAppBar(_modelType, plural: true),
@@ -106,7 +108,7 @@ class _ModelListViewState extends State<ModelListView> {
         body: Padding(
             padding: const EdgeInsets.all(25),
             child: Column(children: [
-              ModelListTile.buildRow(ModelConfig(_modelType).listTitleNames(),
+              tileFactory.titleRow(
                   style: Theme.of(context).textTheme.titleMedium),
               const Divider(),
               Expanded(child: listener())

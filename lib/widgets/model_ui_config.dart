@@ -1,0 +1,134 @@
+import 'dart:convert';
+
+import 'package:amplify_core/amplify_core.dart';
+import 'package:change_case/change_case.dart';
+import 'package:logging/logging.dart';
+import 'package:xerian/extensions/model_extensions.dart';
+import 'package:xerian/models/ModelProvider.dart';
+import 'package:json_annotation/json_annotation.dart';
+
+part 'model_ui_config.g.dart';
+
+@JsonSerializable()
+class ModelUiConfig {
+  static final Logger log = Logger("ModelUiConfig");
+
+  static Map<String, ModelUiConfig> configurations = {};
+
+  static ModelUiConfig config(ModelType modelType) {
+    final result = configurations[modelType.modelName()] ??
+        ModelUiConfig(modelType.modelName());
+    (jsonEncode(result));
+    return result;
+  }
+
+  static final List<String> hiddenFields = ['id', 'metaData', 'original'];
+  static final List<String> autosetFields = ['number', 'sku', 'balence'];
+
+  static List<DisplayField> _defaultFields(ModelType modelType) {
+    return modelType.schema.fields!.values
+        .where((v) => !hiddenFields.contains(v.name))
+        .map((f) =>
+            DisplayField(f.name, readOnly: autosetFields.contains(f.name)))
+        .toList();
+  }
+
+  // static final _config = ModelTypeUIConfig(listFields: [
+  //   ListField('number'),
+  //   ListField('firstName'),
+  //   ListField('lastName'),
+  //   ListField('phoneNumber'),
+  //   ListField('email', displayName: 'E-Mail'),
+  //   ListField('balance'),
+  //   ListField('comunicationPreferences', displayName: 'Contact')
+  // ], enumFields: [
+  //   EnumField('status', AccountStatus.values),
+  //   EnumField('comunicationPreferences', AccountComunicationPreferences.values),
+  // ]);
+
+  final String modelName;
+  late final List<DisplayField> listFields;
+  late final List<DisplayField> viewFields;
+
+  ModelUiConfig(this.modelName, {listFields, viewFields, enumFields}) {
+    this.viewFields = viewFields ?? _defaultFields(modelType);
+    this.listFields = listFields ?? _defaultFields(modelType);
+  }
+
+  factory ModelUiConfig.fromJson(Map<String, dynamic> json) =>
+      _$ModelUiConfigFromJson(json);
+
+  Map<String, dynamic> toJson() => _$ModelUiConfigToJson(this);
+
+  ModelSchema get schema => ModelProvider.instance.modelSchemas
+      .firstWhere((e) => e.name == modelName);
+
+  ModelType get modelType =>
+      ModelProvider.instance.getModelTypeByModelName(modelName);
+
+  ModelField modelField(String name) =>
+      schema.fields!.values.firstWhere((f) => f.name == name);
+
+  List<String> enumValuesForField(String fieldName) {
+    return viewFields.firstWhere((e) => e.name == fieldName).values?.toList() ??
+        [];
+  }
+
+  List<String> get listFieldNames =>
+      listFields.map((f) => f.displayName).toList();
+
+  List<String> get listFieldTitleNames =>
+      listFieldNames.map((f) => f.toCapitalCase()).toList();
+
+  // List<ModelField> get viewModelFields =>
+  //     viewFields.map((f) => f.modelField).toList();
+
+  List<String> get viewFieldNames =>
+      viewFields.map((f) => f.displayName).toList();
+
+  List<String> get viewFieldTitleNames =>
+      viewFieldNames.map((f) => f.toCapitalCase()).toList();
+
+  List<String> listFieldValues(Model model) =>
+      listFields.map((f) => model.toMap()[f.name].toString()).toList();
+
+  String path() => '/${modelType.modelName().toLowerCase()}';
+
+  // List<ModelField> viewFields() {
+  //   final hide = _get('hideFields')?.map((d) => d[0]).toList() ?? hideFields;
+  //   return modelType
+  //       .schema()
+  //       .fields!
+  //       .values
+  //       .where((v) => !hide.contains(v.name))
+  //       .toList();
+  // }
+
+  //   GoRoute listRoute() {
+  //   return GoRoute(
+  //     path: listPath(),
+  //     builder: (BuildContext context, GoRouterState state) {
+  //       return ModelListView(this, listFieldNames());
+  //     },
+  //   );
+  // }
+}
+
+@JsonSerializable()
+class DisplayField {
+  final String name;
+  final String? altName;
+  final bool readOnly;
+  final String? linkedTo;
+  final List<String>? values;
+
+  DisplayField(this.name,
+      {this.altName, this.readOnly = false, this.values, this.linkedTo});
+
+  factory DisplayField.fromJson(Map<String, dynamic> json) =>
+      _$DisplayFieldFromJson(json);
+
+  Map<String, dynamic> toJson() => _$DisplayFieldToJson(this);
+
+  String get displayName => altName ?? name;
+}

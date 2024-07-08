@@ -20,12 +20,12 @@ class _ModelAppBarState extends State<ModelAppBar> {
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      title: Text(widget.modelType.schema().name),
+      title: Text(widget.modelType.schema.name),
       actions: [
         IconButton(
             icon: const Icon(Icons.settings),
             onPressed: () {
-              context.push(Settings.classType.path());
+              context.push(Settings.classType.viewPath);
             }),
       ],
     );
@@ -44,7 +44,7 @@ enum Crud {
 
   String title(ModelType modelType, {bool plural = false}) {
     final modelName =
-        plural ? modelType.schema().pluralName : modelType.schema().name;
+        plural ? modelType.schema.pluralName : modelType.schema.name;
     return '$name $modelName';
   }
 }

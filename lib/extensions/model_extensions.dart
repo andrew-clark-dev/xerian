@@ -1,15 +1,44 @@
 import 'package:amplify_core/amplify_core.dart';
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:xerian/model_config.dart';
 import 'package:xerian/models/ModelProvider.dart';
+import 'package:xerian/widgets/model_list_view.dart';
+import 'package:xerian/widgets/model_view.dart';
 
 extension ModelTypeExtensions on ModelType {
-  String path() => '/${modelName().toLowerCase()}';
-  String listPath() => '/${modelName().toLowerCase()}list';
-  String formPath() => '/${modelName().toLowerCase()}form';
+  String get viewPath => '/${modelName().toLowerCase()}';
+  String get listPath => '/${modelName().toLowerCase()}list';
+  String get formPath => '/${modelName().toLowerCase()}form';
 
-  ModelSchema schema() {
+  ModelSchema get schema {
     return ModelProvider.instance.modelSchemas
         .firstWhere((e) => e.name == modelName());
+  }
+
+  GoRoute route({Widget? page, bool? isList, String? path}) {
+    return GoRoute(
+      path: _path(path, isList),
+      builder: (BuildContext context, GoRouterState state) {
+        return _target(page, isList, state);
+      },
+    );
+  }
+
+  String _path(String? path, bool? isList) {
+    if (path != null) return path;
+    if (isList ?? false) return listPath;
+    return viewPath;
+  }
+
+  Widget _target(Widget? page, bool? isList, GoRouterState? state) {
+    if (page != null) return page;
+    if (isList ?? false) return ModelListView(this);
+    if (state?.extra == null) {
+      return ModelView(this);
+    } else {
+      return ModelView(this, model: state!.extra as Model);
+    }
   }
 }
 
@@ -31,6 +60,7 @@ extension ModelFieldExtensions on ModelField {
   }
 }
 
-extension ModelExtensions on Model {
-  List<ModelField> viewFields() => ModelConfig(getInstanceType()).viewFields();
-}
+// extension ModelExtensions on Model {
+//   List<ModelField> get viewFields =>
+//       ModelUiConfig.configurations[getInstanceType()]!.viewModelFields;
+// }
