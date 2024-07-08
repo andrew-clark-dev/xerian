@@ -6,7 +6,7 @@ import { Stack } from 'aws-cdk-lib/core';
 import { ITable } from 'aws-cdk-lib/aws-dynamodb';
 import { backendFunction } from './custom-resources/function/resource';
 import { configureEventBridge, eventbridgeToLambda } from './custom-resources/eventbridge/resource';
-import { AdminlUser } from './custom-resources/cognito/admin-user';
+import { createAdminUser } from './custom-resources/cognito/resourse';
 
 /**
  * @see https://docs.amplify.aws/react/build-a-backend/ to add storage, functions, and more
@@ -26,7 +26,7 @@ const { tables } = backend.data.resources
 const accountTable: ITable = tables['Account']
 const syncTable: ITable = tables['SyncInfo']
 
-const { cfnUserPool } = backend.auth.resources.cfnResources
+const { userPool } = backend.auth.resources
 const { groups } = backend.auth.resources
 
 var env: { [key: string]: string } = {
@@ -47,10 +47,6 @@ const eventBridgeDataSource = backend.data.addEventBridgeDataSource("EventBridge
 
 const accountSyncBridge = eventbridgeToLambda(dataStack, eventBus, syncAccountFunction, 'frontend.account.sync.request')
 
-const adminUser = new AdminlUser(authStack, 'admin-user', {
-  cfnUserPool,
-  email: 'andrew.p.clark@protonmail.com',
-  groupName: 'ADMINS',
-});
+const adminUser = createAdminUser(authStack, 'andrew.p.clark@protonmail.com', userPool, 'ADMINS');
 
 
