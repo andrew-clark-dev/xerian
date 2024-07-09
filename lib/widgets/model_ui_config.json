@@ -1,217 +1,97 @@
 {
-    "modelName": "Account",
-    "listFields": [
-        {
-            "name": "number",
-            "altName": null,
-            "readOnly": true,
-            "linkedTo": null,
-            "values": null
-        },
-        {
-            "name": "firstName",
-            "altName": null,
-            "readOnly": false,
-            "linkedTo": null,
-            "values": null
-        },
-        {
-            "name": "lastName",
-            "altName": null,
-            "readOnly": false,
-            "linkedTo": null,
-            "values": null
-        },
-        {
-            "name": "email",
-            "altName": null,
-            "readOnly": false,
-            "linkedTo": null,
-            "values": null
-        },
-        {
-            "name": "phoneNumber",
-            "altName": null,
-            "readOnly": false,
-            "linkedTo": null,
-            "values": null
-        },
-        {
-            "name": "isMobile",
-            "altName": null,
-            "readOnly": false,
-            "linkedTo": null,
-            "values": null
-        },
-        {
-            "name": "address",
-            "altName": null,
-            "readOnly": false,
-            "linkedTo": null,
-            "values": null
-        },
-        {
-            "name": "city",
-            "altName": null,
-            "readOnly": false,
-            "linkedTo": null,
-            "values": null
-        },
-        {
-            "name": "state",
-            "altName": null,
-            "readOnly": false,
-            "linkedTo": null,
-            "values": null
-        },
-        {
-            "name": "postcode",
-            "altName": null,
-            "readOnly": false,
-            "linkedTo": null,
-            "values": null
-        },
-        {
-            "name": "balance",
-            "altName": null,
-            "readOnly": false,
-            "linkedTo": null,
-            "values": null
-        },
-        {
-            "name": "comunicationPreferences",
-            "altName": null,
-            "readOnly": false,
-            "linkedTo": null,
-            "values": null
-        },
-        {
-            "name": "status",
-            "altName": null,
-            "readOnly": false,
-            "linkedTo": null,
-            "values": null
-        },
-        {
-            "name": "createdAt",
-            "altName": null,
-            "readOnly": false,
-            "linkedTo": null,
-            "values": null
-        },
-        {
-            "name": "updatedAt",
-            "altName": null,
-            "readOnly": false,
-            "linkedTo": null,
-            "values": null
-        }
-    ],
-    "viewFields": [
-        {
-            "name": "number",
-            "altName": null,
-            "readOnly": true,
-            "linkedTo": null,
-            "values": null
-        },
-        {
-            "name": "firstName",
-            "altName": null,
-            "readOnly": false,
-            "linkedTo": null,
-            "values": null
-        },
-        {
-            "name": "lastName",
-            "altName": null,
-            "readOnly": false,
-            "linkedTo": null,
-            "values": null
-        },
-        {
-            "name": "email",
-            "altName": null,
-            "readOnly": false,
-            "linkedTo": null,
-            "values": null
-        },
-        {
-            "name": "phoneNumber",
-            "altName": null,
-            "readOnly": false,
-            "linkedTo": null,
-            "values": null
-        },
-        {
-            "name": "isMobile",
-            "altName": null,
-            "readOnly": false,
-            "linkedTo": null,
-            "values": null
-        },
-        {
-            "name": "address",
-            "altName": null,
-            "readOnly": false,
-            "linkedTo": null,
-            "values": null
-        },
-        {
-            "name": "city",
-            "altName": null,
-            "readOnly": false,
-            "linkedTo": null,
-            "values": null
-        },
-        {
-            "name": "state",
-            "altName": null,
-            "readOnly": false,
-            "linkedTo": null,
-            "values": null
-        },
-        {
-            "name": "postcode",
-            "altName": null,
-            "readOnly": false,
-            "linkedTo": null,
-            "values": null
-        },
-        {
-            "name": "balance",
-            "altName": null,
-            "readOnly": false,
-            "linkedTo": null,
-            "values": null
-        },
-        {
-            "name": "comunicationPreferences",
-            "altName": null,
-            "readOnly": false,
-            "linkedTo": null,
-            "values": null
-        },
-        {
-            "name": "status",
-            "altName": null,
-            "readOnly": false,
-            "linkedTo": null,
-            "values": null
-        },
-        {
-            "name": "createdAt",
-            "altName": null,
-            "readOnly": false,
-            "linkedTo": null,
-            "values": null
-        },
-        {
-            "name": "updatedAt",
-            "altName": null,
-            "readOnly": false,
-            "linkedTo": null,
-            "values": null
-        }
-    ]
+    "Account": {
+        "modelName": "Account",
+        "listFields": [
+            {
+                "name": "number"
+            },
+            {
+                "name": "firstName"
+            },
+            {
+                "name": "lastName"
+            },
+            {
+                "name": "email",
+                "altName": "E-Mail"
+            },
+            {
+                "name": "phoneNumber"
+            },
+            {
+                "name": "isMobile"
+            },
+            {
+                "name": "balance"
+            },
+            {
+                "name": "comunicationPreferences",
+                "altName": "Contact"
+            }
+        ],
+        "viewFields": [
+            {
+                "name": "number",
+                "readOnly": true
+            },
+            {
+                "name": "firstName"
+            },
+            {
+                "name": "lastName"
+            },
+            {
+                "name": "email",
+                "altName": "E-Mail"
+            },
+            {
+                "name": "phoneNumber"
+            },
+            {
+                "name": "isMobile"
+            },
+            {
+                "name": "address"
+            },
+            {
+                "name": "city"
+            },
+            {
+                "name": "state"
+            },
+            {
+                "name": "postcode"
+            },
+            {
+                "name": "balance",
+                "readOnly": true
+            },
+            {
+                "name": "comunicationPreferences",
+                "altName": "Contact",
+                "values": [
+                    "sms",
+                    "email",
+                    "none",
+                    "all"
+                ]
+            },
+            {
+                "name": "status",
+                "values": [
+                    "active",
+                    "inactive",
+                    "suspended"
+                ]
+            },
+            {
+                "name": "createdAt",
+                "readOnly": true
+            },
+            {
+                "name": "updatedAt",
+                "readOnly": true
+            }
+        ]
+    }
 }

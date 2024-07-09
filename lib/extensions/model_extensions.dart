@@ -59,8 +59,3 @@ extension ModelFieldExtensions on ModelField {
     return false;
   }
 }
-
-// extension ModelExtensions on Model {
-//   List<ModelField> get viewFields =>
-//       ModelUiConfig.configurations[getInstanceType()]!.viewModelFields;
-// }

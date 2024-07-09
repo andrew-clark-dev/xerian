@@ -6,6 +6,7 @@ part of 'model_ui_config.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
+// ignore: unused_element
 ModelUiConfig _$ModelUiConfigFromJson(Map<String, dynamic> json) =>
     ModelUiConfig(
       json['modelName'] as String,
@@ -16,8 +17,8 @@ ModelUiConfig _$ModelUiConfigFromJson(Map<String, dynamic> json) =>
 Map<String, dynamic> _$ModelUiConfigToJson(ModelUiConfig instance) =>
     <String, dynamic>{
       'modelName': instance.modelName,
-      'listFields': instance.listFields,
-      'viewFields': instance.viewFields,
+      'listFields': instance.listFields.map((e) => e.toJson()).toList(),
+      'viewFields': instance.viewFields.map((e) => e.toJson()).toList(),
     };
 
 DisplayField _$DisplayFieldFromJson(Map<String, dynamic> json) => DisplayField(

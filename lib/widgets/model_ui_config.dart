@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:amplify_core/amplify_core.dart';
 import 'package:change_case/change_case.dart';
+import 'package:flutter/services.dart';
 import 'package:logging/logging.dart';
 import 'package:xerian/extensions/model_extensions.dart';
 import 'package:xerian/models/ModelProvider.dart';
@@ -9,16 +10,39 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'model_ui_config.g.dart';
 
-@JsonSerializable()
+@JsonSerializable(explicitToJson: true)
 class ModelUiConfig {
   static final Logger log = Logger("ModelUiConfig");
 
   static Map<String, ModelUiConfig> configurations = {};
 
+  static Future<void> init() async {
+    final String modelUiConfigJsonString =
+        await rootBundle.loadString('lib/widgets/model_ui_config.json');
+    if (modelUiConfigJsonString.isEmpty) {
+      _dumpDefaultConfig();
+    } else {
+      Map<String, dynamic> modelUiConfigJson =
+          jsonDecode(modelUiConfigJsonString);
+      modelUiConfigJson.forEach((modelName, configJson) {
+        ModelUiConfig modelUiConfig = ModelUiConfig.fromJson(configJson);
+        configurations[modelName] = modelUiConfig;
+      });
+    }
+  }
+
+  static _dumpDefaultConfig() {
+    var conf = {};
+    for (var s in ModelProvider.instance.modelSchemas) {
+      conf[s.name] = ModelUiConfig(s.name);
+    }
+    safePrint(jsonEncode(conf));
+  }
+
   static ModelUiConfig config(ModelType modelType) {
     final result = configurations[modelType.modelName()] ??
         ModelUiConfig(modelType.modelName());
-    (jsonEncode(result));
+    safePrint('${modelType.modelName()} configured with ${jsonEncode(result)}');
     return result;
   }
 
@@ -55,8 +79,15 @@ class ModelUiConfig {
     this.listFields = listFields ?? _defaultFields(modelType);
   }
 
-  factory ModelUiConfig.fromJson(Map<String, dynamic> json) =>
-      _$ModelUiConfigFromJson(json);
+  factory ModelUiConfig.fromJson(Map<String, dynamic> json) => ModelUiConfig(
+        json['modelName'] as String,
+        listFields: (json['listFields'] as List)
+            .map((j) => DisplayField.fromJson(j))
+            .toList(),
+        viewFields: (json['viewFields'] as List)
+            .map((j) => DisplayField.fromJson(j))
+            .toList(),
+      );
 
   Map<String, dynamic> toJson() => _$ModelUiConfigToJson(this);
 
@@ -81,11 +112,13 @@ class ModelUiConfig {
   // List<ModelField> get viewModelFields =>
   //     viewFields.map((f) => f.modelField).toList();
 
-  List<String> get viewFieldNames =>
+  List<String> get viewFieldNames => viewFields.map((f) => f.name).toList();
+
+  List<String> get viewFieldDisplayNames =>
       viewFields.map((f) => f.displayName).toList();
 
   List<String> get viewFieldTitleNames =>
-      viewFieldNames.map((f) => f.toCapitalCase()).toList();
+      viewFieldDisplayNames.map((f) => f.toCapitalCase()).toList();
 
   List<String> listFieldValues(Model model) =>
       listFields.map((f) => model.toMap()[f.name].toString()).toList();

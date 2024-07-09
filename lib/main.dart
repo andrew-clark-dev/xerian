@@ -17,6 +17,7 @@ import 'package:xerian/models/ModelProvider.dart';
 import 'package:xerian/pages/dashboard/dashboard_view.dart';
 import 'package:xerian/pages/settings/settings_view.dart';
 import 'package:xerian/pages/login/login_screen.dart';
+import 'package:xerian/widgets/model_ui_config.dart';
 
 Future<void> main() async {
   try {
@@ -74,8 +75,8 @@ Future<void> _configureAmplify() async {
     final storage = AmplifyStorageS3();
     await Amplify.addPlugins([auth, api, storage]);
     await Amplify.configure(amplifyConfig);
-
-    safePrint('Successfully configured');
+    await ModelUiConfig.init();
+    safePrint('Amplify Successfully configured');
   } on Exception catch (e) {
     safePrint('Error configuring Amplify: $e');
   }
