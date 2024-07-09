@@ -181,23 +181,23 @@ class _ModelViewState extends State<ModelView> {
   TextFormField text(ModelField field) => TextFormField(
       controller: controllers[field.name],
       decoration: InputDecoration(
-        labelText: field.name.toCapitalCase(),
+        labelText: config.viewFieldTitleName(field.name),
       ),
       readOnly: field.isAutoSet(),
       style: field.isAutoSet()
           ? const TextStyle(color: Colors.deepPurpleAccent)
           : null);
 
-  DropdownButtonFormField dropDown(ModelField value) =>
+  DropdownButtonFormField dropDown(ModelField field) =>
       DropdownButtonFormField<String?>(
           decoration: InputDecoration(
-            labelText: value.name.toCapitalCase(),
+            labelText: config.viewFieldTitleName(field.name),
           ),
-          value: enumStates[value.name],
+          value: enumStates[field.name],
           hint: const Text('Select an option'),
           onChanged: (String? enumValue) {
             setState(() {
-              enumStates[value.name] = enumValue!;
+              enumStates[field.name] = enumValue!;
             });
           },
           validator: (String? enumValue) {
@@ -207,7 +207,7 @@ class _ModelViewState extends State<ModelView> {
             return null;
           },
           items: config
-              .enumValues(value.name)
+              .enumValues(field.name)
               .map<DropdownMenuItem<String>>((String value) {
             return DropdownMenuItem<String>(
               value: value,
@@ -215,14 +215,14 @@ class _ModelViewState extends State<ModelView> {
             );
           }).toList());
 
-  FormField switcher(ModelField value) {
+  FormField switcher(ModelField field) {
     return FormField(
         key: null,
         initialValue: false,
-        builder: (FormFieldState<dynamic> field) {
+        builder: (FormFieldState<dynamic> fieldState) {
           return InputDecorator(
               decoration: InputDecoration(
-                labelText: value.name.toCapitalCase(),
+                labelText: config.viewFieldTitleName(field.name),
               ),
               textAlign: TextAlign.left,
               child: Align(
@@ -231,10 +231,10 @@ class _ModelViewState extends State<ModelView> {
                       scale: 0.8,
                       child: Switch(
                         // This bool value toggles the switch.
-                        value: booleanStates[value.name]!,
+                        value: booleanStates[field.name]!,
                         onChanged: (bool b) {
                           setState(() {
-                            booleanStates[value.name] = b;
+                            booleanStates[field.name] = b;
                           });
                         },
                       ))));

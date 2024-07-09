@@ -12,6 +12,9 @@ part 'model_ui_config.g.dart';
 
 @JsonSerializable(explicitToJson: true)
 class ModelUiConfig {
+  static final List<String> hiddenFields = ['id', 'metaData', 'original'];
+  static final List<String> autosetFields = ['number', 'sku', 'balence'];
+
   static final Logger log = Logger("ModelUiConfig");
 
   static Map<String, ModelUiConfig> configurations = {};
@@ -46,9 +49,6 @@ class ModelUiConfig {
     return result;
   }
 
-  static final List<String> hiddenFields = ['id', 'metaData', 'original'];
-  static final List<String> autosetFields = ['number', 'sku', 'balence'];
-
   static List<DisplayField> _defaultFields(ModelType modelType) {
     return modelType.schema.fields!.values
         .where((v) => !hiddenFields.contains(v.name))
@@ -57,24 +57,17 @@ class ModelUiConfig {
         .toList();
   }
 
-  // static final _config = ModelTypeUIConfig(listFields: [
-  //   ListField('number'),
-  //   ListField('firstName'),
-  //   ListField('lastName'),
-  //   ListField('phoneNumber'),
-  //   ListField('email', displayName: 'E-Mail'),
-  //   ListField('balance'),
-  //   ListField('comunicationPreferences', displayName: 'Contact')
-  // ], enumFields: [
-  //   EnumField('status', AccountStatus.values),
-  //   EnumField('comunicationPreferences', AccountComunicationPreferences.values),
-  // ]);
-
   final String modelName;
   late final List<DisplayField> listFields;
   late final List<DisplayField> viewFields;
+  late final List<ModelField> modelFields;
 
-  ModelUiConfig(this.modelName, {listFields, viewFields, enumFields}) {
+  // ignore: slash_for_doc_comments
+  /**
+   *  The config object
+   */
+
+  ModelUiConfig(this.modelName, {listFields, viewFields}) {
     this.viewFields = viewFields ?? _defaultFields(modelType);
     this.listFields = listFields ?? _defaultFields(modelType);
   }
@@ -119,6 +112,9 @@ class ModelUiConfig {
 
   List<String> get viewFieldTitleNames =>
       viewFieldDisplayNames.map((f) => f.toCapitalCase()).toList();
+
+  String viewFieldTitleName(String name) =>
+      viewFields.firstWhere((f) => f.name == name).displayName.toCapitalCase();
 
   List<String> listFieldValues(Model model) =>
       listFields.map((f) => model.toMap()[f.name].toString()).toList();
