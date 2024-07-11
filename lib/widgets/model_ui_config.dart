@@ -19,7 +19,7 @@ class ModelUiConfig {
 
   static Map<String, ModelUiConfig> configurations = {};
 
-  static Future<void> init() async {
+  static Future<void> configure() async {
     final String modelUiConfigJsonString =
         await rootBundle.loadString('lib/widgets/model_ui_config.json');
     if (modelUiConfigJsonString.isEmpty) {

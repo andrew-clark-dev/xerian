@@ -33,6 +33,17 @@ class _SettingsViewState extends State<SettingsView> {
     safePrint(response);
   }
 
+  Future<void> fetchCurrentUserAttributes() async {
+    try {
+      final result = await Amplify.Auth.fetchUserAttributes();
+      for (final element in result) {
+        safePrint('key: ${element.userAttributeKey}; value: ${element.value}');
+      }
+    } on AuthException catch (e) {
+      safePrint('Error fetching user attributes: ${e.message}');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -75,6 +86,8 @@ class _SettingsViewState extends State<SettingsView> {
                               subtitle: 'Tap to execute custom callback',
                               onTap: () => request(),
                             ),
+                            const SettingsContainer(
+                                children: [Text("Some text ")]),
                           ],
                         ),
                       )),

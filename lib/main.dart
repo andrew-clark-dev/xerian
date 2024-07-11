@@ -1,3 +1,5 @@
+import 'dart:js_interop';
+
 import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
 import 'package:go_router/go_router.dart';
@@ -11,6 +13,7 @@ import 'package:amplify_storage_s3/amplify_storage_s3.dart';
 import 'package:amplify_flutter/amplify_flutter.dart';
 
 import 'package:xerian/amplify_outputs.dart';
+import 'package:xerian/extensions/amplify_extentions.dart';
 import 'package:xerian/extensions/model_extensions.dart';
 
 import 'package:xerian/models/ModelProvider.dart';
@@ -75,7 +78,7 @@ Future<void> _configureAmplify() async {
     final storage = AmplifyStorageS3();
     await Amplify.addPlugins([auth, api, storage]);
     await Amplify.configure(amplifyConfig);
-    await ModelUiConfig.init();
+    await ModelUiConfig.configure();
     safePrint('Amplify Successfully configured');
   } on Exception catch (e) {
     safePrint('Error configuring Amplify: $e');
@@ -102,7 +105,7 @@ class EncoreShopApp extends StatelessWidget {
       // redirect to the login page if the user is not logged in
       redirect: (BuildContext context, GoRouterState state) async {
         // if the user is not logged in, they need to login
-        final loggedIn = await isAuthorized();
+        final loggedIn = await Amplify.Auth.isAuthorized();
         final loggingIn = state.path == Login.classType.viewPath;
         if (!loggedIn) return loggingIn ? null : Login.classType.viewPath;
 

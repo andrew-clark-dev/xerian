@@ -20,10 +20,10 @@ class ModelListView extends StatefulWidget {
 
   @override
   // ignore: library_private_types_in_public_api,
-  _ModelListViewState createState() => _ModelListViewState();
+  ModelListViewState createState() => ModelListViewState();
 }
 
-class _ModelListViewState extends State<ModelListView> {
+class ModelListViewState extends State<ModelListView> {
   late final Api _api;
   late final ModelType _modelType;
 
@@ -41,11 +41,15 @@ class _ModelListViewState extends State<ModelListView> {
 
   final ScrollController controller = ScrollController();
 
+  /// Overide this method to control the fetching of the model data.
+  /// e.g. fetch from a non amplify source and convert to amplify mode for displaying.
+  Future<PaginatedResult<Model>?> fetch(PaginatedResult<Model>? page) =>
+      _api.fetch(page);
+
   Future<void> _fetchMore() async {
     loading = true;
-
     try {
-      page = (await _api.fetch(page))!;
+      page = (await fetch(page))!;
       setState(() {
         models += page!.items;
       });
