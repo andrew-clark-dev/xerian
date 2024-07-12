@@ -11,10 +11,10 @@ extension ModelTypeExtensions on ModelType {
   String get listPath => '/${modelName().toLowerCase()}list';
   String get formPath => '/${modelName().toLowerCase()}form';
 
-  ModelSchema get schema {
-    return ModelProvider.instance.modelSchemas
-        .firstWhere((e) => e.name == modelName());
-  }
+  ModelUiConfig get uiConfig => ModelUiConfiguration.get(this);
+
+  ModelSchema get schema => ModelProvider.instance.modelSchemas
+      .firstWhere((e) => e.name == modelName());
 
   GoRoute route({Widget? page, bool? isList, String? path}) {
     return GoRoute(

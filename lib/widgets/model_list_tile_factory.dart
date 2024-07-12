@@ -11,7 +11,7 @@ class ModelListTileFactory {
   late final ModelUiConfig config;
 
   ModelListTileFactory(ModelType modelType) {
-    config = ModelUiConfig.config(modelType);
+    config = modelType.uiConfig;
   }
 
   ListTile tile(Model model, {TextStyle? style}) {

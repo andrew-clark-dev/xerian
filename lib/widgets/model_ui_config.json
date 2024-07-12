@@ -1,97 +1,99 @@
 {
-    "Account": {
-        "modelName": "Account",
-        "listFields": [
-            {
-                "name": "number"
-            },
-            {
-                "name": "firstName"
-            },
-            {
-                "name": "lastName"
-            },
-            {
-                "name": "email",
-                "altName": "E-Mail"
-            },
-            {
-                "name": "phoneNumber"
-            },
-            {
-                "name": "isMobile"
-            },
-            {
-                "name": "balance"
-            },
-            {
-                "name": "comunicationPreferences",
-                "altName": "Contact"
-            }
-        ],
-        "viewFields": [
-            {
-                "name": "number",
-                "readOnly": true
-            },
-            {
-                "name": "firstName"
-            },
-            {
-                "name": "lastName"
-            },
-            {
-                "name": "email",
-                "altName": "E-Mail"
-            },
-            {
-                "name": "phoneNumber"
-            },
-            {
-                "name": "isMobile"
-            },
-            {
-                "name": "address"
-            },
-            {
-                "name": "city"
-            },
-            {
-                "name": "state"
-            },
-            {
-                "name": "postcode"
-            },
-            {
-                "name": "balance",
-                "readOnly": true
-            },
-            {
-                "name": "comunicationPreferences",
-                "altName": "Contact",
-                "values": [
-                    "sms",
-                    "email",
-                    "none",
-                    "all"
-                ]
-            },
-            {
-                "name": "status",
-                "values": [
-                    "active",
-                    "inactive",
-                    "suspended"
-                ]
-            },
-            {
-                "name": "createdAt",
-                "readOnly": true
-            },
-            {
-                "name": "updatedAt",
-                "readOnly": true
-            }
-        ]
+    "modelConfigurations": {
+        "Account": {
+            "modelName": "Account",
+            "listFields": [
+                {
+                    "name": "number"
+                },
+                {
+                    "name": "firstName"
+                },
+                {
+                    "name": "lastName"
+                },
+                {
+                    "name": "email",
+                    "altName": "E-Mail"
+                },
+                {
+                    "name": "phoneNumber"
+                },
+                {
+                    "name": "isMobile"
+                },
+                {
+                    "name": "balance"
+                },
+                {
+                    "name": "comunicationPreferences",
+                    "altName": "Contact"
+                }
+            ],
+            "viewFields": [
+                {
+                    "name": "number",
+                    "readOnly": true
+                },
+                {
+                    "name": "firstName"
+                },
+                {
+                    "name": "lastName"
+                },
+                {
+                    "name": "email",
+                    "altName": "E-Mail"
+                },
+                {
+                    "name": "phoneNumber"
+                },
+                {
+                    "name": "isMobile"
+                },
+                {
+                    "name": "address"
+                },
+                {
+                    "name": "city"
+                },
+                {
+                    "name": "state"
+                },
+                {
+                    "name": "postcode"
+                },
+                {
+                    "name": "balance",
+                    "readOnly": true
+                },
+                {
+                    "name": "comunicationPreferences",
+                    "altName": "Contact",
+                    "values": [
+                        "sms",
+                        "email",
+                        "none",
+                        "all"
+                    ]
+                },
+                {
+                    "name": "status",
+                    "values": [
+                        "active",
+                        "inactive",
+                        "suspended"
+                    ]
+                },
+                {
+                    "name": "createdAt",
+                    "readOnly": true
+                },
+                {
+                    "name": "updatedAt",
+                    "readOnly": true
+                }
+            ]
+        }
     }
 }

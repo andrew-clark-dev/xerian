@@ -48,7 +48,7 @@ class _ModelViewState extends State<ModelView> {
     super.initState();
     model = widget.model;
     update = model != null;
-    config = ModelUiConfig.config(widget.modelType);
+    config = widget.modelType.uiConfig;
     for (var field in config.viewModelFields) {
       switch (field.fieldType()) {
         case ModelFieldTypeEnum.bool:
@@ -70,12 +70,11 @@ class _ModelViewState extends State<ModelView> {
             enumStates[field.name] = json[field.name] == null
                 ? null
                 : (json[field.name] as Enum).name;
-          // case ModelFieldTypeEnum.double:
-          //   controllers[field.name]!.text =
-          //       (json[field.name] ?? '0.00') as String;
+          case ModelFieldTypeEnum.double:
+            controllers[field.name]!.text =
+                json[field.name]?.toString() ?? '0.0';
           case ModelFieldTypeEnum.dateTime:
-            controllers[field.name]!.text = dateFormatter.format(
-                (json[field.name] as TemporalDateTime).getDateTimeInUtc());
+            controllers[field.name]!.text = json[field.name]?.toString() ?? '';
           default:
             controllers[field.name]!.text =
                 json[field.name]?.toString() ?? 'None';
@@ -94,11 +93,18 @@ class _ModelViewState extends State<ModelView> {
     for (var field in config.viewModelFields) {
       switch (field.fieldType()) {
         case ModelFieldTypeEnum.bool:
-          jsonData[field.name] = booleanStates[field.name].toString();
+          jsonData[field.name] = booleanStates[field.name];
         case ModelFieldTypeEnum.enumeration:
           jsonData[field.name] = enumStates[field.name];
+        case ModelFieldTypeEnum.double:
+          jsonData[field.name] =
+              double.parse(controllers[field.name]?.value.text ?? '0.0');
+        // case ModelFieldTypeEnum.dateTime:
+        //   jsonData[field.name] = dateFormatter
+        //       .parse(controllers[field.name]?.value.text ?? '')
+        //       .toIso8601String();
         default:
-          jsonData[field.name] = controllers[field.name]?.value.text ?? "";
+          jsonData[field.name] = controllers[field.name]?.value.text;
       }
     }
 
@@ -106,6 +112,7 @@ class _ModelViewState extends State<ModelView> {
     if (update) {
       request = ModelMutations.update(config.modelType.fromJson(jsonData));
     } else {
+      jsonData['id'] = UUID.getUUID();
       request = ModelMutations.create(config.modelType.fromJson(jsonData));
     }
 

@@ -1,8 +1,8 @@
 import 'dart:convert';
+import 'package:flutter_helper_utils/flutter_helper_utils.dart';
 
 import 'package:amplify_core/amplify_core.dart';
 import 'package:change_case/change_case.dart';
-import 'package:flutter/services.dart';
 import 'package:logging/logging.dart';
 import 'package:xerian/extensions/model_extensions.dart';
 import 'package:xerian/models/ModelProvider.dart';
@@ -11,45 +11,68 @@ import 'package:json_annotation/json_annotation.dart';
 part 'model_ui_config.g.dart';
 
 @JsonSerializable(explicitToJson: true)
-class ModelUiConfig {
-  static final List<String> hiddenFields = ['id', 'metaData', 'original'];
-  static final List<String> autosetFields = ['number', 'sku', 'balence'];
+class ModelUiConfiguration {
+  static ModelUiConfiguration? _modelUiConfiguration;
 
+  static void configure(String configuration) {
+    _modelUiConfiguration = ModelUiConfiguration._internal(configuration);
+    safePrint("Configuration used");
+    safePrint(_modelUiConfiguration!.toJson().encodedJsonString);
+  }
+
+  static get configurations => _modelUiConfiguration?.modelConfigurations;
+
+  static ModelUiConfig get(ModelType modelType) =>
+      configurations[modelType.modelName()];
+
+  Map<String, ModelUiConfig> modelConfigurations = {};
+
+  // Create a new config (for testing only)
+  ModelUiConfiguration(this.modelConfigurations);
+
+  ModelUiConfiguration._internal(String configuration) {
+    if (_modelUiConfiguration != null) {
+      throw 'Model Ui Configuration error - already configured';
+    }
+
+    Map<String, dynamic> modelUiConfigJson = {};
+
+    if (configuration.isNotEmpty) {
+      modelUiConfigJson = jsonDecode(configuration);
+    }
+
+    // Default configs
+    for (var modelSchema in ModelProvider.instance.modelSchemas) {
+      final name = modelSchema.name;
+      if (modelUiConfigJson.keys.contains(name)) {
+        modelConfigurations[name] =
+            ModelUiConfig.fromJson(modelUiConfigJson[name]);
+      } else {
+        modelConfigurations[name] = ModelUiConfig(name);
+      }
+    }
+  }
+
+  Map<String, dynamic> toJson() => _$ModelUiConfigurationToJson(this);
+
+  factory ModelUiConfiguration.fromJson(Map<String, dynamic> json) =>
+      _$ModelUiConfigurationFromJson(json);
+}
+
+@JsonSerializable(explicitToJson: true, includeIfNull: false)
+class ModelUiConfig {
   static final Logger log = Logger("ModelUiConfig");
 
-  static Map<String, ModelUiConfig> configurations = {};
+  /// The list of feild never to show in the basic ui components.
+  /// Id is given by amplify, Model UI never displays it
+  /// Model UI also support directly meta data on any model Model UI never displays it.
+  static final List<String> hiddenFields = ['id', 'metaData'];
 
-  static Future<void> configure() async {
-    final String modelUiConfigJsonString =
-        await rootBundle.loadString('lib/widgets/model_ui_config.json');
-    if (modelUiConfigJsonString.isEmpty) {
-      _dumpDefaultConfig();
-    } else {
-      Map<String, dynamic> modelUiConfigJson =
-          jsonDecode(modelUiConfigJsonString);
-      modelUiConfigJson.forEach((modelName, configJson) {
-        ModelUiConfig modelUiConfig = ModelUiConfig.fromJson(configJson);
-        configurations[modelName] = modelUiConfig;
-      });
-    }
-  }
+  /// These fileds are never input by the user. So are ALWAY readonly when displyed.
+  static final List<String> autosetFields = ['id', 'createdAt', 'updatedAt'];
 
-  static _dumpDefaultConfig() {
-    var conf = {};
-    for (var s in ModelProvider.instance.modelSchemas) {
-      conf[s.name] = ModelUiConfig(s.name);
-    }
-    safePrint(jsonEncode(conf));
-  }
-
-  static ModelUiConfig config(ModelType modelType) {
-    final result = configurations[modelType.modelName()] ??
-        ModelUiConfig(modelType.modelName());
-    safePrint('${modelType.modelName()} configured with ${jsonEncode(result)}');
-    return result;
-  }
-
-  static List<DisplayField> _defaultFields(ModelType modelType) {
+  // return the default field config, used when no config found in json file
+  List<DisplayField> _defaultFields(ModelType modelType) {
     return modelType.schema.fields!.values
         .where((v) => !hiddenFields.contains(v.name))
         .map((f) =>
@@ -60,13 +83,8 @@ class ModelUiConfig {
   final String modelName;
   late final List<DisplayField> listFields;
   late final List<DisplayField> viewFields;
-  late final List<ModelField> modelFields;
 
-  // ignore: slash_for_doc_comments
-  /**
-   *  The config object
-   */
-
+  ///  The config object
   ModelUiConfig(this.modelName, {listFields, viewFields}) {
     this.viewFields = viewFields ?? _defaultFields(modelType);
     this.listFields = listFields ?? _defaultFields(modelType);
@@ -123,11 +141,15 @@ class ModelUiConfig {
       .where((v) => viewFieldNames.contains(v.name))
       .toList();
 
+  List<ModelField> get viewModelSettableFields => schema.fields!.values
+      .where((v) => viewFieldNames.contains(v.name))
+      .toList();
+
   List<String> enumValues(String fieldName) =>
       viewFields.firstWhere((f) => f.name == fieldName).values ?? [];
 }
 
-@JsonSerializable()
+@JsonSerializable(includeIfNull: false)
 class DisplayField {
   final String name;
   final String? altName;
