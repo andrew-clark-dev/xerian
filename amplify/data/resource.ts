@@ -1,6 +1,4 @@
 import { type ClientSchema, a, defineData } from "@aws-amplify/backend";
-import { addUserToGroup } from "./add-user-to-group/resource";
-import { listUsers } from "./list-users/resource";
 
 const schema = a.schema({
 
@@ -17,26 +15,9 @@ const schema = a.schema({
       isAdmin: a.boolean().default(false),
       isManage: a.boolean().default(false),
       imageUrl: a.url(),
+      poolId: a.string().required(),
       metadata: a.json(),
-    }).authorization((allow) => [allow.group("ADMINS")]),
-
-  listUsers: a
-    .query()
-    .authorization((allow) => [allow.group("ADMINS")])
-    .handler(a.handler.function(listUsers))
-    .returns(a.json()),
-
-
-
-  addUserToGroup: a
-    .mutation()
-    .arguments({
-      userId: a.string().required(),
-      groupName: a.string().required(),
-    })
-    .authorization((allow) => [allow.group("ADMINS")])
-    .handler(a.handler.function(addUserToGroup))
-    .returns(a.json()),
+    }).authorization((allow) => [allow.group("Admin")]),
 
   Dashboard: a
     .model({
