@@ -1,11 +1,11 @@
 import 'package:amplify_auth_cognito/amplify_auth_cognito.dart';
 import 'package:amplify_flutter/amplify_flutter.dart';
-import 'package:encoreitem/home.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:encore_core/extentions.dart';
 import 'amplify_outputs.dart';
 import 'login.dart';
+import 'home.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
