@@ -1,6 +1,6 @@
 // ignore: unused_import
 import 'package:amplify_core/amplify_core.dart';
-import 'package:encore_core/encore_core.dart';
+import 'package:encore_core/extentions.dart';
 import 'package:test/test.dart';
 
 class MockAuthSession extends AuthSession {

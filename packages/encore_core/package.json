@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "generate-password-ts": "^1.6.5"
+  }
+}
