@@ -3,7 +3,7 @@ import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:encoreitem/home.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:encore_core/encore_core.dart';
+import 'package:encore_core/extentions.dart';
 import 'amplify_outputs.dart';
 import 'login.dart';
 
