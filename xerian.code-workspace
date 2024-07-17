@@ -1,0 +1,14 @@
+{
+  "folders": [
+    {
+      "path": "projects/encoreitem"
+    },
+    {
+      "path": "projects/encoreshop"
+    },
+    {
+      "path": "packages/encore"
+    }
+  ],
+  "settings": {}
+}
