@@ -7,7 +7,10 @@
       "path": "projects/encoreshop"
     },
     {
-      "path": "packages/encore"
+      "path": "projects/encore"
+    },
+    {
+      "path": "packages/encore_core"
     }
   ],
   "settings": {}

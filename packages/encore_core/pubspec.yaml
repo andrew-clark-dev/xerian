@@ -1,0 +1,20 @@
+name: encore_core
+description: A starting point for Dart libraries or applications.
+version: 1.0.0
+# repository: https://github.com/my_org/my_repo
+
+environment:
+  sdk: ^3.4.3
+
+# Add regular dependencies here.
+dependencies:
+  amplify_auth_cognito: ^2.3.0
+  amplify_core: ^2.3.0
+  aws_lambda_api: ^2.0.0
+  build_runner: ^2.4.11
+  mockito: ^5.4.4
+  # path: ^1.8.0
+
+dev_dependencies:
+  lints: ^3.0.0
+  test: ^1.24.0
