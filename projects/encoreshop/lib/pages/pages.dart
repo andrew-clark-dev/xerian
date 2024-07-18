@@ -1,3 +1,4 @@
+import 'package:amplify_auth_cognito/amplify_auth_cognito.dart';
 import 'package:amplify_core/amplify_core.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -37,18 +38,45 @@ class PageBar extends AppBar {
 }
 
 class _PageBarState extends State<PageBar> {
+  Future<void> signOutCurrentUser() async {
+    final result = await Amplify.Auth.signOut();
+    if (result is CognitoCompleteSignOut) {
+      safePrint('Sign out completed successfully');
+    } else if (result is CognitoFailedSignOut) {
+      safePrint('Error signing user out: ${result.exception.message}');
+    }
+  }
+
+  void handle(String value) {
+    switch (value) {
+      case 'Logout':
+        signOutCurrentUser();
+      case 'Settings':
+        break;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return AppBar(
-      title: Text(widget.text),
-      actions: [
-        IconButton(
-            icon: const Icon(Icons.settings),
-            onPressed: () {
-              context.push("/settings");
-            }),
-      ],
-    );
+    return AppBar(title: Text(widget.text), actions: [
+      PopupMenuButton<String>(
+        onSelected: handle,
+        itemBuilder: (BuildContext context) => [
+          const PopupMenuItem(
+            value: '1',
+            child: Text('Profile'),
+          ),
+          const PopupMenuItem(
+            value: '2',
+            child: Text('Setting'),
+          ),
+          const PopupMenuItem(
+            value: 'Logout',
+            child: Text('Logout'),
+          ),
+        ],
+      )
+    ]);
   }
 }
 

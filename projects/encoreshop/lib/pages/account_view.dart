@@ -48,63 +48,14 @@ class _AccountViewState extends State<AccountView> {
     controllers[Account.FIRSTNAME.fieldName] = TextEditingController();
     controllers[Account.LASTNAME.fieldName] = TextEditingController();
 
-    // for (var field in config.viewModelFields) {
-    //   switch (field.fieldType()) {
-    //     case ModelFieldTypeEnum.bool:
-    //       booleanStates[field.name] = false;
-    //     case ModelFieldTypeEnum.enumeration:
-    //       enumStates[field.name] = null;
-    //     default:
-    //       controllers[field.name] = TextEditingController();
-    //   }
-    // }
-
     if (update) {
       controllers[Account.NUMBER.fieldName]!.text = account!.number;
       controllers[Account.FIRSTNAME.fieldName]!.text = account!.firstName;
       controllers[Account.LASTNAME.fieldName]!.text = account!.lastName ?? "";
     }
-
-    //   for (var field in config.viewModelFields) {
-    //     switch (field.fieldType()) {
-    //       case ModelFieldTypeEnum.bool:
-    //         booleanStates[field.name] = (json[field.name] ?? false) as bool;
-    //       case ModelFieldTypeEnum.enumeration:
-    //         enumStates[field.name] = json[field.name] == null ? null : (json[field.name] as Enum).name;
-    //       case ModelFieldTypeEnum.double:
-    //         controllers[field.name]!.text = json[field.name]?.toString() ?? '0.0';
-    //       case ModelFieldTypeEnum.dateTime:
-    //         controllers[field.name]!.text = json[field.name]?.toString() ?? '';
-    //       default:
-    //         controllers[field.name]!.text = json[field.name]?.toString() ?? 'None';
-    //     }
-    //   }
-    // }
   }
 
   Future<void> submitForm(ScaffoldMessengerState scaffoldMessenger) async {
-    Map<String, Object?> jsonData = {};
-    // For updates initialize to the existing model
-    // if (update) jsonData = model!.toJson();
-
-    // Update all displayed fields (Note: required fields not displayed must be defaulted, obviously)
-    // for (var field in config.viewModelFields) {
-    //   switch (field.fieldType()) {
-    //     case ModelFieldTypeEnum.bool:
-    //       jsonData[field.name] = booleanStates[field.name];
-    //     case ModelFieldTypeEnum.enumeration:
-    //       jsonData[field.name] = enumStates[field.name];
-    //     case ModelFieldTypeEnum.double:
-    //       jsonData[field.name] = double.parse(controllers[field.name]?.value.text ?? '0.0');
-    //     // case ModelFieldTypeEnum.dateTime:
-    //     //   jsonData[field.name] = dateFormatter
-    //     //       .parse(controllers[field.name]?.value.text ?? '')
-    //     //       .toIso8601String();
-    //     default:
-    //       jsonData[field.name] = controllers[field.name]?.value.text;
-    //   }
-    // }
-
     GraphQLRequest<Model> request;
     if (update) {
       final updatedAccount = account!.copyWith(
