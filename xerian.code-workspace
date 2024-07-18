@@ -11,6 +11,9 @@
     },
     {
       "path": "packages/encore_core"
+    },
+    {
+      "path": "projects/archive"
     }
   ],
   "settings": {}
