@@ -36,6 +36,7 @@ class EncoreShop extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp.router(
       title: 'Encore Shop',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
         // This is the theme of your application.
         //
