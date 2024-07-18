@@ -77,6 +77,7 @@ const schema = a.schema({
   // Default is to allow access to authenticated users
   .authorization((allow) => [allow.authenticated()]);
 
+// Used for code completion / highlighting when making requests from frontend
 export type Schema = ClientSchema<typeof schema>;
 
 export const data = defineData({

@@ -16,5 +16,8 @@
       "path": "projects/archive"
     }
   ],
-  "settings": {}
+  "settings": {
+    "dart.lineLength": 132,
+    "editor.rulers": []
+  }
 }

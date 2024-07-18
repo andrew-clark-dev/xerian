@@ -1,15 +1,15 @@
 import 'package:amplify_api/amplify_api.dart';
 import 'package:amplify_core/amplify_core.dart';
 
-class Api {
-  final ModelType modelType;
+class Api<T extends Model> {
+  final ModelType<T> modelType;
 
   Api(this.modelType);
 
-  Future<PaginatedResult<Model>?> fetch(PaginatedResult<Model>? page,
-      {QueryPredicate<Model>? query}) async {
+  Future<PaginatedResult<T>?> fetch(PaginatedResult<T>? page,
+      {QueryPredicate<T>? query}) async {
     try {
-      GraphQLRequest<PaginatedResult<Model>> request;
+      GraphQLRequest<PaginatedResult<T>> request;
       if (page == null) {
         request = ModelQueries.list(modelType, where: query);
       } else {

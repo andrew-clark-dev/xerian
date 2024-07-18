@@ -1,25 +1,23 @@
+import 'package:amplify_api/amplify_api.dart';
 import 'package:amplify_auth_cognito/amplify_auth_cognito.dart';
 import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
-import 'package:encore_core/extentions.dart';
-import 'package:encore_core/model_ui.dart';
 import 'amplify_outputs.dart';
-import 'home.dart';
-import 'login.dart';
+import 'models/ModelProvider.dart';
+import 'router.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await _configureAmplify();
-  runApp(EncoreItem());
+  runApp(const EncoreShop());
 }
 
 Future<void> _configureAmplify() async {
   try {
     final auth = AmplifyAuthCognito();
-
-    await Amplify.addPlugins([auth]);
+    final api = AmplifyAPI(options: APIPluginOptions(modelProvider: ModelProvider.instance));
+    await Amplify.addPlugins([auth, api]);
     await Amplify.configure(amplifyConfig);
     safePrint('Amplify Successfully configured');
   } on Exception catch (e) {
@@ -27,39 +25,11 @@ Future<void> _configureAmplify() async {
   }
 }
 
-class EncoreItem extends StatelessWidget {
-  EncoreItem({super.key});
+// This is brilliant, should be in a util package
+T? cast<T>(dynamic x) => x is T ? x : null;
 
-  final _router = GoRouter(
-    routes: [
-      GoRoute(
-        path: '/',
-        builder: (context, state) => const Home(),
-      ),
-      GoRoute(
-        path: "/login",
-        builder: (context, state) => const Login(),
-      ),
-      GoRoute(
-        path: "/accounts",
-        builder:  (context, state) => ModelListView(),
-      },
- 
-    ],
-    redirect: (BuildContext context, GoRouterState state) async {
-      // if the user is not logged in, they need to login
-      final loggedIn = await Amplify.Auth.isAuthorized;
-      final loggingIn = state.path == "/login";
-      if (!loggedIn) return loggingIn ? null : "/login";
-
-      // if the user is logged in but still on the login page, send them to
-      // the home
-      if (loggingIn) return "/";
-
-      // no need to redirect at all
-      return null;
-    },
-  );
+class EncoreShop extends StatelessWidget {
+  const EncoreShop({super.key});
 
   // This widget is the root of your application.
   @override
@@ -85,7 +55,7 @@ class EncoreItem extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      routerConfig: _router,
+      routerConfig: router,
     );
   }
 }
