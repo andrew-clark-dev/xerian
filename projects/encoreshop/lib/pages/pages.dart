@@ -1,10 +1,11 @@
 import 'package:amplify_core/amplify_core.dart';
+import 'package:encoreshop/services/cognito.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import 'cascading_menu.dart';
 import 'home.dart';
 import 'account_list_view.dart';
+import 'settings.dart';
 
 class PageDrawer extends StatelessWidget {
   const PageDrawer({super.key});
@@ -40,9 +41,19 @@ class PageBar extends AppBar {
 class _PageBarState extends State<PageBar> {
   @override
   Widget build(BuildContext context) {
-    return AppBar(title: Text(widget.text), actions: const [
-      CascadingMenu(),
-    ]);
+    return FutureBuilder<Widget>(
+        future: Cognito.userText,
+        builder: (context, AsyncSnapshot<Widget> snapshot) {
+          return AppBar(title: Text(widget.text), actions: [
+            TextButton.icon(
+              label: snapshot.data!,
+              onPressed: () {
+                context.push(Settings.path);
+              },
+              icon: const Icon(Icons.account_circle),
+            ),
+          ]);
+        });
   }
 }
 

@@ -1,6 +1,7 @@
 import 'package:amplify_core/amplify_core.dart';
 import 'package:encore_core/extentions.dart';
 import 'package:encoreshop/models/Account.dart';
+import 'package:encoreshop/pages/settings.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -21,6 +22,10 @@ final router = GoRouter(
     GoRoute(
       path: Login.path,
       builder: (context, state) => const Login(),
+    ),
+    GoRoute(
+      path: Settings.path,
+      builder: (context, state) => const Settings(),
     ),
     GoRoute(
       path: AccountListView.path,
