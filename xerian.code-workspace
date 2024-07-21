@@ -1,0 +1,23 @@
+{
+  "folders": [
+    {
+      "path": "projects/encoreitem"
+    },
+    {
+      "path": "projects/encoreshop"
+    },
+    {
+      "path": "projects/encore"
+    },
+    {
+      "path": "packages/encore_core"
+    },
+    {
+      "path": "projects/archive"
+    }
+  ],
+  "settings": {
+    "dart.lineLength": 132,
+    "editor.rulers": []
+  }
+}

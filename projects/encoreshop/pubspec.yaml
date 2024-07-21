@@ -1,0 +1,31 @@
+name: encoreshop
+description: "A new Flutter project."
+publish_to: "none"
+version: 0.1.0
+
+environment:
+  sdk: ">=3.4.3 <4.0.0"
+
+dependencies:
+  amplify_auth_cognito: ^2.3.0
+  amplify_authenticator: ^2.1.1
+  amplify_flutter: ^2.3.0
+  flutter:
+    sdk: flutter
+  go_router: ^14.2.1
+
+  encore_core:
+    path: ../../packages/encore_core
+  amplify_api: ^2.3.0
+  amplify_core: ^2.3.0
+  intl: ^0.19.0
+  form_validation: ^3.1.1+8
+  flutter_settings_screens: ^0.3.4
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+
+flutter:
+  uses-material-design: true
