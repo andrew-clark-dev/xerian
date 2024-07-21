@@ -46,7 +46,7 @@ class _PageBarState extends State<PageBar> {
         builder: (context, AsyncSnapshot<Widget> snapshot) {
           return AppBar(title: Text(widget.text), actions: [
             TextButton.icon(
-              label: snapshot.data!,
+              label: snapshot.data ?? const Text("None"),
               onPressed: () {
                 context.push(Settings.path);
               },
