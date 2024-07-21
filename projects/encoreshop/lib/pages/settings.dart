@@ -1,5 +1,9 @@
+import 'package:encoreshop/services/cognito.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_settings_screens/flutter_settings_screens.dart';
+import 'package:go_router/go_router.dart';
+
+import 'login.dart';
 
 class Settings extends StatefulWidget {
   const Settings({super.key});
@@ -19,6 +23,14 @@ class _SettingsState extends State<Settings> {
             child: SettingsScreen(
               title: 'Application Settings',
               children: [
+                SettingsGroup(title: 'User', children: <Widget>[
+                  SimpleSettingsTile(
+                      title: 'Logout current User',
+                      onTap: () async {
+                        await Cognito.signOutCurrentUser();
+                        if (context.mounted) context.go(Login.path);
+                      })
+                ]),
                 SettingsGroup(title: 'Adminstration', children: <Widget>[
                   SimpleSettingsTile(
                       title: 'Synchronize with Consigncloud',
