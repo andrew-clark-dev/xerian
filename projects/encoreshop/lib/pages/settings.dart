@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_settings_screens/flutter_settings_screens.dart';
 import 'package:go_router/go_router.dart';
 
+import '../services/upload_file.dart';
 import 'login.dart';
 
 class Settings extends StatefulWidget {
@@ -33,42 +34,35 @@ class _SettingsState extends State<Settings> {
                 ]),
                 SettingsGroup(title: 'Adminstration', children: <Widget>[
                   SimpleSettingsTile(
-                      title: 'Synchronize with Consigncloud',
-                      subtitle: 'General App Settings',
-                      child: Padding(
-                        padding: const EdgeInsets.all(25),
-                        child: SettingsScreen(
-                          title: 'Synchronize with Consigncloud',
-                          children: <Widget>[
-                            const TextInputSettingsTile(
-                              title: 'api key',
-                              settingKey: 'cc-sync-api-key',
-                              obscureText: true,
-                              borderColor: Colors.blueAccent,
-                              errorColor: Colors.deepOrangeAccent,
-                            ),
-                            TextInputSettingsTile(
-                              title: 'limit',
-                              settingKey: 'cc-sync-limit',
-                              borderColor: Colors.blueAccent,
-                              errorColor: Colors.deepOrangeAccent,
-                              initialValue: '0',
-                              validator: (String? limit) {
-                                if (int.tryParse(limit ?? '') != null) {
-                                  return null;
-                                }
-                                return "Must be an integer";
-                              },
-                            ),
-                            // SimpleSettingsTile(
-                            //   title: 'Custom Settings',
-                            //   subtitle: 'Tap to execute custom callback',
-                            //   onTap: () => request(),
-                            // ),
-                            const SettingsContainer(children: [Text("Some text ")]),
-                          ],
+                    title: 'More Settings',
+                    subtitle: 'General App Settings',
+                    child: SettingsScreen(
+                      title: 'App Settings',
+                      children: <Widget>[
+                        SimpleSettingsTile(
+                            title: 'Upload File',
+                            onTap: () async {
+                              await UploadFile().uploadDataImportFile();
+                            }),
+                        CheckboxSettingsTile(
+                          leading: Icon(Icons.adb),
+                          settingKey: 'key-is-developer',
+                          title: 'Developer Mode',
+                          onChange: (bool value) {
+                            debugPrint('Developer Mode ${value ? 'on' : 'off'}');
+                          },
                         ),
-                      )),
+                        SwitchSettingsTile(
+                          leading: Icon(Icons.usb),
+                          settingKey: 'key-is-usb-debugging',
+                          title: 'USB Debugging',
+                          onChange: (value) {
+                            debugPrint('USB Debugging: $value');
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
                 ]),
               ],
             )));
