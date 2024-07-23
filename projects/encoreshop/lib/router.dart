@@ -14,6 +14,7 @@ import 'pages/login.dart';
 T? cast<T>(dynamic x) => x is T ? x : null;
 
 final router = GoRouter(
+  initialLocation: Home.path,
   routes: [
     GoRoute(
       path: Home.path,
@@ -39,12 +40,12 @@ final router = GoRouter(
   redirect: (BuildContext context, GoRouterState state) async {
     // if the user is not logged in, they need to login
     final loggedIn = await Amplify.Auth.isAuthorized;
-    final loggingIn = state.path == "/login";
-    if (!loggedIn) return loggingIn ? null : "/login";
+    final loggingIn = state.path == Login.path;
+    if (!loggedIn) return loggingIn ? null : Login.path;
 
     // if the user is logged in but still on the login page, send them to
     // the home
-    if (loggingIn) return "/";
+    if (loggingIn) return Home.path;
 
     // no need to redirect at all
     return null;
