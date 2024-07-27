@@ -1,4 +1,5 @@
 import { type ClientSchema, a, defineData } from "@aws-amplify/backend";
+import { addUserToGroup } from "./add-user-to-group/resource"
 
 const schema = a.schema({
 
@@ -21,6 +22,19 @@ const schema = a.schema({
       metadata: a.json(),
     })
     .secondaryIndexes((index) => [index("number")]),
+
+  // Functions
+  addUserToGroup: a
+    .mutation()
+    .arguments({
+      userId: a.string().required(),
+      groupName: a.string().required(),
+    })
+    .authorization((allow) => [allow.groups(["Admin"])])
+    .handler(a.handler.function(addUserToGroup))
+    .returns(a.json()),
+
+
 })
 
 
