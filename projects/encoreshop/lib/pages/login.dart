@@ -21,12 +21,12 @@ class _LoginState extends State<Login> {
   @override
   Widget build(BuildContext context) {
     return Authenticator(
+      initialStep: AuthenticatorStep.signIn,
+
       // `authenticatorBuilder` is used to customize the UI for one or more steps
       authenticatorBuilder: (BuildContext context, AuthenticatorState state) {
         switch (state.currentStep) {
           case AuthenticatorStep.signIn:
-          case AuthenticatorStep.signUp:
-          case AuthenticatorStep.confirmSignUp:
             return CustomScaffold(
               state: state,
               // A prebuilt Sign In form from amplify_authenticator
@@ -45,8 +45,8 @@ class _LoginState extends State<Login> {
               body: const ConfirmResetPasswordForm(),
             );
           default:
-            // Returning null defaults to the prebuilt authenticator for all other steps
-            return null;
+            // Returning not supported for all other actions
+            return const Text('Not Supported');
         }
       },
       child: MaterialApp(builder: Authenticator.builder(), home: const Home()),

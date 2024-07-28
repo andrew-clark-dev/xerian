@@ -5,7 +5,7 @@ import 'package:go_router/go_router.dart';
 
 import 'home.dart';
 import 'account_list_view.dart';
-import 'settings.dart';
+import 'user_settings.dart';
 
 class PageDrawer extends StatelessWidget {
   const PageDrawer({super.key});
@@ -48,7 +48,7 @@ class _PageBarState extends State<PageBar> {
             TextButton.icon(
               label: snapshot.data ?? const Text("None"),
               onPressed: () {
-                context.push(Settings.path);
+                context.push(UserSettings.path);
               },
               icon: const Icon(Icons.account_circle),
             ),
