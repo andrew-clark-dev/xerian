@@ -44,6 +44,7 @@ class _UserSettingsState extends State<UserSettings> {
                       title: 'App Settings',
                       children: <Widget>[
                         SimpleSettingsTile(
+                            leading: const Icon(Icons.file_upload),
                             title: 'Upload File',
                             onTap: () async {
                               await UploadFile().uploadDataImportFile();

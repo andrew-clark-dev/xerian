@@ -1,6 +1,7 @@
 import 'package:amplify_core/amplify_core.dart';
 import 'package:encoreshop/pages/account_view.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 import '../models/Account.dart';
 import '../services/api.dart';
@@ -22,6 +23,8 @@ class AccountListView extends StatefulWidget {
 }
 
 class AccountListViewState extends State<AccountListView> {
+  final NumberFormat formatter = NumberFormat("00000000");
+
   late final Api<Account> _api;
 
   @override
@@ -57,9 +60,12 @@ class AccountListViewState extends State<AccountListView> {
     return ListTile(
       title: Row(
         children: [
-          cell(account.number),
+          cell(formatter.format(account.number)),
           cell(account.firstName),
           cell(account.lastName),
+          cell(account.phoneNumber),
+          cell(account.email),
+          cell(account.balance!.toStringAsFixed(2)),
         ],
       ),
       onTap: () => context.push(AccountView.path, extra: account),
@@ -119,7 +125,7 @@ class AccountListViewState extends State<AccountListView> {
         body: Padding(
             padding: const EdgeInsets.all(25),
             child: Column(children: [
-              _titleTile(['Number', 'First Name', 'Last Name']),
+              _titleTile(['Number', 'First Name', 'Last Name', 'Phone Number', 'Email', 'Balance']),
               const Divider(),
               Expanded(child: listener())
             ])));

@@ -1,6 +1,7 @@
 import 'package:amplify_api/amplify_api.dart';
 import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:encoreshop/models/Account.dart';
+import 'package:encoreshop/models/ModelProvider.dart';
 import 'package:encoreshop/pages/pages.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -23,9 +24,9 @@ class _AccountViewState extends State<AccountView> {
   final _formKey = GlobalKey<FormState>();
   final DateFormat dateFormatter = DateFormat('yyyy-MM-dd HH:mm:ss');
 
-  late final controllers = <String, TextEditingController>{};
-  late final booleanStates = <String, bool>{};
-  late final enumStates = <String, String?>{};
+  late final controllers = <QueryField, TextEditingController>{};
+  late final booleanStates = <QueryField, bool>{};
+  late final enumStates = <QueryField, String>{};
 
   late final Account? account;
   late final bool update;
@@ -44,28 +45,54 @@ class _AccountViewState extends State<AccountView> {
     update = account != null;
 
     // Default the states
-    controllers[Account.NUMBER.fieldName] = TextEditingController();
-    controllers[Account.FIRSTNAME.fieldName] = TextEditingController();
-    controllers[Account.LASTNAME.fieldName] = TextEditingController();
+    controllers[Account.NUMBER] = TextEditingController();
+    controllers[Account.FIRSTNAME] = TextEditingController();
+    controllers[Account.LASTNAME] = TextEditingController();
+    controllers[Account.ADDRESS] = TextEditingController();
+    controllers[Account.BALANCE] = TextEditingController();
+    controllers[Account.CITY] = TextEditingController();
+    controllers[Account.COMMENT] = TextEditingController();
+    controllers[Account.EMAIL] = TextEditingController();
+    controllers[Account.PHONENUMBER] = TextEditingController();
+    controllers[Account.POSTCODE] = TextEditingController();
+    controllers[Account.STATE] = TextEditingController();
+    booleanStates[Account.ISMOBILE] = false;
+    booleanStates[Account.VIP] = false;
+    enumStates[Account.STATUS] = AccountStatus.active.name;
+    enumStates[Account.COMUNICATIONPREFERENCES] = AccountComunicationPreferences.none.name;
 
     if (update) {
-      controllers[Account.NUMBER.fieldName]!.text = account!.number;
-      controllers[Account.FIRSTNAME.fieldName]!.text = account!.firstName;
-      controllers[Account.LASTNAME.fieldName]!.text = account!.lastName ?? "";
+      controllers[Account.NUMBER]!.text = formatter.format(account!.number);
+      controllers[Account.FIRSTNAME]!.text = account!.firstName ?? "";
+      controllers[Account.LASTNAME]!.text = account!.lastName ?? "";
+      controllers[Account.ADDRESS]!.text = account!.address ?? "";
+      controllers[Account.BALANCE]!.text = account!.balance!.toStringAsFixed(2);
+      controllers[Account.CITY]!.text = account!.city ?? "";
+      controllers[Account.COMMENT]!.text = account!.comment ?? "";
+      controllers[Account.EMAIL]!.text = account!.email ?? "";
+      controllers[Account.PHONENUMBER]!.text = account!.phoneNumber ?? "";
+      controllers[Account.POSTCODE]!.text = account!.postcode ?? "";
+      controllers[Account.STATE]!.text = account!.state ?? "";
+      booleanStates[Account.ISMOBILE] = account!.isMobile ?? false;
+      booleanStates[Account.VIP] = account!.vip == AccountVip.vip;
+
+      enumStates[Account.STATUS] = account!.status!.name;
+      enumStates[Account.COMUNICATIONPREFERENCES] = account!.comunicationPreferences!.name;
     }
   }
 
   Future<void> submitForm(ScaffoldMessengerState scaffoldMessenger) async {
     GraphQLRequest<Model> request;
     if (update) {
-      final updatedAccount = account!.copyWith(
-          firstName: controllers[Account.FIRSTNAME.fieldName]!.text, lastName: controllers[Account.FIRSTNAME.fieldName]!.text);
+      final updatedAccount =
+          account!.copyWith(firstName: controllers[Account.FIRSTNAME]!.text, lastName: controllers[Account.FIRSTNAME]!.text);
       request = ModelMutations.update(updatedAccount);
     } else {
       final newAccount = Account(
-          number: "1",
-          firstName: controllers[Account.FIRSTNAME.fieldName]!.text,
-          lastName: controllers[Account.FIRSTNAME.fieldName]!.text);
+          number: 1,
+          firstName: controllers[Account.FIRSTNAME]!.text,
+          lastName: controllers[Account.FIRSTNAME]!.text,
+          balance: 10.00);
       request = ModelMutations.create(newAccount);
     }
 
@@ -90,17 +117,27 @@ class _AccountViewState extends State<AccountView> {
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   Column(
                     children: [
-                      TextFormField(
-                          controller: controllers[Account.NUMBER.fieldName],
-                          decoration: const InputDecoration(labelText: 'Number'),
-                          readOnly: true,
-                          style: readOnlyStyle),
-                      TextFormField(
-                          controller: controllers[Account.FIRSTNAME.fieldName],
-                          decoration: const InputDecoration(labelText: 'First Name')),
-                      TextFormField(
-                          controller: controllers[Account.LASTNAME.fieldName],
-                          decoration: const InputDecoration(labelText: 'Last Name')),
+                      text(Account.NUMBER, 'Number', readOnly: true),
+                      Row(children: [
+                        Expanded(child: text(Account.FIRSTNAME, 'First Name')),
+                        Expanded(child: text(Account.LASTNAME, 'Last Name')),
+                      ]),
+                      Row(children: [
+                        Expanded(child: text(Account.PHONENUMBER, 'Phone Number')),
+                        Expanded(child: text(Account.EMAIL, 'E-Mail')),
+                      ]),
+                      text(Account.ADDRESS, 'Address'),
+                      Row(children: [
+                        Expanded(child: text(Account.CITY, 'City')),
+                        Expanded(child: text(Account.POSTCODE, 'Postcode')),
+                      ]),
+                      text(Account.STATE, 'State'),
+                      text(Account.BALANCE, 'Balance', readOnly: true),
+                      switcher(Account.ISMOBILE, 'Mobile'),
+                      switcher(Account.VIP, 'VIP'),
+                      dropDown(Account.STATUS, 'Status', AccountStatus.values.map((v) => v.name).toList()),
+                      dropDown(Account.COMUNICATIONPREFERENCES, 'Prefs',
+                          AccountComunicationPreferences.values.map((v) => v.name).toList()),
                     ],
                   ),
                   const SizedBox(height: 20),
@@ -133,61 +170,61 @@ class _AccountViewState extends State<AccountView> {
   //   }
   // }
 
-  // TextFormField text(String labelText, {bool readOnly = false}) => TextFormField(
-  //     controller: controllers[field.name],
-  //     decoration: InputDecoration(
-  //       labelText: config.viewFieldTitleName(field.name),
-  //     ),
-  //     readOnly: field.isAutoSet(),
-  //     style: field.isAutoSet() ? const TextStyle(color: Colors.deepPurpleAccent) : null);
+  TextFormField text(QueryField field, String labelText, {bool readOnly = false}) => TextFormField(
+      controller: controllers[field],
+      decoration: InputDecoration(
+        labelText: labelText,
+      ),
+      readOnly: readOnly,
+      style: readOnly ? readOnlyStyle : null);
 
-  // DropdownButtonFormField dropDown(ModelField field) => DropdownButtonFormField<String?>(
-  //     decoration: InputDecoration(
-  //       labelText: config.viewFieldTitleName(field.name),
-  //     ),
-  //     value: enumStates[field.name],
-  //     hint: const Text('Select an option'),
-  //     onChanged: (String? enumValue) {
-  //       setState(() {
-  //         enumStates[field.name] = enumValue!;
-  //       });
-  //     },
-  //     validator: (String? enumValue) {
-  //       if (enumValue == null) {
-  //         return 'Please select a value';
-  //       }
-  //       return null;
-  //     },
-  //     items: config.enumValues(field.name).map<DropdownMenuItem<String>>((String value) {
-  //       return DropdownMenuItem<String>(
-  //         value: value,
-  //         child: Text(value),
-  //       );
-  //     }).toList());
+  DropdownButtonFormField dropDown(QueryField field, String labelText, List<String> enumValues) => DropdownButtonFormField<String?>(
+      decoration: InputDecoration(
+        labelText: labelText,
+      ),
+      value: enumStates[field],
+      hint: const Text('Select an option'),
+      onChanged: (String? enumValue) {
+        setState(() {
+          enumStates[field] = enumValue!;
+        });
+      },
+      validator: (String? enumValue) {
+        if (enumValue == null) {
+          return 'Please select a value';
+        }
+        return null;
+      },
+      items: enumValues.map<DropdownMenuItem<String>>((String value) {
+        return DropdownMenuItem<String>(
+          value: value,
+          child: Text(value),
+        );
+      }).toList());
 
-  // FormField switcher(ModelField field) {
-  //   return FormField(
-  //       key: null,
-  //       initialValue: false,
-  //       builder: (FormFieldState<dynamic> fieldState) {
-  //         return InputDecorator(
-  //             decoration: InputDecoration(
-  //               labelText: config.viewFieldTitleName(field.name),
-  //             ),
-  //             textAlign: TextAlign.left,
-  //             child: Align(
-  //                 alignment: Alignment.centerLeft,
-  //                 child: Transform.scale(
-  //                     scale: 0.8,
-  //                     child: Switch(
-  //                       // This bool value toggles the switch.
-  //                       value: booleanStates[field.name]!,
-  //                       onChanged: (bool b) {
-  //                         setState(() {
-  //                           booleanStates[field.name] = b;
-  //                         });
-  //                       },
-  //                     ))));
-  //       });
-  // }
+  FormField switcher(QueryField field, String labelText) {
+    return FormField(
+        key: null,
+        initialValue: false,
+        builder: (FormFieldState<dynamic> fieldState) {
+          return InputDecorator(
+              decoration: InputDecoration(
+                labelText: labelText,
+              ),
+              textAlign: TextAlign.left,
+              child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Transform.scale(
+                      scale: 0.8,
+                      child: Switch(
+                        // This bool value toggles the switch.
+                        value: booleanStates[field]!,
+                        onChanged: (bool b) {
+                          setState(() {
+                            booleanStates[field] = b;
+                          });
+                        },
+                      ))));
+        });
+  }
 }

@@ -6,6 +6,8 @@ import 'package:aws_common/vm.dart';
 import 'package:file_picker/file_picker.dart';
 
 class UploadFile {
+  static const validFilePrefixes = ['account'];
+
   Future<void> uploadDataImportFile() async {
     FilePickerResult? result = await FilePicker.platform.pickFiles();
 
