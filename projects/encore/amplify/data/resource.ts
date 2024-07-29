@@ -1,13 +1,14 @@
 import { type ClientSchema, a, defineData } from "@aws-amplify/backend";
 import { addUserToGroup } from "./add-user-to-group/resource"
+import { generateClient } from "aws-amplify/api";
 
 const schema = a.schema({
 
   // Models
   Account: a
     .model({
-      number: a.string().required(),
-      firstName: a.string().required(),
+      number: a.integer().required(),
+      firstName: a.string(),
       lastName: a.string(),
       email: a.string(),
       phoneNumber: a.string(),
@@ -19,6 +20,8 @@ const schema = a.schema({
       balance: a.float(),
       comunicationPreferences: a.enum(["sms", "email", "none", "all"]),
       status: a.enum(["active", "inactive", "suspended"]),
+      vip: a.enum(["vip", "none"]),
+      comment: a.string(),
       metadata: a.json(),
     })
     .secondaryIndexes((index) => [index("number")]),
@@ -33,8 +36,6 @@ const schema = a.schema({
     .authorization((allow) => [allow.groups(["Admin"])])
     .handler(a.handler.function(addUserToGroup))
     .returns(a.json()),
-
-
 })
 
 

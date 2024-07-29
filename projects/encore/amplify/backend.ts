@@ -2,7 +2,8 @@ import { defineBackend } from '@aws-amplify/backend';
 import { auth } from './auth/resource';
 import { data } from './data/resource';
 import { storage } from './storage/resource';
-import { createAdminUser } from './custom-resources/cognito/resourse';
+import { accountImport } from './function/resource';
+import { Stack } from 'aws-cdk-lib/core';
 
 /**
  * @see https://docs.amplify.aws/react/build-a-backend/ to add storage, functions, and more
@@ -13,7 +14,7 @@ const backend = defineBackend({
   storage
 });
 
-const customeStack = backend.createStack("custome-stack");
+const bucketStack = Stack.of(backend.storage.resources.bucket);
 
 // extract L1 CfnUserPool resources
 const { cfnUserPool } = backend.auth.resources.cfnResources;
@@ -29,6 +30,9 @@ cfnUserPool.policies = {
   },
 };
 
-const { userPool } = backend.auth.resources
+const bucket = backend.storage.resources.bucket
+const { tables } = backend.data.resources
 
-const adminUser = createAdminUser(customeStack, 'andrew.p.clark@protonmail.com', userPool, 'SuperUser');
+const accountImportFunction = accountImport(tables['Account'], bucket);
+
+
