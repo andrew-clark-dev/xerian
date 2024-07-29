@@ -44,9 +44,23 @@ class _LoginState extends State<Login> {
               // A prebuilt Confirm Reset Password form from amplify_authenticator
               body: const ConfirmResetPasswordForm(),
             );
+          case AuthenticatorStep.confirmSignInNewPassword:
+            return CustomScaffold(
+              state: state,
+              // A prebuilt Confirm Reset Password form from amplify_authenticator
+              body: ConfirmSignInNewPasswordForm(),
+            );
           default:
             // Returning not supported for all other actions
-            return const Text('Not Supported');
+            return CustomScaffold(
+              state: state,
+              // A prebuilt Sign In form from amplify_authenticator
+              body: SignInForm(),
+              footer: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [Text('Access Denied for State ${state.currentStep} !')],
+              ),
+            );
         }
       },
       child: MaterialApp(builder: Authenticator.builder(), home: const Home()),
