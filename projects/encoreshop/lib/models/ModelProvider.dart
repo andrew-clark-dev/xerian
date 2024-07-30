@@ -29,7 +29,7 @@ export 'AccountVip.dart';
 
 class ModelProvider implements amplify_core.ModelProviderInterface {
   @override
-  String version = "ad007c45e688826f4b962f490fd798f9";
+  String version = "90a2e818bfc102f928691a5af74c8f33";
   @override
   List<amplify_core.ModelSchema> modelSchemas = [Account.schema];
   @override

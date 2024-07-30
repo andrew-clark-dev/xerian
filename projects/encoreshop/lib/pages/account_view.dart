@@ -1,6 +1,5 @@
 import 'package:amplify_api/amplify_api.dart';
 import 'package:amplify_flutter/amplify_flutter.dart';
-import 'package:encoreshop/models/Account.dart';
 import 'package:encoreshop/models/ModelProvider.dart';
 import 'package:encoreshop/pages/pages.dart';
 import 'package:flutter/material.dart';
@@ -66,7 +65,7 @@ class _AccountViewState extends State<AccountView> {
       controllers[Account.FIRSTNAME]!.text = account!.firstName ?? "";
       controllers[Account.LASTNAME]!.text = account!.lastName ?? "";
       controllers[Account.ADDRESS]!.text = account!.address ?? "";
-      controllers[Account.BALANCE]!.text = account!.balance!.toStringAsFixed(2);
+      controllers[Account.BALANCE]!.text = account!.balance.toStringAsFixed(2);
       controllers[Account.CITY]!.text = account!.city ?? "";
       controllers[Account.COMMENT]!.text = account!.comment ?? "";
       controllers[Account.EMAIL]!.text = account!.email ?? "";

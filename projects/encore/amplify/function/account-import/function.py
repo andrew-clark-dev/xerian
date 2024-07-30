@@ -50,11 +50,12 @@ def handler(event, context):
                 # You can replace this with your actual row processing logic
                 process_row(row)
 
-                if index > 10:
-                    return {
-                        "statusCode": 200,
-                        "body": "10 lines processed successfully!",
-                    }
+                # Uncomment to test for small ammont
+                # if index > 10:
+                #     return {
+                #         "statusCode": 200,
+                #         "body": "10 lines processed successfully!",
+                #     }
 
             # Return success message
             return {"statusCode": 200, "body": "File processed successfully!"}

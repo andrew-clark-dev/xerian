@@ -17,7 +17,7 @@ const schema = a.schema({
       city: a.string(),
       state: a.string(),
       postcode: a.string(),
-      balance: a.float(),
+      balance: a.float().required(),
       comunicationPreferences: a.enum(["sms", "email", "none", "all"]),
       status: a.enum(["active", "inactive", "suspended"]),
       vip: a.enum(["vip", "none"]),

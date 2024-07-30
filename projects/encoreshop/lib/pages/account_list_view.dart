@@ -65,7 +65,7 @@ class AccountListViewState extends State<AccountListView> {
           cell(account.lastName),
           cell(account.phoneNumber),
           cell(account.email),
-          cell(account.balance!.toStringAsFixed(2)),
+          cell(account.balance.toStringAsFixed(2)),
         ],
       ),
       onTap: () => context.push(AccountView.path, extra: account),

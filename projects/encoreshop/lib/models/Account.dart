@@ -108,8 +108,17 @@ class Account extends amplify_core.Model {
     return _postcode;
   }
   
-  double? get balance {
-    return _balance;
+  double get balance {
+    try {
+      return _balance!;
+    } catch(e) {
+      throw amplify_core.AmplifyCodeGenModelException(
+          amplify_core.AmplifyExceptionMessages.codeGenRequiredFieldForceCastExceptionMessage,
+          recoverySuggestion:
+            amplify_core.AmplifyExceptionMessages.codeGenRequiredFieldForceCastRecoverySuggestion,
+          underlyingException: e.toString()
+          );
+    }
   }
   
   AccountComunicationPreferences? get comunicationPreferences {
@@ -140,9 +149,9 @@ class Account extends amplify_core.Model {
     return _updatedAt;
   }
   
-  const Account._internal({required this.id, required number, firstName, lastName, email, phoneNumber, isMobile, address, city, state, postcode, balance, comunicationPreferences, status, vip, comment, metadata, createdAt, updatedAt}): _number = number, _firstName = firstName, _lastName = lastName, _email = email, _phoneNumber = phoneNumber, _isMobile = isMobile, _address = address, _city = city, _state = state, _postcode = postcode, _balance = balance, _comunicationPreferences = comunicationPreferences, _status = status, _vip = vip, _comment = comment, _metadata = metadata, _createdAt = createdAt, _updatedAt = updatedAt;
+  const Account._internal({required this.id, required number, firstName, lastName, email, phoneNumber, isMobile, address, city, state, postcode, required balance, comunicationPreferences, status, vip, comment, metadata, createdAt, updatedAt}): _number = number, _firstName = firstName, _lastName = lastName, _email = email, _phoneNumber = phoneNumber, _isMobile = isMobile, _address = address, _city = city, _state = state, _postcode = postcode, _balance = balance, _comunicationPreferences = comunicationPreferences, _status = status, _vip = vip, _comment = comment, _metadata = metadata, _createdAt = createdAt, _updatedAt = updatedAt;
   
-  factory Account({String? id, required int number, String? firstName, String? lastName, String? email, String? phoneNumber, bool? isMobile, String? address, String? city, String? state, String? postcode, double? balance, AccountComunicationPreferences? comunicationPreferences, AccountStatus? status, AccountVip? vip, String? comment, String? metadata}) {
+  factory Account({String? id, required int number, String? firstName, String? lastName, String? email, String? phoneNumber, bool? isMobile, String? address, String? city, String? state, String? postcode, required double balance, AccountComunicationPreferences? comunicationPreferences, AccountStatus? status, AccountVip? vip, String? comment, String? metadata}) {
     return Account._internal(
       id: id == null ? amplify_core.UUID.getUUID() : id,
       number: number,
@@ -199,24 +208,24 @@ class Account extends amplify_core.Model {
     
     buffer.write("Account {");
     buffer.write("id=" + "$id" + ", ");
-    buffer.write("number=" + (_number != null ? _number!.toString() : "null") + ", ");
+    buffer.write("number=" + (_number != null ? _number.toString() : "null") + ", ");
     buffer.write("firstName=" + "$_firstName" + ", ");
     buffer.write("lastName=" + "$_lastName" + ", ");
     buffer.write("email=" + "$_email" + ", ");
     buffer.write("phoneNumber=" + "$_phoneNumber" + ", ");
-    buffer.write("isMobile=" + (_isMobile != null ? _isMobile!.toString() : "null") + ", ");
+    buffer.write("isMobile=" + (_isMobile != null ? _isMobile.toString() : "null") + ", ");
     buffer.write("address=" + "$_address" + ", ");
     buffer.write("city=" + "$_city" + ", ");
     buffer.write("state=" + "$_state" + ", ");
     buffer.write("postcode=" + "$_postcode" + ", ");
-    buffer.write("balance=" + (_balance != null ? _balance!.toString() : "null") + ", ");
+    buffer.write("balance=" + (_balance != null ? _balance.toString() : "null") + ", ");
     buffer.write("comunicationPreferences=" + (_comunicationPreferences != null ? amplify_core.enumToString(_comunicationPreferences)! : "null") + ", ");
     buffer.write("status=" + (_status != null ? amplify_core.enumToString(_status)! : "null") + ", ");
     buffer.write("vip=" + (_vip != null ? amplify_core.enumToString(_vip)! : "null") + ", ");
     buffer.write("comment=" + "$_comment" + ", ");
     buffer.write("metadata=" + "$_metadata" + ", ");
-    buffer.write("createdAt=" + (_createdAt != null ? _createdAt!.format() : "null") + ", ");
-    buffer.write("updatedAt=" + (_updatedAt != null ? _updatedAt!.format() : "null"));
+    buffer.write("createdAt=" + (_createdAt != null ? _createdAt.format() : "null") + ", ");
+    buffer.write("updatedAt=" + (_updatedAt != null ? _updatedAt.format() : "null"));
     buffer.write("}");
     
     return buffer.toString();
@@ -254,7 +263,7 @@ class Account extends amplify_core.Model {
     ModelFieldValue<String?>? city,
     ModelFieldValue<String?>? state,
     ModelFieldValue<String?>? postcode,
-    ModelFieldValue<double?>? balance,
+    ModelFieldValue<double>? balance,
     ModelFieldValue<AccountComunicationPreferences?>? comunicationPreferences,
     ModelFieldValue<AccountStatus?>? status,
     ModelFieldValue<AccountVip?>? vip,
@@ -430,7 +439,7 @@ class Account extends amplify_core.Model {
     
     modelSchemaDefinition.addField(amplify_core.ModelFieldDefinition.field(
       key: Account.BALANCE,
-      isRequired: false,
+      isRequired: true,
       ofType: amplify_core.ModelFieldType(amplify_core.ModelFieldTypeEnum.double)
     ));
     
