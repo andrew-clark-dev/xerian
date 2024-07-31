@@ -20,11 +20,74 @@ const schema = a.schema({
       balance: a.float().required(),
       comunicationPreferences: a.enum(["sms", "email", "none", "all"]),
       status: a.enum(["active", "inactive", "suspended"]),
-      vip: a.enum(["vip", "none"]),
+      category: a.enum(["vip", "vender", "standard", "employee"]),
       comment: a.string(),
+      items: a.hasMany("Item", "accountId"), // setup relationships between types
       metadata: a.json(),
+      active: a.boolean().default(true),
     })
     .secondaryIndexes((index) => [index("number")]),
+
+  Item: a
+    .model({
+      sku: a.integer().required(),
+      title: a.string(),
+      accountId: a.id(),
+      account: a.belongsTo("Account", "accountId"),
+      accountNumber: a.integer(),
+      category: a.string().required(),
+      brand: a.string(),
+      color: a.string(),
+      size: a.string(),
+      description: a.string(),
+      details: a.string(),
+      images: a.url().array(), // fields can be arrays,
+      condition: a.enum(['asnew', 'good', 'marked', 'damaged', 'unknown']),
+      quantity: a.integer().required(),
+      split: a.integer().required(),
+      price: a.float().required(),
+      status: a.enum(['tagged', 'hung_out', 'sold', 'to_donate', 'donated', 'parked', 'returned']),
+      printedAt: a.datetime(),
+      metadata: a.json(),
+      active: a.boolean().default(true),
+    })
+    .secondaryIndexes((index) => [index("sku"), index("accountId")]),
+
+  Category: a
+    .model({
+      name: a.string().required(),
+      alt: a.string().array(),
+      metadata: a.json(),
+      active: a.boolean().default(true),
+    })
+    .identifier(['name']),
+
+  Brand: a
+    .model({
+      name: a.string().required(),
+      alt: a.string().array(),
+      metadata: a.json(),
+      active: a.boolean().default(true),
+    })
+    .identifier(['name']),
+
+  Color: a
+    .model({
+      name: a.string().required(),
+      alt: a.string().array(),
+      metadata: a.json(),
+      active: a.boolean().default(true),
+    })
+    .identifier(['name']),
+
+  Size: a
+    .model({
+      name: a.string().required(),
+      alt: a.string().array(),
+      metadata: a.json(),
+      active: a.boolean().default(true),
+    })
+    .identifier(['name']),
 
   // Functions
   addUserToGroup: a

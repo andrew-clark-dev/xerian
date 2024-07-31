@@ -1,5 +1,6 @@
 import urllib
 import boto3
+from boto3.dynamodb.conditions import Key
 import pandas as pd
 import numpy as np
 import io
@@ -18,9 +19,16 @@ logger.info("Running account-import function")
 
 # Initialize boto3 client
 s3_client = boto3.client("s3")
-dynamodb = boto3.client("dynamodb")
-table_name = os.environ.get("ACCOUNT_TABLE_NAME")
+dynamodb = boto3.client('dynamodb')
+dynamodb_res = boto3.resource('dynamodb')
 
+table_name = os.environ.get("ITEM_TABLE_NAME")
+table = dynamodb_res.Table(table_name)
+logger.info(f"Item Table - {table_name}")
+account_table_name = os.environ.get("ACCOUNT_TABLE_NAME")
+account_table = dynamodb_res.Table(account_table_name)
+logger.info(f"Account Table - {account_table_name}")
+logger.info("Running account-import function")
 
 def handler(event, context):
     # Define S3 bucket and file key
@@ -76,50 +84,70 @@ def process_row(row):
     # Mapping row to account object
 
     createdAt = datetime.strptime(row["Created"], "%Y-%m-%d %H:%M:%S")
+
+    status = "tagged"
+    if row["Parked"]:
+        status = "parked"
+    if row["Sold"]:
+        status = "sold"
+    
     item_data = {
-        "__typename": {"S": "Account"},
+        "__typename": {"S": "Item"},
         "id": {"S": str(uuid.uuid4())},
-        "number": {"N": str(row["Number"])},
-        "balance": {"N": str(row["Balance"]).replace(",", "")},
-        "comunicationPreferences": {"S": "none"},
-        "status": {"S": "active"},
-        "category": {"S": "standard"},
+        "sku": {"N": str(row["SKU"])},
+        "title": {"S": str(row["Title"])},
+        "condition": {"S": "unknown"},
+        "split": {"S": str(row["Split"]).replace("%", "")},  # Strp off %
+        "price": {"N": str(row["Tag Price"]).replace(",", "")},
+        "status": {"S": status},
         "metadata": {"S": row.to_json()},
+        "active": {"BOOL": row["Active"]},
         "createdAt": {"S": createdAt.isoformat() + "Z"},
         "updatedAt": {"S": datetime.utcnow().isoformat() + "Z"},
     }
 
-    if row["First Name"] is not None:
-        item_data["firstName"] = {"S": row["First Name"]}
-    if row["Last Name"] is not None:
-        item_data["lastName"] = {"S": row["Last Name"]}
-    if row["Phone"] is not None:
-        item_data["phoneNumber"] = {"S": row["Phone"]}
-    if row["City"] is not None:
-        item_data["city"] = {"S": row["City"]}
-    if row["State"] is not None:
-        item_data["state"] = {"S": row["State"]}
-    if row["Zip"] is not None:
-        item_data["postcode"] = {"S": row["Zip"]}
-
-    # Ugly but it works to get the address
-    address = None
-    if row["Address Line 1"] is not None:
-        address = row["Address Line 1"]
-        if row["Address Line 2"] is not None:
-            address = address + "\n" + row["Address Line 2"]
+    if row["Category"] is not None:
+        item_data["category"] = {"S": row["Category"]}
+    if row["Brand"] is not None:
+        item_data["brand"] = {"S": row["Brand"]}
+    if row["Color"] is not None:
+        item_data["color"] = {"S": row["Color"]}
+    if row["Size"] is not None:
+        item_data["size"] = {"S": row["Size"]}
+    if row["Description"] is not None:
+        item_data["description"] = {"S": row["Description"]}
+    if row["Details"] is not None:
+        item_data["details"] = {"S": row["Details"]}
+    if row["Printed"] is not None:
+        printedAt = datetime.strptime(row["Printed"], "%Y-%m-%d %H:%M:%S")
+        item_data["printedAt"] = {"S": printedAt.isoformat() + "Z"}
+    if row["Quantity"] is not None:
+        item_data["quantity"] = {"N": str(row["Quantity"])}
     else:
-        if row["Address Line 2"] is not None:
-            address = row["Address Line 2"]
-    if address is not None:
-        item_data["address"] = {"S": address}
+        item_data["quantity"] = {"N": "0"}
+        
+    # Now let us connect the Account, first query on the secondary index we have created for number
+    accountResponse = account_table.query(
+        IndexName='accountsByNumber',
+        KeyConditionExpression=Key('number').eq(row["Account"])
+    )
+    logger.info(f"accountResponse : {accountResponse}")
+
+
+
+    items = accountResponse.get('Items')
+    account = items[0] if len(items) > 0 else None
+
+    if account is not None:
+        logger.info(f"Bind to Account : {account["number"]}, id : {account["id"]}")
+        item_data["accountId"] =  {"S": account["id"]}
+        item_data["accountNumber"] =  {"S": str(account["number"])}
+
+    logger.info(f"Item data: {item_data}")
 
     # Perform upsert operation
     response = dynamodb.put_item(
         TableName=table_name,
-        Item=item_data,
-        ConditionExpression="attribute_not_exists(#number)",  # Only insert if the number key doesn't exist
-        ExpressionAttributeNames={"#number": "number"},
-    )
+        Item=item_data)
 
     logger.info(f"Respnse : {response}")

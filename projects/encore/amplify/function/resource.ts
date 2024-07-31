@@ -9,14 +9,15 @@ import { S3EventSourceV2, S3EventSourceProps } from 'aws-cdk-lib/aws-lambda-even
 export function backendFunction(
     stack: Stack,
     functionName: string,
-    timeout: Duration = Duration.seconds(60), // Default one minute 
-    memorySize: number = 1024,
     environment: { [key: string]: string; },
-    tables: ITable[] = [],
-    buckets: IBucket[] = [],
+    tables?: ITable[],
+    buckets?: IBucket[],
     eventSource?: IEventSource,
+    timeout: Duration = Duration.seconds(300), // Default 5 minutes 
+    memorySize: number = 1024,
 ): Function {
     console.log(`Creating function - ${functionName}`);
+    console.log(`With env - ${environment}`);
 
     const lambdaFunction = new Function(
         stack,
@@ -34,7 +35,7 @@ export function backendFunction(
             environment: environment
         })
 
-    tables.forEach((table) => {
+    tables?.forEach((table) => {
         table.grantFullAccess(lambdaFunction)
     })
 
@@ -54,7 +55,8 @@ export function backendFunction(
 export function s3EventFunction(
     stack: Stack,
     functionName: string,
-    table: ITable,
+    environment: { [key: string]: string; } = {},
+    tables: ITable[],
     bucket: IBucket,
     filter: NotificationKeyFilter,
     timeout: Duration = Duration.seconds(60), // Default one minute 
@@ -63,17 +65,26 @@ export function s3EventFunction(
     console.log(`Creating S3 event function - ${functionName}`);
     const props: S3EventSourceProps = { events: [EventType.OBJECT_CREATED], filters: [filter] };
     const eventSource = new S3EventSourceV2(bucket, props);
-    const env: { [key: string]: string } = {
-        TARGET_TABLE: table.tableName,
-        SOURCE_BUCKET: bucket.bucketName,
-        FUNCTION_NAME: functionName,
-    }
-    return backendFunction(stack, functionName, timeout, memorySize, env, [table], [bucket], eventSource);
+    return backendFunction(stack, functionName, environment, tables, [bucket], eventSource, timeout, memorySize,);
 }
 
-export function accountImport(table: ITable, bucket: IBucket): Function {
+export function accountImport(environment: { [key: string]: string; }, table: ITable, bucket: IBucket): Function {
     console.log(`Creating Account Import function`);
     const bucketStack = Stack.of(bucket);
     const filter: NotificationKeyFilter = { prefix: 'uploads/import/Account', suffix: 'csv' };
-    return s3EventFunction(bucketStack, 'account-import', table, bucket, filter, Duration.seconds(300));
+    return s3EventFunction(bucketStack, 'account-import', environment, [table], bucket, filter, Duration.seconds(300));
+}
+
+export function itemImport(environment: { [key: string]: string; }, tables: ITable[], bucket: IBucket): Function {
+    console.log(`Creating Item Import function`);
+    const bucketStack = Stack.of(bucket);
+    const filter: NotificationKeyFilter = { prefix: 'uploads/import/Item', suffix: 'csv' };
+    return s3EventFunction(bucketStack, 'item-import', environment, tables, bucket, filter, Duration.seconds(300));
+}
+
+
+export function truncateTable(tables: ITable[]): Function {
+    console.log(`Creating Account Import function`);
+    const tableStack = Stack.of(tables[0]);
+    return backendFunction(tableStack, 'truncate-table', {}, tables, []);
 }
