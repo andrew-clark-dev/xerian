@@ -1,6 +1,7 @@
 import 'package:amplify_core/amplify_core.dart';
 import 'package:encore_core/extentions.dart';
 import 'package:encoreshop/models/Account.dart';
+import 'package:encoreshop/models/Brand.dart';
 import 'package:encoreshop/models/Item.dart';
 import 'package:encoreshop/pages/user_settings.dart';
 import 'package:encoreshop/pages/signup.dart';
@@ -9,6 +10,8 @@ import 'package:go_router/go_router.dart';
 
 import 'pages/account_list_view.dart';
 import 'pages/account_view.dart';
+import 'pages/brand_list_view.dart';
+import 'pages/brand_view.dart';
 import 'pages/home.dart';
 import 'pages/item_list_view.dart';
 import 'pages/item_view.dart';
@@ -54,6 +57,14 @@ final router = GoRouter(
     GoRoute(
       path: ItemView.path,
       builder: (context, state) => ItemView(item: cast<Item>(state.extra)),
+    ),
+    GoRoute(
+      path: BrandListView.path,
+      builder: (context, state) => const BrandListView(),
+    ),
+    GoRoute(
+      path: BrandView.path,
+      builder: (context, state) => BrandView(brand: cast<Brand>(state.extra)),
     )
   ],
   redirect: (BuildContext context, GoRouterState state) async {

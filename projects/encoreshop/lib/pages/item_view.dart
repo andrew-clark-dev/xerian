@@ -1,9 +1,8 @@
-import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:encoreshop/models/ModelProvider.dart';
 import 'package:encoreshop/pages/pages.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
-import 'package:form_validation/form_validation.dart';
+
+import 'page_view_state.dart';
 
 const readOnlyStyle = TextStyle(color: Colors.deepPurpleAccent);
 
@@ -18,23 +17,8 @@ class ItemView extends StatefulWidget {
   State<ItemView> createState() => _ItemViewState();
 }
 
-class _ItemViewState extends State<ItemView> {
-  final _formKey = GlobalKey<FormState>();
-  final DateFormat dateFormatter = DateFormat('yyyy-MM-dd HH:mm:ss');
-
-  late final controllers = <QueryField, TextEditingController>{};
-  late final booleanStates = <QueryField, bool>{};
-  late final enumStates = <QueryField, String>{};
-
+class _ItemViewState extends PageViewState<ItemView> {
   late final Item? item;
-  late final bool update;
-
-  final NumberFormat formatter = NumberFormat("00000000");
-//  final CounterService counter = CounterService(Item.classType);
-
-  final emailValidator = Validator(validators: [const EmailValidator()]);
-  final phoneValidator = Validator(validators: [const PhoneNumberValidator()]);
-  final requiredValidator = Validator(validators: [const RequiredValidator()]);
 
   @override
   void initState() {
@@ -55,8 +39,8 @@ class _ItemViewState extends State<ItemView> {
     controllers[Item.DETAILS] = TextEditingController();
     controllers[Item.QUANTITY] = TextEditingController();
     booleanStates[Item.ACTIVE] = true;
-    enumStates[Item.STATUS] = ItemStatus.tagged.name;
-    enumStates[Item.CONDITION] = ItemCondition.unknown.name;
+    enumStates[Item.STATUS] = ItemStatus.TAGGED.name;
+    enumStates[Item.CONDITION] = ItemCondition.UNKNOWN.name;
 
     if (update) {
       controllers[Item.SKU]!.text = formatter.format(item!.sku);
@@ -104,7 +88,7 @@ class _ItemViewState extends State<ItemView> {
             padding: const EdgeInsets.all(25),
             child: SingleChildScrollView(
               child: Form(
-                key: _formKey,
+                key: formKey,
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   Column(
                     children: [
@@ -127,7 +111,7 @@ class _ItemViewState extends State<ItemView> {
                   const SizedBox(height: 20),
                   ElevatedButton(
                     onPressed: () {
-                      if (_formKey.currentState?.validate() ?? false) {
+                      if (formKey.currentState?.validate() ?? false) {
                         // Form is valid, process the data
                         submitForm(ScaffoldMessenger.of(context));
                       }
@@ -141,80 +125,5 @@ class _ItemViewState extends State<ItemView> {
         ),
       ),
     );
-  }
-
-  // FormField formField(ModelField field) {
-  //   switch (field.fieldType()) {
-  //     case ModelFieldTypeEnum.bool:
-  //       return switcher(field);
-  //     case ModelFieldTypeEnum.enumeration:
-  //       return dropDown(field);
-  //     default:
-  //       return text(field);
-  //   }
-  // }
-
-  TextFormField text(QueryField field, String labelText, {bool readOnly = false}) => TextFormField(
-      controller: controllers[field],
-      decoration: InputDecoration(
-        labelText: labelText,
-      ),
-      readOnly: readOnly,
-      style: readOnly ? readOnlyStyle : null);
-
-  DropdownButtonFormField dropDown(QueryField field, String labelText, List<dynamic> enumValues) =>
-      DropdownButtonFormField<String?>(
-          decoration: InputDecoration(
-            labelText: labelText,
-          ),
-          value: enumStates[field],
-          hint: const Text('Select an option'),
-          onChanged: (String? enumValue) {
-            setState(() {
-              enumStates[field] = enumValue!;
-            });
-          },
-          validator: (String? enumValue) {
-            if (enumValue == null) {
-              return 'Please select a value';
-            }
-            return null;
-          },
-          items: menuItems(enumValues));
-
-  List<DropdownMenuItem<String>> menuItems(List<dynamic> enumValues) {
-    final List<String> list = enumValues.map((v) => (v as Enum).name).toList();
-    return list.map<DropdownMenuItem<String>>((String value) {
-      return DropdownMenuItem<String>(
-        value: value,
-        child: Text(value),
-      );
-    }).toList();
-  }
-
-  FormField switcher(QueryField field, String labelText) {
-    return FormField(
-        key: null,
-        initialValue: false,
-        builder: (FormFieldState<dynamic> fieldState) {
-          return InputDecorator(
-              decoration: InputDecoration(
-                labelText: labelText,
-              ),
-              textAlign: TextAlign.left,
-              child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: Transform.scale(
-                      scale: 0.8,
-                      child: Switch(
-                        // This bool value toggles the switch.
-                        value: booleanStates[field]!,
-                        onChanged: (bool b) {
-                          setState(() {
-                            booleanStates[field] = b;
-                          });
-                        },
-                      ))));
-        });
   }
 }

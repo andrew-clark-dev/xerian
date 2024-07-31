@@ -1,14 +1,13 @@
 import 'package:amplify_core/amplify_core.dart';
 import 'package:encoreshop/models/Item.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 
 import '../services/api.dart';
 
 import 'package:go_router/go_router.dart';
 
 import 'item_view.dart';
-import 'pages.dart';
+import 'page_list_view._state.dart';
 
 const limit = 20;
 
@@ -22,41 +21,16 @@ class ItemListView extends StatefulWidget {
   ItemListViewState createState() => ItemListViewState();
 }
 
-class ItemListViewState extends State<ItemListView> {
-  final NumberFormat formatter = NumberFormat("00000000");
-
-  late final Api<Item> _api;
-
+class ItemListViewState extends PageListViewState<ItemListView> {
   @override
   void initState() {
+    api = Api(Item.classType);
     super.initState();
-    _api = Api(Item.classType);
-    fetchMore();
   }
 
-  List<Item?> items = [];
-  PaginatedResult<Item>? page;
-  bool loading = true;
-
-  final ScrollController controller = ScrollController();
-
-  Future<void> fetchMore() async {
-    loading = true;
-    try {
-      page = (await _api.fetch(page))!;
-      setState(() {
-        items += page!.items;
-      });
-    } on ApiException catch (e) {
-      safePrint('Query failed: $e');
-    } finally {
-      loading = false;
-    }
-  }
-
-  Expanded cell(dynamic value) => Expanded(child: Text(value ?? "", textAlign: TextAlign.left));
-
-  ListTile _tile(Item item) {
+  @override
+  ListTile tile(Model model) {
+    Item item = model as Item;
     return ListTile(
       title: Row(
         children: [
@@ -70,78 +44,11 @@ class ItemListViewState extends State<ItemListView> {
     );
   }
 
-  ListTile _titleTile(List<String> titles) {
+  @override
+  ListTile titleTile() {
+    final titles = ['SKU', 'Account', 'Title', 'Price'];
     return ListTile(
       title: Row(children: titles.map((t) => cell(t)).toList()),
-    );
-  }
-
-  NotificationListener listener() {
-    return NotificationListener<ScrollNotification>(
-      onNotification: (notification) {
-        if (notification is ScrollEndNotification &&
-            controller.position.pixels >= controller.position.maxScrollExtent - 200 &&
-            !loading) {
-          // we need to call fetchmore logic here
-          if (page!.hasNextResult && !loading) {
-            // call here fetchMore
-            fetchMore();
-          }
-        }
-        return true;
-      },
-      child: ListView.builder(
-          // attach the scroll controller to this List
-          controller: controller,
-          // we can pragmatically increase posts length by 1 to show a spinner for loading more
-          itemCount: items.length + ((page?.hasNextResult ?? false) ? 1 : 0),
-          itemBuilder: (context, index) {
-            if (index < items.length) {
-              // you can have here your custom widgets for displaying posts or what
-              return _tile(items[index]!);
-            } else {
-              return loading
-                  ? const Center(
-                      child: CircularProgressIndicator(),
-                    )
-                  : const SizedBox.shrink();
-            }
-          }),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-        floatingActionButton: FloatingActionButton(
-          // Navigate to the page to create new items
-          onPressed: () => context.push(ItemView.path),
-          child: const Icon(Icons.add),
-        ),
-        appBar: PageBar(Item.schema.pluralName!),
-        drawer: const PageDrawer(), // Add the drawer here
-        body: Padding(
-            padding: const EdgeInsets.all(25),
-            child: Column(children: [
-              _titleTile(['SKU', 'Account', 'Title', 'Price']),
-              const Divider(),
-              Expanded(child: listener())
-            ])));
-  }
-}
-
-class ItemListTile extends ListTile {
-  final Model model;
-  final Row row;
-  final String path;
-
-  const ItemListTile(this.model, this.row, this.path, {super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return ListTile(
-      title: row,
-      onTap: () => context.push(path, extra: model),
     );
   }
 }

@@ -54,13 +54,29 @@ const env: { [key: string]: string } = {
 console.log(`Env - ${env}`);
 
 const accountImportFunction = accountImport(env, tables['Account'], bucket);
-const itemImportFunction = itemImport(env, [tables['Item'], tables['Account']], bucket);
+const itemImportFunction = itemImport(env,
+  [
+    tables['Item'],
+    tables['Account'],
+    tables['Category'],
+    tables['Brand'],
+    tables['Color'],
+    tables['Size'],
+  ],
+  bucket);
 itemImportFunction.addToRolePolicy(
   new PolicyStatement({
     actions: ['dynamodb:Query'],
     resources: [`${tables['Account'].tableArn}/index/*`],
   }),
 );
-const truncateTableFunction = truncateTable([tables['Account'], tables['Item']])
+const truncateTableFunction = truncateTable([
+  tables['Account'],
+  tables['Item'],
+  tables['Category'],
+  tables['Brand'],
+  tables['Color'],
+  tables['Size'],
+])
 
 

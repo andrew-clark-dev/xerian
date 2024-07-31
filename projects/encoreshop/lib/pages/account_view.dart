@@ -3,8 +3,8 @@ import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:encoreshop/models/ModelProvider.dart';
 import 'package:encoreshop/pages/pages.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
-import 'package:form_validation/form_validation.dart';
+
+import 'page_view_state.dart';
 
 const readOnlyStyle = TextStyle(color: Colors.deepPurpleAccent);
 
@@ -19,23 +19,8 @@ class AccountView extends StatefulWidget {
   State<AccountView> createState() => _AccountViewState();
 }
 
-class _AccountViewState extends State<AccountView> {
-  final _formKey = GlobalKey<FormState>();
-  final DateFormat dateFormatter = DateFormat('yyyy-MM-dd HH:mm:ss');
-
-  late final controllers = <QueryField, TextEditingController>{};
-  late final booleanStates = <QueryField, bool>{};
-  late final enumStates = <QueryField, String>{};
-
+class _AccountViewState extends PageViewState<AccountView> {
   late final Account? account;
-  late final bool update;
-
-  final NumberFormat formatter = NumberFormat("00000000");
-//  final CounterService counter = CounterService(Account.classType);
-
-  final emailValidator = Validator(validators: [const EmailValidator()]);
-  final phoneValidator = Validator(validators: [const PhoneNumberValidator()]);
-  final requiredValidator = Validator(validators: [const RequiredValidator()]);
 
   @override
   void initState() {
@@ -56,9 +41,9 @@ class _AccountViewState extends State<AccountView> {
     controllers[Account.POSTCODE] = TextEditingController();
     controllers[Account.STATE] = TextEditingController();
     booleanStates[Account.ISMOBILE] = false;
-    enumStates[Account.CATEGORY] = AccountCategory.standard.name;
-    enumStates[Account.STATUS] = AccountStatus.active.name;
-    enumStates[Account.COMUNICATIONPREFERENCES] = AccountComunicationPreferences.none.name;
+    enumStates[Account.CATEGORY] = AccountCategory.STANDARD.name;
+    enumStates[Account.STATUS] = AccountStatus.ACTIVE.name;
+    enumStates[Account.COMUNICATIONPREFERENCES] = AccountComunicationPreferences.NONE.name;
 
     if (update) {
       controllers[Account.NUMBER]!.text = formatter.format(account!.number);
@@ -112,7 +97,7 @@ class _AccountViewState extends State<AccountView> {
             padding: const EdgeInsets.all(25),
             child: SingleChildScrollView(
               child: Form(
-                key: _formKey,
+                key: formKey,
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   Column(
                     children: [
@@ -141,7 +126,7 @@ class _AccountViewState extends State<AccountView> {
                   const SizedBox(height: 20),
                   ElevatedButton(
                     onPressed: () {
-                      if (_formKey.currentState?.validate() ?? false) {
+                      if (formKey.currentState?.validate() ?? false) {
                         // Form is valid, process the data
                         submitForm(ScaffoldMessenger.of(context));
                       }
@@ -155,80 +140,5 @@ class _AccountViewState extends State<AccountView> {
         ),
       ),
     );
-  }
-
-  // FormField formField(ModelField field) {
-  //   switch (field.fieldType()) {
-  //     case ModelFieldTypeEnum.bool:
-  //       return switcher(field);
-  //     case ModelFieldTypeEnum.enumeration:
-  //       return dropDown(field);
-  //     default:
-  //       return text(field);
-  //   }
-  // }
-
-  TextFormField text(QueryField field, String labelText, {bool readOnly = false}) => TextFormField(
-      controller: controllers[field],
-      decoration: InputDecoration(
-        labelText: labelText,
-      ),
-      readOnly: readOnly,
-      style: readOnly ? readOnlyStyle : null);
-
-  DropdownButtonFormField dropDown(QueryField field, String labelText, List<dynamic> enumValues) =>
-      DropdownButtonFormField<String?>(
-          decoration: InputDecoration(
-            labelText: labelText,
-          ),
-          value: enumStates[field],
-          hint: const Text('Select an option'),
-          onChanged: (String? enumValue) {
-            setState(() {
-              enumStates[field] = enumValue!;
-            });
-          },
-          validator: (String? enumValue) {
-            if (enumValue == null) {
-              return 'Please select a value';
-            }
-            return null;
-          },
-          items: menuItems(enumValues));
-
-  List<DropdownMenuItem<String>> menuItems(List<dynamic> enumValues) {
-    final List<String> list = enumValues.map((v) => v.name).toList() as List<String>;
-    return list.map<DropdownMenuItem<String>>((String value) {
-      return DropdownMenuItem<String>(
-        value: value,
-        child: Text(value),
-      );
-    }).toList();
-  }
-
-  FormField switcher(QueryField field, String labelText) {
-    return FormField(
-        key: null,
-        initialValue: false,
-        builder: (FormFieldState<dynamic> fieldState) {
-          return InputDecorator(
-              decoration: InputDecoration(
-                labelText: labelText,
-              ),
-              textAlign: TextAlign.left,
-              child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: Transform.scale(
-                      scale: 0.8,
-                      child: Switch(
-                        // This bool value toggles the switch.
-                        value: booleanStates[field]!,
-                        onChanged: (bool b) {
-                          setState(() {
-                            booleanStates[field] = b;
-                          });
-                        },
-                      ))));
-        });
   }
 }

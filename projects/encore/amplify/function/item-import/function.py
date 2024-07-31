@@ -28,7 +28,13 @@ logger.info(f"Item Table - {table_name}")
 account_table_name = os.environ.get("ACCOUNT_TABLE_NAME")
 account_table = dynamodb_res.Table(account_table_name)
 logger.info(f"Account Table - {account_table_name}")
+category_table_name = os.environ.get("CATEGORY_TABLE_NAME")
+brand_table_name = os.environ.get("BRAND_TABLE_NAME")
+color_table_name = os.environ.get("COLOR_TABLE_NAME")
+size_table_name = os.environ.get("SIZE_TABLE_NAME")
 logger.info("Running account-import function")
+
+
 
 def handler(event, context):
     # Define S3 bucket and file key
@@ -85,18 +91,18 @@ def process_row(row):
 
     createdAt = datetime.strptime(row["Created"], "%Y-%m-%d %H:%M:%S")
 
-    status = "tagged"
+    status = "TAGGED"
     if row["Parked"]:
-        status = "parked"
+        status = "PARKED"
     if row["Sold"]:
-        status = "sold"
+        status = "SOLD"
     
     item_data = {
         "__typename": {"S": "Item"},
         "id": {"S": str(uuid.uuid4())},
         "sku": {"N": str(row["SKU"])},
         "title": {"S": str(row["Title"])},
-        "condition": {"S": "unknown"},
+        "condition": {"S": "UNKNOWN"},
         "split": {"S": str(row["Split"]).replace("%", "")},  # Strp off %
         "price": {"N": str(row["Tag Price"]).replace(",", "")},
         "status": {"S": status},
@@ -108,12 +114,56 @@ def process_row(row):
 
     if row["Category"] is not None:
         item_data["category"] = {"S": row["Category"]}
+        category_data = {
+            "__typename": {"S": "Category"},
+            "name": {"S": row["Category"]},
+            "createdAt": {"S": datetime.utcnow().isoformat() + "Z"},
+            "updatedAt": {"S": datetime.utcnow().isoformat() + "Z"},
+        }
+        response = dynamodb.put_item(
+            TableName=category_table_name,
+            Item=category_data)
+        logger.info(f"Category Response : {response}")
+
     if row["Brand"] is not None:
         item_data["brand"] = {"S": row["Brand"]}
+        brand_data = {
+            "__typename": {"S": "Brand"},
+            "name": {"S": row["Brand"]},
+            "createdAt": {"S": datetime.utcnow().isoformat() + "Z"},
+            "updatedAt": {"S": datetime.utcnow().isoformat() + "Z"},
+        }
+        response = dynamodb.put_item(
+            TableName=brand_table_name,
+            Item=brand_data)
+        logger.info(f"Brand Response : {response}")
+
     if row["Color"] is not None:
         item_data["color"] = {"S": row["Color"]}
+        color_data = {
+            "__typename": {"S": "Color"},
+            "name": {"S": row["Color"]},
+            "createdAt": {"S": datetime.utcnow().isoformat() + "Z"},
+            "updatedAt": {"S": datetime.utcnow().isoformat() + "Z"},
+        }
+        response = dynamodb.put_item(
+            TableName=color_table_name,
+            Item=color_data)
+        logger.info(f"Color Response : {response}")
+
     if row["Size"] is not None:
         item_data["size"] = {"S": row["Size"]}
+        size_data = {
+            "__typename": {"S": "Size"},
+            "name": {"S": row["Size"]},
+            "createdAt": {"S": datetime.utcnow().isoformat() + "Z"},
+            "updatedAt": {"S": datetime.utcnow().isoformat() + "Z"},
+        }
+        response = dynamodb.put_item(
+            TableName=size_table_name,
+            Item=size_data)
+        logger.info(f"Size Response : {response}")
+
     if row["Description"] is not None:
         item_data["description"] = {"S": row["Description"]}
     if row["Details"] is not None:
@@ -134,7 +184,6 @@ def process_row(row):
     logger.info(f"accountResponse : {accountResponse}")
 
 
-
     items = accountResponse.get('Items')
     account = items[0] if len(items) > 0 else None
 
@@ -150,4 +199,4 @@ def process_row(row):
         TableName=table_name,
         Item=item_data)
 
-    logger.info(f"Respnse : {response}")
+    logger.info(f"Item Response : {response}")

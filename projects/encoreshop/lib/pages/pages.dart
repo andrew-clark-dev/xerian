@@ -1,9 +1,9 @@
-import 'package:amplify_core/amplify_core.dart';
 import 'package:encoreshop/pages/item_list_view.dart';
 import 'package:encoreshop/services/cognito.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import 'brand_list_view.dart';
 import 'home.dart';
 import 'account_list_view.dart';
 import 'user_settings.dart';
@@ -27,7 +27,8 @@ class PageDrawer extends StatelessWidget {
         children: <Widget>[
           _tile(context, "Home", Home.path),
           _tile(context, "Accounts", AccountListView.path),
-          _tile(context, "Items", ItemListView.path)
+          _tile(context, "Items", ItemListView.path),
+          _tile(context, "Brands", BrandListView.path)
         ],
       ),
     );
@@ -59,26 +60,5 @@ class _PageBarState extends State<PageBar> {
             ),
           ]);
         });
-  }
-}
-
-abstract class PageViewState<T extends StatefulWidget> extends State<T> {
-  late final controllers = <String, TextEditingController>{};
-
-  void initControllers(List<QueryField> fields) {
-    for (var f in fields) {
-      controllers[f.fieldName] = TextEditingController();
-    }
-  }
-
-  dynamic getValue(QueryField f) {
-    return controllers[f.fieldName]?.text;
-
-    // switch (f.fieldType.fieldType) {
-    //   case value:
-
-    //     break;
-    //   default:
-    // }
   }
 }
