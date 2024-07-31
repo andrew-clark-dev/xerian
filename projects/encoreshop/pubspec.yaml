@@ -25,6 +25,7 @@ dependencies:
   file_picker: ^8.0.6
   aws_common: ^0.7.1
 
+  collection: any
 dev_dependencies:
   flutter_test:
     sdk: flutter

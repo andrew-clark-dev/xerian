@@ -1,4 +1,5 @@
 import 'package:amplify_core/amplify_core.dart';
+import 'package:encoreshop/pages/item_list_view.dart';
 import 'package:encoreshop/services/cognito.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -23,7 +24,11 @@ class PageDrawer extends StatelessWidget {
     return Drawer(
       child: ListView(
         padding: EdgeInsets.zero,
-        children: <Widget>[_tile(context, "Home", Home.path), _tile(context, "Accounts", AccountListView.path)],
+        children: <Widget>[
+          _tile(context, "Home", Home.path),
+          _tile(context, "Accounts", AccountListView.path),
+          _tile(context, "Items", ItemListView.path)
+        ],
       ),
     );
   }

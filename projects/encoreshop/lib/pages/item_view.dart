@@ -8,18 +8,18 @@ import 'package:form_validation/form_validation.dart';
 
 const readOnlyStyle = TextStyle(color: Colors.deepPurpleAccent);
 
-class AccountView extends StatefulWidget {
-  final Account? account;
+class ItemView extends StatefulWidget {
+  final Item? item;
 
-  const AccountView({super.key, this.account});
+  const ItemView({super.key, this.item});
 
-  static String get path => "/${Account.schema.name.toLowerCase()}";
+  static String get path => "/${Item.schema.name.toLowerCase()}";
 
   @override
-  State<AccountView> createState() => _AccountViewState();
+  State<ItemView> createState() => _ItemViewState();
 }
 
-class _AccountViewState extends State<AccountView> {
+class _ItemViewState extends State<ItemView> {
   final _formKey = GlobalKey<FormState>();
   final DateFormat dateFormatter = DateFormat('yyyy-MM-dd HH:mm:ss');
 
@@ -27,11 +27,11 @@ class _AccountViewState extends State<AccountView> {
   late final booleanStates = <QueryField, bool>{};
   late final enumStates = <QueryField, String>{};
 
-  late final Account? account;
+  late final Item? item;
   late final bool update;
 
   final NumberFormat formatter = NumberFormat("00000000");
-//  final CounterService counter = CounterService(Account.classType);
+//  final CounterService counter = CounterService(Item.classType);
 
   final emailValidator = Validator(validators: [const EmailValidator()]);
   final phoneValidator = Validator(validators: [const PhoneNumberValidator()]);
@@ -40,70 +40,63 @@ class _AccountViewState extends State<AccountView> {
   @override
   void initState() {
     super.initState();
-    account = widget.account;
-    update = account != null;
+    item = widget.item;
+    update = item != null;
 
     // Default the states
-    controllers[Account.NUMBER] = TextEditingController();
-    controllers[Account.FIRSTNAME] = TextEditingController();
-    controllers[Account.LASTNAME] = TextEditingController();
-    controllers[Account.ADDRESS] = TextEditingController();
-    controllers[Account.BALANCE] = TextEditingController();
-    controllers[Account.CITY] = TextEditingController();
-    controllers[Account.COMMENT] = TextEditingController();
-    controllers[Account.EMAIL] = TextEditingController();
-    controllers[Account.PHONENUMBER] = TextEditingController();
-    controllers[Account.POSTCODE] = TextEditingController();
-    controllers[Account.STATE] = TextEditingController();
-    booleanStates[Account.ISMOBILE] = false;
-    enumStates[Account.CATEGORY] = AccountCategory.standard.name;
-    enumStates[Account.STATUS] = AccountStatus.active.name;
-    enumStates[Account.COMUNICATIONPREFERENCES] = AccountComunicationPreferences.none.name;
+    controllers[Item.SKU] = TextEditingController();
+    controllers[Item.TITLE] = TextEditingController();
+    controllers[Item.ACCOUNTNUMBER] = TextEditingController();
+    controllers[Item.CATEGORY] = TextEditingController();
+    controllers[Item.PRICE] = TextEditingController();
+    controllers[Item.BRAND] = TextEditingController();
+    controllers[Item.COLOR] = TextEditingController();
+    controllers[Item.SIZE] = TextEditingController();
+    controllers[Item.DESCRIPTION] = TextEditingController();
+    controllers[Item.DETAILS] = TextEditingController();
+    controllers[Item.QUANTITY] = TextEditingController();
+    booleanStates[Item.ACTIVE] = true;
+    enumStates[Item.STATUS] = ItemStatus.tagged.name;
+    enumStates[Item.CONDITION] = ItemCondition.unknown.name;
 
     if (update) {
-      controllers[Account.NUMBER]!.text = formatter.format(account!.number);
-      controllers[Account.FIRSTNAME]!.text = account!.firstName ?? "";
-      controllers[Account.LASTNAME]!.text = account!.lastName ?? "";
-      controllers[Account.ADDRESS]!.text = account!.address ?? "";
-      controllers[Account.BALANCE]!.text = account!.balance.toStringAsFixed(2);
-      controllers[Account.CITY]!.text = account!.city ?? "";
-      controllers[Account.COMMENT]!.text = account!.comment ?? "";
-      controllers[Account.EMAIL]!.text = account!.email ?? "";
-      controllers[Account.PHONENUMBER]!.text = account!.phoneNumber ?? "";
-      controllers[Account.POSTCODE]!.text = account!.postcode ?? "";
-      controllers[Account.STATE]!.text = account!.state ?? "";
-      booleanStates[Account.ISMOBILE] = account!.isMobile ?? false;
-
-      enumStates[Account.CATEGORY] = account!.category!.name;
-      enumStates[Account.STATUS] = account!.status!.name;
-      enumStates[Account.COMUNICATIONPREFERENCES] = account!.comunicationPreferences!.name;
+      controllers[Item.SKU]!.text = formatter.format(item!.sku);
+      controllers[Item.TITLE]!.text = item!.title ?? "";
+      controllers[Item.ACCOUNTNUMBER]!.text = formatter.format(item!.accountNumber);
+      controllers[Item.CATEGORY]!.text = item!.category;
+      controllers[Item.PRICE]!.text = item!.price.toStringAsFixed(2);
+      controllers[Item.BRAND]!.text = item!.brand ?? "";
+      controllers[Item.COLOR]!.text = item!.color ?? "";
+      controllers[Item.SIZE]!.text = item!.size ?? "";
+      controllers[Item.DESCRIPTION]!.text = item!.description ?? "";
+      controllers[Item.DETAILS]!.text = item!.details ?? "";
+      controllers[Item.QUANTITY]!.text = item!.quantity.toString();
+      booleanStates[Item.ACTIVE] = item!.active ?? false;
+      // enumStates[Item.STATUS] = item!.status!.name;
+      enumStates[Item.CONDITION] = item!.condition!.name;
     }
   }
 
   Future<void> submitForm(ScaffoldMessengerState scaffoldMessenger) async {
-    GraphQLRequest<Model> request;
-    if (update) {
-      final updatedAccount =
-          account!.copyWith(firstName: controllers[Account.FIRSTNAME]!.text, lastName: controllers[Account.FIRSTNAME]!.text);
-      request = ModelMutations.update(updatedAccount);
-    } else {
-      final newAccount = Account(
-          number: 1,
-          firstName: controllers[Account.FIRSTNAME]!.text,
-          lastName: controllers[Account.FIRSTNAME]!.text,
-          balance: 10.00);
-      request = ModelMutations.create(newAccount);
-    }
+    // GraphQLRequest<Model> request;
+    // if (update) {
+    //   final updatedItem = item!.copyWith(firstName: controllers[Item.FIRSTNAME]!.text, lastName: controllers[Item.FIRSTNAME]!.text);
+    //   request = ModelMutations.update(updatedItem);
+    // } else {
+    //   final newItem = Item(
+    //       number: 1, firstName: controllers[Item.FIRSTNAME]!.text, lastName: controllers[Item.FIRSTNAME]!.text, balance: 10.00);
+    //   request = ModelMutations.create(newItem);
+    // }
 
-    final response = await Amplify.API.mutate(request: request).response;
+    // final response = await Amplify.API.mutate(request: request).response;
 
-    scaffoldMessenger.showSnackBar(SnackBar(content: Text('Account store ${response.hasErrors ? "failed" : "succeeded"}')));
+    // scaffoldMessenger.showSnackBar(SnackBar(content: Text('Item store ${response.hasErrors ? "failed" : "succeeded"}')));
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: PageBar(Account.schema.name),
+      appBar: PageBar(Item.schema.name),
       body: Align(
         alignment: Alignment.topCenter,
         child: ConstrainedBox(
@@ -116,26 +109,20 @@ class _AccountViewState extends State<AccountView> {
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   Column(
                     children: [
-                      text(Account.NUMBER, 'Number', readOnly: true),
+                      text(Item.SKU, 'SKU', readOnly: true),
+                      text(Item.TITLE, 'Title', readOnly: true),
+                      text(Item.ACCOUNTNUMBER, 'Account', readOnly: true),
                       Row(children: [
-                        Expanded(child: text(Account.FIRSTNAME, 'First Name')),
-                        Expanded(child: text(Account.LASTNAME, 'Last Name')),
+                        Expanded(child: text(Item.CATEGORY, 'Category')),
+                        Expanded(child: text(Item.BRAND, 'Brand')),
                       ]),
                       Row(children: [
-                        Expanded(child: text(Account.PHONENUMBER, 'Phone Number')),
-                        Expanded(child: text(Account.EMAIL, 'E-Mail')),
+                        Expanded(child: text(Item.COLOR, 'Color')),
+                        Expanded(child: text(Item.SIZE, 'Size')),
                       ]),
-                      text(Account.ADDRESS, 'Address'),
-                      Row(children: [
-                        Expanded(child: text(Account.CITY, 'City')),
-                        Expanded(child: text(Account.POSTCODE, 'Postcode')),
-                      ]),
-                      text(Account.STATE, 'State'),
-                      text(Account.BALANCE, 'Balance', readOnly: true),
-                      switcher(Account.ISMOBILE, 'Mobile'),
-                      dropDown(Account.CATEGORY, 'Type', AccountCategory.values),
-                      dropDown(Account.STATUS, 'Status', AccountStatus.values),
-                      dropDown(Account.COMUNICATIONPREFERENCES, 'Prefs', AccountComunicationPreferences.values),
+                      switcher(Item.ACTIVE, 'Active'),
+                      dropDown(Item.STATUS, 'Status', ItemStatus.values),
+                      dropDown(Item.CONDITION, 'Contition', ItemCondition.values),
                     ],
                   ),
                   const SizedBox(height: 20),
@@ -197,7 +184,7 @@ class _AccountViewState extends State<AccountView> {
           items: menuItems(enumValues));
 
   List<DropdownMenuItem<String>> menuItems(List<dynamic> enumValues) {
-    final List<String> list = enumValues.map((v) => v.name).toList() as List<String>;
+    final List<String> list = enumValues.map((v) => (v as Enum).name).toList();
     return list.map<DropdownMenuItem<String>>((String value) {
       return DropdownMenuItem<String>(
         value: value,

@@ -1,6 +1,7 @@
 import 'package:amplify_core/amplify_core.dart';
 import 'package:encore_core/extentions.dart';
 import 'package:encoreshop/models/Account.dart';
+import 'package:encoreshop/models/Item.dart';
 import 'package:encoreshop/pages/user_settings.dart';
 import 'package:encoreshop/pages/signup.dart';
 import 'package:flutter/material.dart';
@@ -9,6 +10,8 @@ import 'package:go_router/go_router.dart';
 import 'pages/account_list_view.dart';
 import 'pages/account_view.dart';
 import 'pages/home.dart';
+import 'pages/item_list_view.dart';
+import 'pages/item_view.dart';
 import 'pages/login.dart';
 
 // This is brilliant, should be in a util package
@@ -43,6 +46,14 @@ final router = GoRouter(
     GoRoute(
       path: AccountView.path,
       builder: (context, state) => AccountView(account: cast<Account>(state.extra)),
+    ),
+    GoRoute(
+      path: ItemListView.path,
+      builder: (context, state) => const ItemListView(),
+    ),
+    GoRoute(
+      path: ItemView.path,
+      builder: (context, state) => ItemView(item: cast<Item>(state.extra)),
     )
   ],
   redirect: (BuildContext context, GoRouterState state) async {

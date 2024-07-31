@@ -21,6 +21,7 @@
 
 import 'ModelProvider.dart';
 import 'package:amplify_core/amplify_core.dart' as amplify_core;
+import 'package:collection/collection.dart';
 
 
 /** This is an auto generated class representing the Account type in your schema. */
@@ -40,9 +41,11 @@ class Account extends amplify_core.Model {
   final double? _balance;
   final AccountComunicationPreferences? _comunicationPreferences;
   final AccountStatus? _status;
-  final AccountVip? _vip;
+  final AccountCategory? _category;
   final String? _comment;
+  final List<Item>? _items;
   final String? _metadata;
+  final bool? _active;
   final amplify_core.TemporalDateTime? _createdAt;
   final amplify_core.TemporalDateTime? _updatedAt;
 
@@ -129,16 +132,24 @@ class Account extends amplify_core.Model {
     return _status;
   }
   
-  AccountVip? get vip {
-    return _vip;
+  AccountCategory? get category {
+    return _category;
   }
   
   String? get comment {
     return _comment;
   }
   
+  List<Item>? get items {
+    return _items;
+  }
+  
   String? get metadata {
     return _metadata;
+  }
+  
+  bool? get active {
+    return _active;
   }
   
   amplify_core.TemporalDateTime? get createdAt {
@@ -149,9 +160,9 @@ class Account extends amplify_core.Model {
     return _updatedAt;
   }
   
-  const Account._internal({required this.id, required number, firstName, lastName, email, phoneNumber, isMobile, address, city, state, postcode, required balance, comunicationPreferences, status, vip, comment, metadata, createdAt, updatedAt}): _number = number, _firstName = firstName, _lastName = lastName, _email = email, _phoneNumber = phoneNumber, _isMobile = isMobile, _address = address, _city = city, _state = state, _postcode = postcode, _balance = balance, _comunicationPreferences = comunicationPreferences, _status = status, _vip = vip, _comment = comment, _metadata = metadata, _createdAt = createdAt, _updatedAt = updatedAt;
+  const Account._internal({required this.id, required number, firstName, lastName, email, phoneNumber, isMobile, address, city, state, postcode, required balance, comunicationPreferences, status, category, comment, items, metadata, active, createdAt, updatedAt}): _number = number, _firstName = firstName, _lastName = lastName, _email = email, _phoneNumber = phoneNumber, _isMobile = isMobile, _address = address, _city = city, _state = state, _postcode = postcode, _balance = balance, _comunicationPreferences = comunicationPreferences, _status = status, _category = category, _comment = comment, _items = items, _metadata = metadata, _active = active, _createdAt = createdAt, _updatedAt = updatedAt;
   
-  factory Account({String? id, required int number, String? firstName, String? lastName, String? email, String? phoneNumber, bool? isMobile, String? address, String? city, String? state, String? postcode, required double balance, AccountComunicationPreferences? comunicationPreferences, AccountStatus? status, AccountVip? vip, String? comment, String? metadata}) {
+  factory Account({String? id, required int number, String? firstName, String? lastName, String? email, String? phoneNumber, bool? isMobile, String? address, String? city, String? state, String? postcode, required double balance, AccountComunicationPreferences? comunicationPreferences, AccountStatus? status, AccountCategory? category, String? comment, List<Item>? items, String? metadata, bool? active}) {
     return Account._internal(
       id: id == null ? amplify_core.UUID.getUUID() : id,
       number: number,
@@ -167,9 +178,11 @@ class Account extends amplify_core.Model {
       balance: balance,
       comunicationPreferences: comunicationPreferences,
       status: status,
-      vip: vip,
+      category: category,
       comment: comment,
-      metadata: metadata);
+      items: items != null ? List<Item>.unmodifiable(items) : items,
+      metadata: metadata,
+      active: active);
   }
   
   bool equals(Object other) {
@@ -194,9 +207,11 @@ class Account extends amplify_core.Model {
       _balance == other._balance &&
       _comunicationPreferences == other._comunicationPreferences &&
       _status == other._status &&
-      _vip == other._vip &&
+      _category == other._category &&
       _comment == other._comment &&
-      _metadata == other._metadata;
+      DeepCollectionEquality().equals(_items, other._items) &&
+      _metadata == other._metadata &&
+      _active == other._active;
   }
   
   @override
@@ -208,30 +223,31 @@ class Account extends amplify_core.Model {
     
     buffer.write("Account {");
     buffer.write("id=" + "$id" + ", ");
-    buffer.write("number=" + (_number != null ? _number.toString() : "null") + ", ");
+    buffer.write("number=" + (_number != null ? _number!.toString() : "null") + ", ");
     buffer.write("firstName=" + "$_firstName" + ", ");
     buffer.write("lastName=" + "$_lastName" + ", ");
     buffer.write("email=" + "$_email" + ", ");
     buffer.write("phoneNumber=" + "$_phoneNumber" + ", ");
-    buffer.write("isMobile=" + (_isMobile != null ? _isMobile.toString() : "null") + ", ");
+    buffer.write("isMobile=" + (_isMobile != null ? _isMobile!.toString() : "null") + ", ");
     buffer.write("address=" + "$_address" + ", ");
     buffer.write("city=" + "$_city" + ", ");
     buffer.write("state=" + "$_state" + ", ");
     buffer.write("postcode=" + "$_postcode" + ", ");
-    buffer.write("balance=" + (_balance != null ? _balance.toString() : "null") + ", ");
+    buffer.write("balance=" + (_balance != null ? _balance!.toString() : "null") + ", ");
     buffer.write("comunicationPreferences=" + (_comunicationPreferences != null ? amplify_core.enumToString(_comunicationPreferences)! : "null") + ", ");
     buffer.write("status=" + (_status != null ? amplify_core.enumToString(_status)! : "null") + ", ");
-    buffer.write("vip=" + (_vip != null ? amplify_core.enumToString(_vip)! : "null") + ", ");
+    buffer.write("category=" + (_category != null ? amplify_core.enumToString(_category)! : "null") + ", ");
     buffer.write("comment=" + "$_comment" + ", ");
     buffer.write("metadata=" + "$_metadata" + ", ");
-    buffer.write("createdAt=" + (_createdAt != null ? _createdAt.format() : "null") + ", ");
-    buffer.write("updatedAt=" + (_updatedAt != null ? _updatedAt.format() : "null"));
+    buffer.write("active=" + (_active != null ? _active!.toString() : "null") + ", ");
+    buffer.write("createdAt=" + (_createdAt != null ? _createdAt!.format() : "null") + ", ");
+    buffer.write("updatedAt=" + (_updatedAt != null ? _updatedAt!.format() : "null"));
     buffer.write("}");
     
     return buffer.toString();
   }
   
-  Account copyWith({int? number, String? firstName, String? lastName, String? email, String? phoneNumber, bool? isMobile, String? address, String? city, String? state, String? postcode, double? balance, AccountComunicationPreferences? comunicationPreferences, AccountStatus? status, AccountVip? vip, String? comment, String? metadata}) {
+  Account copyWith({int? number, String? firstName, String? lastName, String? email, String? phoneNumber, bool? isMobile, String? address, String? city, String? state, String? postcode, double? balance, AccountComunicationPreferences? comunicationPreferences, AccountStatus? status, AccountCategory? category, String? comment, List<Item>? items, String? metadata, bool? active}) {
     return Account._internal(
       id: id,
       number: number ?? this.number,
@@ -247,9 +263,11 @@ class Account extends amplify_core.Model {
       balance: balance ?? this.balance,
       comunicationPreferences: comunicationPreferences ?? this.comunicationPreferences,
       status: status ?? this.status,
-      vip: vip ?? this.vip,
+      category: category ?? this.category,
       comment: comment ?? this.comment,
-      metadata: metadata ?? this.metadata);
+      items: items ?? this.items,
+      metadata: metadata ?? this.metadata,
+      active: active ?? this.active);
   }
   
   Account copyWithModelFieldValues({
@@ -266,9 +284,11 @@ class Account extends amplify_core.Model {
     ModelFieldValue<double>? balance,
     ModelFieldValue<AccountComunicationPreferences?>? comunicationPreferences,
     ModelFieldValue<AccountStatus?>? status,
-    ModelFieldValue<AccountVip?>? vip,
+    ModelFieldValue<AccountCategory?>? category,
     ModelFieldValue<String?>? comment,
-    ModelFieldValue<String?>? metadata
+    ModelFieldValue<List<Item>?>? items,
+    ModelFieldValue<String?>? metadata,
+    ModelFieldValue<bool?>? active
   }) {
     return Account._internal(
       id: id,
@@ -285,9 +305,11 @@ class Account extends amplify_core.Model {
       balance: balance == null ? this.balance : balance.value,
       comunicationPreferences: comunicationPreferences == null ? this.comunicationPreferences : comunicationPreferences.value,
       status: status == null ? this.status : status.value,
-      vip: vip == null ? this.vip : vip.value,
+      category: category == null ? this.category : category.value,
       comment: comment == null ? this.comment : comment.value,
-      metadata: metadata == null ? this.metadata : metadata.value
+      items: items == null ? this.items : items.value,
+      metadata: metadata == null ? this.metadata : metadata.value,
+      active: active == null ? this.active : active.value
     );
   }
   
@@ -306,14 +328,28 @@ class Account extends amplify_core.Model {
       _balance = (json['balance'] as num?)?.toDouble(),
       _comunicationPreferences = amplify_core.enumFromString<AccountComunicationPreferences>(json['comunicationPreferences'], AccountComunicationPreferences.values),
       _status = amplify_core.enumFromString<AccountStatus>(json['status'], AccountStatus.values),
-      _vip = amplify_core.enumFromString<AccountVip>(json['vip'], AccountVip.values),
+      _category = amplify_core.enumFromString<AccountCategory>(json['category'], AccountCategory.values),
       _comment = json['comment'],
+      _items = json['items']  is Map
+        ? (json['items']['items'] is List
+          ? (json['items']['items'] as List)
+              .where((e) => e != null)
+              .map((e) => Item.fromJson(new Map<String, dynamic>.from(e)))
+              .toList()
+          : null)
+        : (json['items'] is List
+          ? (json['items'] as List)
+              .where((e) => e?['serializedData'] != null)
+              .map((e) => Item.fromJson(new Map<String, dynamic>.from(e?['serializedData'])))
+              .toList()
+          : null),
       _metadata = json['metadata'],
+      _active = json['active'],
       _createdAt = json['createdAt'] != null ? amplify_core.TemporalDateTime.fromString(json['createdAt']) : null,
       _updatedAt = json['updatedAt'] != null ? amplify_core.TemporalDateTime.fromString(json['updatedAt']) : null;
   
   Map<String, dynamic> toJson() => {
-    'id': id, 'number': _number, 'firstName': _firstName, 'lastName': _lastName, 'email': _email, 'phoneNumber': _phoneNumber, 'isMobile': _isMobile, 'address': _address, 'city': _city, 'state': _state, 'postcode': _postcode, 'balance': _balance, 'comunicationPreferences': amplify_core.enumToString(_comunicationPreferences), 'status': amplify_core.enumToString(_status), 'vip': amplify_core.enumToString(_vip), 'comment': _comment, 'metadata': _metadata, 'createdAt': _createdAt?.format(), 'updatedAt': _updatedAt?.format()
+    'id': id, 'number': _number, 'firstName': _firstName, 'lastName': _lastName, 'email': _email, 'phoneNumber': _phoneNumber, 'isMobile': _isMobile, 'address': _address, 'city': _city, 'state': _state, 'postcode': _postcode, 'balance': _balance, 'comunicationPreferences': amplify_core.enumToString(_comunicationPreferences), 'status': amplify_core.enumToString(_status), 'category': amplify_core.enumToString(_category), 'comment': _comment, 'items': _items?.map((Item? e) => e?.toJson()).toList(), 'metadata': _metadata, 'active': _active, 'createdAt': _createdAt?.format(), 'updatedAt': _updatedAt?.format()
   };
   
   Map<String, Object?> toMap() => {
@@ -331,9 +367,11 @@ class Account extends amplify_core.Model {
     'balance': _balance,
     'comunicationPreferences': _comunicationPreferences,
     'status': _status,
-    'vip': _vip,
+    'category': _category,
     'comment': _comment,
+    'items': _items,
     'metadata': _metadata,
+    'active': _active,
     'createdAt': _createdAt,
     'updatedAt': _updatedAt
   };
@@ -353,9 +391,13 @@ class Account extends amplify_core.Model {
   static final BALANCE = amplify_core.QueryField(fieldName: "balance");
   static final COMUNICATIONPREFERENCES = amplify_core.QueryField(fieldName: "comunicationPreferences");
   static final STATUS = amplify_core.QueryField(fieldName: "status");
-  static final VIP = amplify_core.QueryField(fieldName: "vip");
+  static final CATEGORY = amplify_core.QueryField(fieldName: "category");
   static final COMMENT = amplify_core.QueryField(fieldName: "comment");
+  static final ITEMS = amplify_core.QueryField(
+    fieldName: "items",
+    fieldType: amplify_core.ModelFieldType(amplify_core.ModelFieldTypeEnum.model, ofModelName: 'Item'));
   static final METADATA = amplify_core.QueryField(fieldName: "metadata");
+  static final ACTIVE = amplify_core.QueryField(fieldName: "active");
   static var schema = amplify_core.Model.defineSchema(define: (amplify_core.ModelSchemaDefinition modelSchemaDefinition) {
     modelSchemaDefinition.name = "Account";
     modelSchemaDefinition.pluralName = "Accounts";
@@ -456,7 +498,7 @@ class Account extends amplify_core.Model {
     ));
     
     modelSchemaDefinition.addField(amplify_core.ModelFieldDefinition.field(
-      key: Account.VIP,
+      key: Account.CATEGORY,
       isRequired: false,
       ofType: amplify_core.ModelFieldType(amplify_core.ModelFieldTypeEnum.enumeration)
     ));
@@ -467,10 +509,23 @@ class Account extends amplify_core.Model {
       ofType: amplify_core.ModelFieldType(amplify_core.ModelFieldTypeEnum.string)
     ));
     
+    modelSchemaDefinition.addField(amplify_core.ModelFieldDefinition.hasMany(
+      key: Account.ITEMS,
+      isRequired: false,
+      ofModelName: 'Item',
+      associatedKey: Item.ACCOUNT
+    ));
+    
     modelSchemaDefinition.addField(amplify_core.ModelFieldDefinition.field(
       key: Account.METADATA,
       isRequired: false,
       ofType: amplify_core.ModelFieldType(amplify_core.ModelFieldTypeEnum.string)
+    ));
+    
+    modelSchemaDefinition.addField(amplify_core.ModelFieldDefinition.field(
+      key: Account.ACTIVE,
+      isRequired: false,
+      ofType: amplify_core.ModelFieldType(amplify_core.ModelFieldTypeEnum.bool)
     ));
     
     modelSchemaDefinition.addField(amplify_core.ModelFieldDefinition.nonQueryField(
