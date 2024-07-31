@@ -223,25 +223,25 @@ class Account extends amplify_core.Model {
     
     buffer.write("Account {");
     buffer.write("id=" + "$id" + ", ");
-    buffer.write("number=" + (_number != null ? _number!.toString() : "null") + ", ");
+    buffer.write("number=" + (_number != null ? _number.toString() : "null") + ", ");
     buffer.write("firstName=" + "$_firstName" + ", ");
     buffer.write("lastName=" + "$_lastName" + ", ");
     buffer.write("email=" + "$_email" + ", ");
     buffer.write("phoneNumber=" + "$_phoneNumber" + ", ");
-    buffer.write("isMobile=" + (_isMobile != null ? _isMobile!.toString() : "null") + ", ");
+    buffer.write("isMobile=" + (_isMobile != null ? _isMobile.toString() : "null") + ", ");
     buffer.write("address=" + "$_address" + ", ");
     buffer.write("city=" + "$_city" + ", ");
     buffer.write("state=" + "$_state" + ", ");
     buffer.write("postcode=" + "$_postcode" + ", ");
-    buffer.write("balance=" + (_balance != null ? _balance!.toString() : "null") + ", ");
+    buffer.write("balance=" + (_balance != null ? _balance.toString() : "null") + ", ");
     buffer.write("comunicationPreferences=" + (_comunicationPreferences != null ? amplify_core.enumToString(_comunicationPreferences)! : "null") + ", ");
     buffer.write("status=" + (_status != null ? amplify_core.enumToString(_status)! : "null") + ", ");
     buffer.write("category=" + (_category != null ? amplify_core.enumToString(_category)! : "null") + ", ");
     buffer.write("comment=" + "$_comment" + ", ");
     buffer.write("metadata=" + "$_metadata" + ", ");
-    buffer.write("active=" + (_active != null ? _active!.toString() : "null") + ", ");
-    buffer.write("createdAt=" + (_createdAt != null ? _createdAt!.format() : "null") + ", ");
-    buffer.write("updatedAt=" + (_updatedAt != null ? _updatedAt!.format() : "null"));
+    buffer.write("active=" + (_active != null ? _active.toString() : "null") + ", ");
+    buffer.write("createdAt=" + (_createdAt != null ? _createdAt.format() : "null") + ", ");
+    buffer.write("updatedAt=" + (_updatedAt != null ? _updatedAt.format() : "null"));
     buffer.write("}");
     
     return buffer.toString();

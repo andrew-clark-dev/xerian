@@ -1,6 +1,6 @@
 import urllib
-import boto3
-import pandas as pd
+import boto3  # type: ignore
+import pandas as pd  # type: ignore
 import numpy as np
 import io
 import os
