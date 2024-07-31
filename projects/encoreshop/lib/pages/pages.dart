@@ -1,3 +1,4 @@
+import 'package:encoreshop/pages/category_list_view.dart';
 import 'package:encoreshop/pages/item_list_view.dart';
 import 'package:encoreshop/services/cognito.dart';
 import 'package:flutter/material.dart';
@@ -28,7 +29,8 @@ class PageDrawer extends StatelessWidget {
           _tile(context, "Home", Home.path),
           _tile(context, "Accounts", AccountListView.path),
           _tile(context, "Items", ItemListView.path),
-          _tile(context, "Brands", BrandListView.path)
+          _tile(context, "Brands", BrandListView.path),
+          _tile(context, "Categories", CategoryListView.path),
         ],
       ),
     );

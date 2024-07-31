@@ -12,10 +12,13 @@ import 'pages/account_list_view.dart';
 import 'pages/account_view.dart';
 import 'pages/brand_list_view.dart';
 import 'pages/brand_view.dart';
+import 'pages/category_list_view.dart';
+import 'pages/category_view.dart';
 import 'pages/home.dart';
 import 'pages/item_list_view.dart';
 import 'pages/item_view.dart';
 import 'pages/login.dart';
+import '../models/Category.dart' as m;
 
 // This is brilliant, should be in a util package
 T? cast<T>(dynamic x) => x is T ? x : null;
@@ -65,7 +68,15 @@ final router = GoRouter(
     GoRoute(
       path: BrandView.path,
       builder: (context, state) => BrandView(brand: cast<Brand>(state.extra)),
-    )
+    ),
+    GoRoute(
+      path: CategoryListView.path,
+      builder: (context, state) => const CategoryListView(),
+    ),
+    GoRoute(
+      path: CategoryView.path,
+      builder: (context, state) => CategoryView(brand: cast<m.Category>(state.extra)),
+    ),
   ],
   redirect: (BuildContext context, GoRouterState state) async {
     // if the user is not logged in, they need to login
