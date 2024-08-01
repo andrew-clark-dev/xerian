@@ -3,6 +3,8 @@ import 'package:encore_core/extentions.dart';
 import 'package:encoreshop/models/Account.dart';
 import 'package:encoreshop/models/Brand.dart';
 import 'package:encoreshop/models/Item.dart';
+import 'package:encoreshop/models/Color.dart' as c;
+import 'package:encoreshop/models/Size.dart' as s;
 import 'package:encoreshop/pages/user_settings.dart';
 import 'package:encoreshop/pages/signup.dart';
 import 'package:flutter/material.dart';
@@ -14,11 +16,15 @@ import 'pages/brand_list_view.dart';
 import 'pages/brand_view.dart';
 import 'pages/category_list_view.dart';
 import 'pages/category_view.dart';
+import 'pages/color_list_view.dart';
+import 'pages/color_view.dart';
 import 'pages/home.dart';
 import 'pages/item_list_view.dart';
 import 'pages/item_view.dart';
 import 'pages/login.dart';
 import '../models/Category.dart' as m;
+import 'pages/size_list_view.dart';
+import 'pages/size_view.dart';
 
 // This is brilliant, should be in a util package
 T? cast<T>(dynamic x) => x is T ? x : null;
@@ -76,6 +82,22 @@ final router = GoRouter(
     GoRoute(
       path: CategoryView.path,
       builder: (context, state) => CategoryView(brand: cast<m.Category>(state.extra)),
+    ),
+    GoRoute(
+      path: ColorListView.path,
+      builder: (context, state) => const ColorListView(),
+    ),
+    GoRoute(
+      path: ColorView.path,
+      builder: (context, state) => ColorView(color: cast<c.Color>(state.extra)),
+    ),
+    GoRoute(
+      path: SizeListView.path,
+      builder: (context, state) => const SizeListView(),
+    ),
+    GoRoute(
+      path: SizeView.path,
+      builder: (context, state) => SizeView(size: cast<s.Size>(state.extra)),
     ),
   ],
   redirect: (BuildContext context, GoRouterState state) async {

@@ -5,8 +5,10 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import 'brand_list_view.dart';
+import 'color_list_view.dart';
 import 'home.dart';
 import 'account_list_view.dart';
+import 'size_list_view.dart';
 import 'user_settings.dart';
 
 class PageDrawer extends StatelessWidget {
@@ -29,8 +31,10 @@ class PageDrawer extends StatelessWidget {
           _tile(context, "Home", Home.path),
           _tile(context, "Accounts", AccountListView.path),
           _tile(context, "Items", ItemListView.path),
-          _tile(context, "Brands", BrandListView.path),
           _tile(context, "Categories", CategoryListView.path),
+          _tile(context, "Brands", BrandListView.path),
+          _tile(context, "Colors", ColorListView.path),
+          _tile(context, "Sizes", SizeListView.path),
         ],
       ),
     );
