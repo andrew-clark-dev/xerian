@@ -1,5 +1,6 @@
 import 'package:amplify_core/amplify_core.dart';
 import 'package:encoreshop/models/Item.dart';
+import 'package:encoreshop/services/model_extensions.dart';
 import 'package:flutter/material.dart';
 
 import '../services/api.dart';
@@ -7,14 +8,14 @@ import '../services/api.dart';
 import 'package:go_router/go_router.dart';
 
 import 'item_view.dart';
-import 'page_list_view._state.dart';
+import 'page_list_view_state.dart';
 
 const limit = 20;
 
 class ItemListView extends StatefulWidget {
   const ItemListView({super.key});
 
-  static String get path => "/${Item.schema.pluralName!.toLowerCase()}";
+  static String get path => Item.classType.listPath;
 
   @override
   // ignore: library_private_types_in_public_api,
@@ -45,10 +46,13 @@ class ItemListViewState extends PageListViewState<ItemListView> {
   }
 
   @override
-  ListTile titleTile() {
+  ListTile get titleTile {
     final titles = ['SKU', 'Account', 'Title', 'Price'];
     return ListTile(
       title: Row(children: titles.map((t) => cell(t)).toList()),
     );
   }
+
+  @override
+  ModelType<Model> get modelType => Item.classType;
 }

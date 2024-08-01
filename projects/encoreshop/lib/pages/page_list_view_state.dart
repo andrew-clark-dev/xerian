@@ -1,8 +1,9 @@
 import 'package:amplify_core/amplify_core.dart';
+import 'package:encoreshop/models/Brand.dart';
+import 'package:encoreshop/services/model_extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-import '../models/Brand.dart';
 import '../services/api.dart';
 
 import 'package:go_router/go_router.dart';
@@ -47,7 +48,9 @@ abstract class PageListViewState<T extends StatefulWidget> extends State<T> {
 
   ListTile tile(Model model);
 
-  ListTile titleTile();
+  ListTile get titleTile;
+
+  ModelType get modelType;
 
   NotificationListener listener() {
     return NotificationListener<ScrollNotification>(
@@ -88,13 +91,12 @@ abstract class PageListViewState<T extends StatefulWidget> extends State<T> {
     return Scaffold(
         floatingActionButton: FloatingActionButton(
           // Navigate to the page to create new accounts
-          onPressed: () => context.push(BrandView.path),
+          onPressed: () => context.push(modelType.viewPath),
           child: const Icon(Icons.add),
         ),
-        appBar: PageBar(Brand.schema.pluralName!),
+        appBar: PageBar(modelType.schema.pluralName!),
         drawer: const PageDrawer(), // Add the drawer here
         body: Padding(
-            padding: const EdgeInsets.all(25),
-            child: Column(children: [titleTile(), const Divider(), Expanded(child: listener())])));
+            padding: const EdgeInsets.all(25), child: Column(children: [titleTile, const Divider(), Expanded(child: listener())])));
   }
 }

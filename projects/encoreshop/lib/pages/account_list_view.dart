@@ -1,5 +1,6 @@
 import 'package:amplify_core/amplify_core.dart';
 import 'package:encoreshop/pages/account_view.dart';
+import 'package:encoreshop/services/model_extensions.dart';
 import 'package:flutter/material.dart';
 
 import '../models/Account.dart';
@@ -7,14 +8,14 @@ import '../services/api.dart';
 
 import 'package:go_router/go_router.dart';
 
-import 'page_list_view._state.dart';
+import 'page_list_view_state.dart';
 
 const limit = 20;
 
 class AccountListView extends StatefulWidget {
   const AccountListView({super.key});
 
-  static String get path => "/${Account.schema.pluralName!.toLowerCase()}";
+  static String get path => Account.classType.listPath;
 
   @override
   // ignore: library_private_types_in_public_api,
@@ -47,10 +48,13 @@ class AccountListViewState extends PageListViewState<AccountListView> {
   }
 
   @override
-  ListTile titleTile() {
+  ListTile get titleTile {
     final titles = ['Number', 'First Name', 'Last Name', 'Phone Number', 'Email', 'Balance'];
     return ListTile(
       title: Row(children: titles.map((t) => cell(t)).toList()),
     );
   }
+
+  @override
+  ModelType<Model> get modelType => Account.classType;
 }

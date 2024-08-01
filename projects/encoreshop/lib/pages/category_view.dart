@@ -1,5 +1,6 @@
 import 'package:amplify_api/amplify_api.dart';
 import 'package:amplify_flutter/amplify_flutter.dart';
+import 'package:encoreshop/services/model_extensions.dart';
 import '../models/Category.dart' as m;
 import 'package:encoreshop/pages/pages.dart';
 import 'package:flutter/material.dart';
@@ -13,7 +14,7 @@ class CategoryView extends StatefulWidget {
 
   const CategoryView({super.key, this.brand});
 
-  static String get path => "/${m.Category.schema.name.toLowerCase()}";
+  static String get path => m.Category.classType.viewPath;
 
   @override
   State<CategoryView> createState() => _CategoryViewState();

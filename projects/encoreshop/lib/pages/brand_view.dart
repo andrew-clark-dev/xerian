@@ -2,6 +2,7 @@ import 'package:amplify_api/amplify_api.dart';
 import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:encoreshop/models/ModelProvider.dart';
 import 'package:encoreshop/pages/pages.dart';
+import 'package:encoreshop/services/model_extensions.dart';
 import 'package:flutter/material.dart';
 
 import 'page_view_state.dart';
@@ -13,7 +14,7 @@ class BrandView extends StatefulWidget {
 
   const BrandView({super.key, this.brand});
 
-  static String get path => "/${Brand.schema.name.toLowerCase()}";
+  static String get path => Brand.classType.viewPath;
 
   @override
   State<BrandView> createState() => _BrandViewState();

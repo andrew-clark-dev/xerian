@@ -1,5 +1,6 @@
 import 'package:amplify_core/amplify_core.dart';
-import 'package:encoreshop/pages/page_list_view._state.dart';
+import 'package:encoreshop/pages/page_list_view_state.dart';
+import 'package:encoreshop/services/model_extensions.dart';
 import 'package:flutter/material.dart';
 
 import '../models/Size.dart';
@@ -14,7 +15,7 @@ const limit = 20;
 class SizeListView extends StatefulWidget {
   const SizeListView({super.key});
 
-  static String get path => "/${Size.schema.pluralName!.toLowerCase()}";
+  static String get path => Size.classType.listPath;
 
   @override
   // ignore: library_private_types_in_public_api,
@@ -44,10 +45,13 @@ class SizeListViewState extends PageListViewState<SizeListView> {
   }
 
   @override
-  ListTile titleTile() {
+  ListTile get titleTile {
     final titles = ['Size', 'Active', 'Alternatives'];
     return ListTile(
       title: Row(children: titles.map((t) => cell(t)).toList()),
     );
   }
+
+  @override
+  ModelType<Model> get modelType => Size.classType;
 }

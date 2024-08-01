@@ -1,5 +1,6 @@
 import 'package:encoreshop/models/ModelProvider.dart';
 import 'package:encoreshop/pages/pages.dart';
+import 'package:encoreshop/services/model_extensions.dart';
 import 'package:flutter/material.dart';
 
 import 'page_view_state.dart';
@@ -11,7 +12,7 @@ class ItemView extends StatefulWidget {
 
   const ItemView({super.key, this.item});
 
-  static String get path => "/${Item.schema.name.toLowerCase()}";
+  static String get path => Item.classType.viewPath;
 
   @override
   State<ItemView> createState() => _ItemViewState();
