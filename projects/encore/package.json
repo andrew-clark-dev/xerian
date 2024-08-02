@@ -20,6 +20,7 @@
     "typescript": "^5.5.3"
   },
   "dependencies": {
+    "@aws-sdk/client-cognito-identity-provider": "^3.620.0",
     "aws-amplify": "^6.4.0",
     "generate-password-ts": "^1.6.5"
   }

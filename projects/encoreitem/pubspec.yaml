@@ -42,7 +42,10 @@ dependencies:
 
   encore_core:
     path: ../../packages/encore_core
+  dropdown_search: ^5.0.6
 
+  amplify_core: any
+  collection: any
 dev_dependencies:
   flutter_test:
     sdk: flutter

@@ -1,11 +1,15 @@
-import 'package:amplify_core/amplify_core.dart';
+import 'package:encoreshop/pages/category_list_view.dart';
+import 'package:encoreshop/pages/item_list_view.dart';
 import 'package:encoreshop/services/cognito.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import 'brand_list_view.dart';
+import 'color_list_view.dart';
 import 'home.dart';
 import 'account_list_view.dart';
-import 'settings.dart';
+import 'size_list_view.dart';
+import 'user_settings.dart';
 
 class PageDrawer extends StatelessWidget {
   const PageDrawer({super.key});
@@ -23,7 +27,15 @@ class PageDrawer extends StatelessWidget {
     return Drawer(
       child: ListView(
         padding: EdgeInsets.zero,
-        children: <Widget>[_tile(context, "Home", Home.path), _tile(context, "Accounts", AccountListView.path)],
+        children: <Widget>[
+          _tile(context, "Home", Home.path),
+          _tile(context, "Accounts", AccountListView.path),
+          _tile(context, "Items", ItemListView.path),
+          _tile(context, "Categories", CategoryListView.path),
+          _tile(context, "Brands", BrandListView.path),
+          _tile(context, "Colors", ColorListView.path),
+          _tile(context, "Sizes", SizeListView.path),
+        ],
       ),
     );
   }
@@ -48,32 +60,11 @@ class _PageBarState extends State<PageBar> {
             TextButton.icon(
               label: snapshot.data ?? const Text("None"),
               onPressed: () {
-                context.push(Settings.path);
+                context.push(UserSettings.path);
               },
               icon: const Icon(Icons.account_circle),
             ),
           ]);
         });
-  }
-}
-
-abstract class PageViewState<T extends StatefulWidget> extends State<T> {
-  late final controllers = <String, TextEditingController>{};
-
-  void initControllers(List<QueryField> fields) {
-    for (var f in fields) {
-      controllers[f.fieldName] = TextEditingController();
-    }
-  }
-
-  dynamic getValue(QueryField f) {
-    return controllers[f.fieldName]?.text;
-
-    // switch (f.fieldType.fieldType) {
-    //   case value:
-
-    //     break;
-    //   default:
-    // }
   }
 }

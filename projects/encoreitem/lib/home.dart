@@ -1,9 +1,4 @@
-// Copyright 2020, the Flutter project authors. Please see the AUTHORS file
-// for details. All rights reserved. Use of this source code is governed by a
-// BSD-style license that can be found in the LICENSE file.
-
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart' as intl;
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -15,6 +10,7 @@ class Home extends StatefulWidget {
 class _HomeState extends State<StatefulWidget> {
   final _formKey = GlobalKey<FormState>();
   var controllers = <String, TextEditingController>{};
+  final itemScrollController = ScrollController();
 
   @override
   void dispose() {
@@ -87,18 +83,18 @@ class _HomeState extends State<StatefulWidget> {
             child: Card(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.all(16),
+                scrollDirection: Axis.vertical,
+                controller: itemScrollController,
                 child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 400),
+                  constraints: const BoxConstraints(maxWidth: 350),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       ...[
-                        textFormField(
-                            'Account', 'Enter the members account number'),
+                        textFormField('Account', 'Enter the members account number'),
                         textFormField('Category', 'Enter the item category'),
-                        textFormField(
-                            'Description', 'Enter the item description'),
+                        textFormField('Description', 'Enter the item description'),
                         textFormField('Brand', 'Enter the item brand'),
                         textFormField('Color', 'Enter the item color'),
                         textFormField('Size', 'Enter the item size'),
@@ -114,16 +110,13 @@ class _HomeState extends State<StatefulWidget> {
                                   // If the form is valid, display a snackbar. In the real world,
                                   // you'd often call a server or save the information in a database.
                                   ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                        content: Text('Processing Data')),
+                                    const SnackBar(content: Text('Processing Data')),
                                   );
                                 }
                               },
                               child: const Text('Save'),
                             ),
-                            SizedBox(
-                                width: 100,
-                                child: switchFormField('Print On Save')),
+                            SizedBox(width: 100, child: switchFormField('Print On Save')),
                           ],
                         ),
                       ].expand(
@@ -142,63 +135,6 @@ class _HomeState extends State<StatefulWidget> {
           ),
         ),
       ),
-    );
-  }
-}
-
-class _FormDatePicker extends StatefulWidget {
-  final DateTime date;
-  final ValueChanged<DateTime> onChanged;
-
-  const _FormDatePicker({
-    required this.date,
-    required this.onChanged,
-  });
-
-  @override
-  State<_FormDatePicker> createState() => _FormDatePickerState();
-}
-
-class _FormDatePickerState extends State<_FormDatePicker> {
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            Text(
-              'Date',
-              style: Theme.of(context).textTheme.bodyLarge,
-            ),
-            Text(
-              intl.DateFormat.yMd().format(widget.date),
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
-          ],
-        ),
-        TextButton(
-          child: const Text('Edit'),
-          onPressed: () async {
-            var newDate = await showDatePicker(
-              context: context,
-              initialDate: widget.date,
-              firstDate: DateTime(1900),
-              lastDate: DateTime(2100),
-            );
-
-            // Don't change the date if the date picker returns null.
-            if (newDate == null) {
-              return;
-            }
-
-            widget.onChanged(newDate);
-          },
-        )
-      ],
     );
   }
 }
