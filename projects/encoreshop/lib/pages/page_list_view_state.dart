@@ -1,5 +1,4 @@
 import 'package:amplify_core/amplify_core.dart';
-import 'package:encoreshop/models/Brand.dart';
 import 'package:encoreshop/services/model_extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -8,7 +7,6 @@ import '../services/api.dart';
 
 import 'package:go_router/go_router.dart';
 
-import 'brand_view.dart';
 import 'pages.dart';
 
 const limit = 20;
