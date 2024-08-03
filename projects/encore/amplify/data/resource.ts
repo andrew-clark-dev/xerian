@@ -25,6 +25,7 @@ const schema = a.schema({
       items: a.hasMany("Item", "accountId"), // setup relationships between types
       metadata: a.json(),
       active: a.boolean().default(true),
+      updatedAt: a.datetime(),
     })
     .secondaryIndexes((index) => [index("number")]),
 
@@ -50,6 +51,7 @@ const schema = a.schema({
       printedAt: a.datetime(),
       metadata: a.json(),
       active: a.boolean().default(true),
+      updatedAt: a.datetime(),
     })
     .secondaryIndexes((index) => [index("sku"), index("accountId")]),
 
@@ -59,6 +61,7 @@ const schema = a.schema({
       alt: a.string().array(),
       metadata: a.json(),
       active: a.boolean().default(true),
+      updatedAt: a.datetime(),
     })
     .identifier(['name']),
 
@@ -68,6 +71,7 @@ const schema = a.schema({
       alt: a.string().array(),
       metadata: a.json(),
       active: a.boolean().default(true),
+      updatedAt: a.datetime(),
     })
     .identifier(['name']),
 
@@ -77,6 +81,7 @@ const schema = a.schema({
       alt: a.string().array(),
       metadata: a.json(),
       active: a.boolean().default(true),
+      updatedAt: a.datetime(),
     })
     .identifier(['name']),
 
@@ -86,6 +91,7 @@ const schema = a.schema({
       alt: a.string().array(),
       metadata: a.json(),
       active: a.boolean().default(true),
+      updatedAt: a.datetime(),
     })
     .identifier(['name']),
 
