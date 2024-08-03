@@ -7,7 +7,7 @@ const schema = a.schema({
   // Models
   Account: a
     .model({
-      number: a.integer().required(),
+      number: a.string().required(),
       firstName: a.string(),
       lastName: a.string(),
       email: a.string(),
@@ -30,11 +30,11 @@ const schema = a.schema({
 
   Item: a
     .model({
-      sku: a.integer().required(),
+      sku: a.string().required(),
       title: a.string(),
       accountId: a.id(),
       account: a.belongsTo("Account", "accountId"),
-      accountNumber: a.integer(),
+      accountNumber: a.string(),
       category: a.string().required(),
       brand: a.string(),
       color: a.string(),

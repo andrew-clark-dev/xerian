@@ -100,7 +100,7 @@ def process_row(row):
     item_data = {
         "__typename": {"S": "Item"},
         "id": {"S": str(uuid.uuid4())},
-        "sku": {"N": str(row["SKU"])},
+        "sku": {"S": str(row["SKU"])},
         "title": {"S": str(row["Title"])},
         "condition": {"S": "UNKNOWN"},
         "split": {"S": str(row["Split"]).replace("%", "")},  # Strp off %
@@ -113,10 +113,10 @@ def process_row(row):
     }
 
     if row["Category"] is not None:
-        item_data["category"] = {"S": row["Category"]}
+        item_data["category"] = {"S": str(row["Category"])}
         category_data = {
             "__typename": {"S": "Category"},
-            "name": {"S": row["Category"]},
+            "name": {"S": str(row["Category"])},
             "createdAt": {"S": datetime.utcnow().isoformat() + "Z"},
             "updatedAt": {"S": datetime.utcnow().isoformat() + "Z"},
         }
@@ -126,10 +126,10 @@ def process_row(row):
         logger.info(f"Category Response : {response}")
 
     if row["Brand"] is not None:
-        item_data["brand"] = {"S": row["Brand"]}
+        item_data["brand"] = {"S": str(row["Brand"])}
         brand_data = {
             "__typename": {"S": "Brand"},
-            "name": {"S": row["Brand"]},
+            "name": {"S": str(row["Brand"])},
             "createdAt": {"S": datetime.utcnow().isoformat() + "Z"},
             "updatedAt": {"S": datetime.utcnow().isoformat() + "Z"},
         }
@@ -139,10 +139,10 @@ def process_row(row):
         logger.info(f"Brand Response : {response}")
 
     if row["Color"] is not None:
-        item_data["color"] = {"S": row["Color"]}
+        item_data["color"] = {"S": str(row["Color"])}
         color_data = {
             "__typename": {"S": "Color"},
-            "name": {"S": row["Color"]},
+            "name": {"S": str(row["Color"])},
             "createdAt": {"S": datetime.utcnow().isoformat() + "Z"},
             "updatedAt": {"S": datetime.utcnow().isoformat() + "Z"},
         }
@@ -152,10 +152,10 @@ def process_row(row):
         logger.info(f"Color Response : {response}")
 
     if row["Size"] is not None:
-        item_data["size"] = {"S": row["Size"]}
+        item_data["size"] = {"S": str(row["Size"])}
         size_data = {
             "__typename": {"S": "Size"},
-            "name": {"S": row["Size"]},
+            "name": {"S": str(row["Size"])},
             "createdAt": {"S": datetime.utcnow().isoformat() + "Z"},
             "updatedAt": {"S": datetime.utcnow().isoformat() + "Z"},
         }
@@ -179,7 +179,7 @@ def process_row(row):
     # Now let us connect the Account, first query on the secondary index we have created for number
     accountResponse = account_table.query(
         IndexName='accountsByNumber',
-        KeyConditionExpression=Key('number').eq(row["Account"])
+        KeyConditionExpression=Key('number').eq(str(row["Account"]))
     )
     logger.info(f"accountResponse : {accountResponse}")
 
