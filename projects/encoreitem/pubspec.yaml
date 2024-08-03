@@ -46,6 +46,12 @@ dependencies:
 
   amplify_core: any
   collection: any
+  flutter_typeahead: ^5.2.0
+  amplify_api: ^2.3.0
+  sqflite: ^2.3.3+1
+  path: ^1.9.0
+  shared_preferences: ^2.3.1
+  provider: ^6.1.2
 dev_dependencies:
   flutter_test:
     sdk: flutter

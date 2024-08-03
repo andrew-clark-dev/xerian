@@ -1,15 +1,25 @@
-import 'package:flutter/material.dart';
+import 'package:encoreitem/models/Account.dart';
+import 'package:encoreitem/models/Category.dart' as c;
 
-class Home extends StatefulWidget {
-  const Home({super.key});
+import 'package:flutter/material.dart';
+import 'package:flutter_typeahead/flutter_typeahead.dart';
+
+import 'services/data_store.dart';
+
+class ItemForm extends StatefulWidget {
+  const ItemForm({super.key});
 
   @override
-  State<StatefulWidget> createState() => _HomeState();
+  State<StatefulWidget> createState() => _ItemFormState();
 }
 
-class _HomeState extends State<StatefulWidget> {
+class _ItemFormState extends State<StatefulWidget> {
   final _formKey = GlobalKey<FormState>();
   var controllers = <String, TextEditingController>{};
+
+  final TextEditingController _accountController = TextEditingController();
+  final TextEditingController _categorxController = TextEditingController();
+
   final itemScrollController = ScrollController();
 
   @override
@@ -17,15 +27,9 @@ class _HomeState extends State<StatefulWidget> {
     // Clean up the controller when the widget is removed from the
     // widget tree.
     controllers.forEach((key, controller) => controller.dispose());
+    _accountController.dispose();
     super.dispose();
   }
-
-  String account = '';
-  String description = '';
-  DateTime date = DateTime.now();
-  double maxValue = 0;
-  bool? brushedTeeth = false;
-  bool enableFeature = false;
 
   bool printOnSave = true;
 
@@ -92,8 +96,51 @@ class _HomeState extends State<StatefulWidget> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       ...[
-                        textFormField('Account', 'Enter the members account number'),
-                        textFormField('Category', 'Enter the item category'),
+                        TypeAheadField<Account>(
+                          controller: _accountController,
+                          suggestionsCallback: (search) => DataStore().accountsByNumber(search),
+                          builder: (context, controller, focusNode) {
+                            return TextField(
+                                controller: controller,
+                                focusNode: focusNode,
+                                autofocus: true,
+                                decoration: const InputDecoration(
+                                  border: OutlineInputBorder(),
+                                  labelText: 'Account',
+                                ));
+                          },
+                          itemBuilder: (context, account) {
+                            return ListTile(
+                              title: Text(account.number.padLeft(8, '0')),
+                              subtitle: Text(account.firstName ?? "None"),
+                            );
+                          },
+                          onSelected: (Account account) {
+                            _accountController.text = account.number.padLeft(8, '0');
+                          },
+                        ),
+                        TypeAheadField<c.Category>(
+                          controller: _categorxController,
+                          suggestionsCallback: (search) => DataStore().categoriesByName(search),
+                          builder: (context, controller, focusNode) {
+                            return TextField(
+                                controller: controller,
+                                focusNode: focusNode,
+                                autofocus: true,
+                                decoration: const InputDecoration(
+                                  border: OutlineInputBorder(),
+                                  labelText: 'Category',
+                                ));
+                          },
+                          itemBuilder: (context, category) {
+                            return ListTile(
+                              title: Text(category.name),
+                            );
+                          },
+                          onSelected: (c.Category category) {
+                            _categorxController.text = category.name;
+                          },
+                        ),
                         textFormField('Description', 'Enter the item description'),
                         textFormField('Brand', 'Enter the item brand'),
                         textFormField('Color', 'Enter the item color'),

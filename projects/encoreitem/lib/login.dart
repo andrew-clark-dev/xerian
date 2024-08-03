@@ -1,7 +1,6 @@
 import 'package:amplify_authenticator/amplify_authenticator.dart';
+import 'package:encoreitem/app.dart';
 import 'package:flutter/material.dart';
-
-import 'home.dart';
 
 class Login extends StatefulWidget {
   const Login({super.key});
@@ -27,29 +26,10 @@ class _LoginState extends State<Login> {
       authenticatorBuilder: (BuildContext context, AuthenticatorState state) {
         switch (state.currentStep) {
           case AuthenticatorStep.signIn:
-            return CustomScaffold(
-              state: state,
-              // A prebuilt Sign In form from amplify_authenticator
-              body: SignInForm(),
-            );
           case AuthenticatorStep.resetPassword:
-            return CustomScaffold(
-              state: state,
-              // A prebuilt Reset Password form from amplify_authenticator
-              body: ResetPasswordForm(),
-            );
           case AuthenticatorStep.confirmResetPassword:
-            return CustomScaffold(
-              state: state,
-              // A prebuilt Confirm Reset Password form from amplify_authenticator
-              body: const ConfirmResetPasswordForm(),
-            );
-          case AuthenticatorStep.confirmSignInNewPassword:
-            return CustomScaffold(
-              state: state,
-              // A prebuilt Confirm Reset Password form from amplify_authenticator
-              body: ConfirmSignInNewPasswordForm(),
-            );
+            // Return null so Authenticator will use the default form
+            return null;
           default:
             // Returning not supported for all other actions
             return CustomScaffold(
@@ -63,7 +43,7 @@ class _LoginState extends State<Login> {
             );
         }
       },
-      child: MaterialApp(builder: Authenticator.builder(), home: const Home()),
+      child: MaterialApp(builder: Authenticator.builder(), home: ItemApp()),
     );
   }
 }
