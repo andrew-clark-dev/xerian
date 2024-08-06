@@ -43,7 +43,7 @@ class _LoginState extends State<Login> {
             );
         }
       },
-      child: MaterialApp(builder: Authenticator.builder(), home: ItemApp()),
+      child: MaterialApp(builder: Authenticator.builder(), home: const ItemApp()),
     );
   }
 }

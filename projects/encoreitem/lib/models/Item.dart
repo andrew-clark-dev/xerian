@@ -261,7 +261,7 @@ class Item extends amplify_core.Model {
     buffer.write("id=" + "$id" + ", ");
     buffer.write("sku=" + "$_sku" + ", ");
     buffer.write("title=" + "$_title" + ", ");
-    buffer.write("account=" + (_account != null ? _account!.toString() : "null") + ", ");
+    buffer.write("account=" + (_account != null ? _account.toString() : "null") + ", ");
     buffer.write("accountNumber=" + "$_accountNumber" + ", ");
     buffer.write("category=" + "$_category" + ", ");
     buffer.write("brand=" + "$_brand" + ", ");
@@ -269,17 +269,17 @@ class Item extends amplify_core.Model {
     buffer.write("size=" + "$_size" + ", ");
     buffer.write("description=" + "$_description" + ", ");
     buffer.write("details=" + "$_details" + ", ");
-    buffer.write("images=" + (_images != null ? _images!.toString() : "null") + ", ");
+    buffer.write("images=" + (_images != null ? _images.toString() : "null") + ", ");
     buffer.write("condition=" + (_condition != null ? amplify_core.enumToString(_condition)! : "null") + ", ");
-    buffer.write("quantity=" + (_quantity != null ? _quantity!.toString() : "null") + ", ");
-    buffer.write("split=" + (_split != null ? _split!.toString() : "null") + ", ");
-    buffer.write("price=" + (_price != null ? _price!.toString() : "null") + ", ");
+    buffer.write("quantity=" + (_quantity != null ? _quantity.toString() : "null") + ", ");
+    buffer.write("split=" + (_split != null ? _split.toString() : "null") + ", ");
+    buffer.write("price=" + (_price != null ? _price.toString() : "null") + ", ");
     buffer.write("status=" + (_status != null ? amplify_core.enumToString(_status)! : "null") + ", ");
-    buffer.write("printedAt=" + (_printedAt != null ? _printedAt!.format() : "null") + ", ");
+    buffer.write("printedAt=" + (_printedAt != null ? _printedAt.format() : "null") + ", ");
     buffer.write("metadata=" + "$_metadata" + ", ");
-    buffer.write("active=" + (_active != null ? _active!.toString() : "null") + ", ");
-    buffer.write("updatedAt=" + (_updatedAt != null ? _updatedAt!.format() : "null") + ", ");
-    buffer.write("createdAt=" + (_createdAt != null ? _createdAt!.format() : "null"));
+    buffer.write("active=" + (_active != null ? _active.toString() : "null") + ", ");
+    buffer.write("updatedAt=" + (_updatedAt != null ? _updatedAt.format() : "null") + ", ");
+    buffer.write("createdAt=" + (_createdAt != null ? _createdAt.format() : "null"));
     buffer.write("}");
     
     return buffer.toString();

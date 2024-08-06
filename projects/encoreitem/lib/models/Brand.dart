@@ -124,11 +124,11 @@ class Brand extends amplify_core.Model {
     
     buffer.write("Brand {");
     buffer.write("name=" + "$_name" + ", ");
-    buffer.write("alt=" + (_alt != null ? _alt!.toString() : "null") + ", ");
+    buffer.write("alt=" + (_alt != null ? _alt.toString() : "null") + ", ");
     buffer.write("metadata=" + "$_metadata" + ", ");
-    buffer.write("active=" + (_active != null ? _active!.toString() : "null") + ", ");
-    buffer.write("updatedAt=" + (_updatedAt != null ? _updatedAt!.format() : "null") + ", ");
-    buffer.write("createdAt=" + (_createdAt != null ? _createdAt!.format() : "null"));
+    buffer.write("active=" + (_active != null ? _active.toString() : "null") + ", ");
+    buffer.write("updatedAt=" + (_updatedAt != null ? _updatedAt.format() : "null") + ", ");
+    buffer.write("createdAt=" + (_createdAt != null ? _createdAt.format() : "null"));
     buffer.write("}");
     
     return buffer.toString();
