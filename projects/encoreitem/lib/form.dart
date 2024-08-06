@@ -1,6 +1,7 @@
+import 'package:amplify_core/amplify_core.dart';
 import 'package:encoreitem/models/Account.dart';
 import 'package:encoreitem/models/Brand.dart';
-import 'package:encoreitem/models/Category.dart';
+import 'package:encoreitem/models/Category.dart' as c;
 import 'package:encoreitem/models/Color.dart';
 import 'package:encoreitem/models/Size.dart';
 
@@ -21,12 +22,6 @@ class _ItemFormState extends State<StatefulWidget> {
   final controllers = <String, TextEditingController>{};
 
   final TextEditingController _accountController = TextEditingController();
-  final TextEditingController _categoryController = TextEditingController();
-  final TextEditingController _brandController = TextEditingController();
-  final TextEditingController _colorController = TextEditingController();
-  final TextEditingController _sizeController = TextEditingController();
-
-  final itemScrollController = ScrollController();
 
   @override
   void dispose() {
@@ -79,6 +74,35 @@ class _ItemFormState extends State<StatefulWidget> {
         });
   }
 
+  TypeAheadField typeAheadField<T extends Model>(
+    callback,
+    modelName,
+  ) {
+    controllers[modelName] = TextEditingController();
+    return TypeAheadField<T>(
+      controller: controllers[modelName],
+      suggestionsCallback: callback,
+      builder: (context, controller, focusNode) {
+        return TextField(
+            controller: controller,
+            focusNode: focusNode,
+            autofocus: true,
+            decoration: InputDecoration(
+              border: const OutlineInputBorder(),
+              labelText: modelName,
+            ));
+      },
+      itemBuilder: (context, item) {
+        return ListTile(
+          title: Text(item.toMap()['name'] as String),
+        );
+      },
+      onSelected: (T item) {
+        controllers[modelName]!.text = item.toMap()['name'] as String;
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -120,94 +144,10 @@ class _ItemFormState extends State<StatefulWidget> {
                         _accountController.text = account.number.padLeft(8, '0');
                       },
                     ),
-                    TypeAheadField<Category>(
-                      controller: _categoryController,
-                      suggestionsCallback: (search) => DataStore().categoriesByName(search),
-                      builder: (context, controller, focusNode) {
-                        return TextField(
-                            controller: controller,
-                            focusNode: focusNode,
-                            autofocus: true,
-                            decoration: const InputDecoration(
-                              border: OutlineInputBorder(),
-                              labelText: 'Category',
-                            ));
-                      },
-                      itemBuilder: (context, item) {
-                        return ListTile(
-                          title: Text(item.name),
-                        );
-                      },
-                      onSelected: (Category item) {
-                        _categoryController.text = item.name;
-                      },
-                    ),
-                    TypeAheadField<Brand>(
-                      controller: _brandController,
-                      suggestionsCallback: (search) => DataStore().brandsByName(search),
-                      builder: (context, controller, focusNode) {
-                        return TextField(
-                            controller: controller,
-                            focusNode: focusNode,
-                            autofocus: true,
-                            decoration: const InputDecoration(
-                              border: OutlineInputBorder(),
-                              labelText: 'Brand',
-                            ));
-                      },
-                      itemBuilder: (context, item) {
-                        return ListTile(
-                          title: Text(item.name),
-                        );
-                      },
-                      onSelected: (Brand item) {
-                        _brandController.text = item.name;
-                      },
-                    ),
-                    TypeAheadField<Color>(
-                      controller: _colorController,
-                      suggestionsCallback: (search) => DataStore().colorsByName(search),
-                      builder: (context, controller, focusNode) {
-                        return TextField(
-                            controller: controller,
-                            focusNode: focusNode,
-                            autofocus: true,
-                            decoration: const InputDecoration(
-                              border: OutlineInputBorder(),
-                              labelText: 'Color',
-                            ));
-                      },
-                      itemBuilder: (context, item) {
-                        return ListTile(
-                          title: Text(item.name),
-                        );
-                      },
-                      onSelected: (Color item) {
-                        _colorController.text = item.name;
-                      },
-                    ),
-                    TypeAheadField<Size>(
-                      controller: _sizeController,
-                      suggestionsCallback: (search) => DataStore().sizesByName(search),
-                      builder: (context, controller, focusNode) {
-                        return TextField(
-                            controller: controller,
-                            focusNode: focusNode,
-                            autofocus: true,
-                            decoration: const InputDecoration(
-                              border: OutlineInputBorder(),
-                              labelText: 'Size',
-                            ));
-                      },
-                      itemBuilder: (context, item) {
-                        return ListTile(
-                          title: Text(item.name),
-                        );
-                      },
-                      onSelected: (Size item) {
-                        _sizeController.text = item.name;
-                      },
-                    ),
+                    typeAheadField<c.Category>((search) => DataStore().categoriesByName(search), 'Category'),
+                    typeAheadField<Brand>((search) => DataStore().brandsByName(search), 'Brand'),
+                    typeAheadField<Color>((search) => DataStore().colorsByName(search), 'Color'),
+                    typeAheadField<Size>((search) => DataStore().sizesByName(search), 'Size'),
                     textFormField('Description', 'Enter the item description'),
                     textFormField('Price', 'Enter the item tag price'),
                     Row(

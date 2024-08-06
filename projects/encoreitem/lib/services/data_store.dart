@@ -81,7 +81,7 @@ class DataStore extends ChangeNotifier {
       // path to perform database upgrades and downgrades.
       version: 2,
     );
-    _updateAll();
+    await _updateAll();
     _ready = true;
     notifyListeners();
   }
