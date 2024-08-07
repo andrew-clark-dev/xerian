@@ -119,6 +119,9 @@ class _ItemFormState extends State<StatefulWidget> {
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
+                const SizedBox(
+                  height: 24,
+                ),
                 ...[
                   TypeAheadField<Account>(
                     controller: _accountController,
@@ -135,12 +138,12 @@ class _ItemFormState extends State<StatefulWidget> {
                     },
                     itemBuilder: (context, account) {
                       return ListTile(
-                        title: Text(account.number.padLeft(8, '0')),
-                        subtitle: Text(account.firstName ?? "None"),
+                        title: Text(account.num),
+                        subtitle: Text(account.fullName),
                       );
                     },
                     onSelected: (Account account) {
-                      _accountController.text = account.number.padLeft(8, '0');
+                      _accountController.text = "${account.num} - ${account.fullName}";
                     },
                   ),
                   typeAheadField<c.Category>((search) => DataStore().categoriesByName(search), 'Category'),
@@ -184,4 +187,9 @@ class _ItemFormState extends State<StatefulWidget> {
       ),
     );
   }
+}
+
+extension AccountExtensions on Account {
+  String get fullName => "${firstName ?? ""} ${lastName ?? ""}";
+  String get num => number.padLeft(8, '0');
 }
