@@ -113,73 +113,71 @@ class _ItemFormState extends State<StatefulWidget> {
         key: _formKey,
         child: Align(
           alignment: Alignment.topCenter,
-          child: Card(
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 350),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  ...[
-                    TypeAheadField<Account>(
-                      controller: _accountController,
-                      suggestionsCallback: (search) => DataStore().accountsByNumber(search),
-                      builder: (context, controller, focusNode) {
-                        return TextField(
-                            controller: controller,
-                            focusNode: focusNode,
-                            autofocus: true,
-                            decoration: const InputDecoration(
-                              border: OutlineInputBorder(),
-                              labelText: 'Account',
-                            ));
-                      },
-                      itemBuilder: (context, account) {
-                        return ListTile(
-                          title: Text(account.number.padLeft(8, '0')),
-                          subtitle: Text(account.firstName ?? "None"),
-                        );
-                      },
-                      onSelected: (Account account) {
-                        _accountController.text = account.number.padLeft(8, '0');
-                      },
-                    ),
-                    typeAheadField<c.Category>((search) => DataStore().categoriesByName(search), 'Category'),
-                    typeAheadField<Brand>((search) => DataStore().brandsByName(search), 'Brand'),
-                    typeAheadField<Color>((search) => DataStore().colorsByName(search), 'Color'),
-                    typeAheadField<Size>((search) => DataStore().sizesByName(search), 'Size'),
-                    textFormField('Description', 'Enter the item description'),
-                    textFormField('Price', 'Enter the item tag price'),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        ElevatedButton(
-                          onPressed: () {
-                            // Validate returns true if the form is valid, or false otherwise.
-                            if (_formKey.currentState!.validate()) {
-                              // If the form is valid, display a snackbar. In the real world,
-                              // you'd often call a server or save the information in a database.
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text('Processing Data')),
-                              );
-                            }
-                          },
-                          child: const Text('Save'),
-                        ),
-                        SizedBox(width: 100, child: switchFormField('Print On Save')),
-                      ],
-                    ),
-                  ].expand(
-                    (widget) => [
-                      widget,
-                      const SizedBox(
-                        height: 24,
-                      )
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 350),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                ...[
+                  TypeAheadField<Account>(
+                    controller: _accountController,
+                    suggestionsCallback: (search) => DataStore().accountsByNumber(search),
+                    builder: (context, controller, focusNode) {
+                      return TextField(
+                          controller: controller,
+                          focusNode: focusNode,
+                          autofocus: true,
+                          decoration: const InputDecoration(
+                            border: OutlineInputBorder(),
+                            labelText: 'Account',
+                          ));
+                    },
+                    itemBuilder: (context, account) {
+                      return ListTile(
+                        title: Text(account.number.padLeft(8, '0')),
+                        subtitle: Text(account.firstName ?? "None"),
+                      );
+                    },
+                    onSelected: (Account account) {
+                      _accountController.text = account.number.padLeft(8, '0');
+                    },
+                  ),
+                  typeAheadField<c.Category>((search) => DataStore().categoriesByName(search), 'Category'),
+                  typeAheadField<Brand>((search) => DataStore().brandsByName(search), 'Brand'),
+                  typeAheadField<Color>((search) => DataStore().colorsByName(search), 'Color'),
+                  typeAheadField<Size>((search) => DataStore().sizesByName(search), 'Size'),
+                  textFormField('Description', 'Enter the item description'),
+                  textFormField('Price', 'Enter the item tag price'),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      ElevatedButton(
+                        onPressed: () {
+                          // Validate returns true if the form is valid, or false otherwise.
+                          if (_formKey.currentState!.validate()) {
+                            // If the form is valid, display a snackbar. In the real world,
+                            // you'd often call a server or save the information in a database.
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Processing Data')),
+                            );
+                          }
+                        },
+                        child: const Text('Save'),
+                      ),
+                      SizedBox(width: 100, child: switchFormField('Print On Save')),
                     ],
-                  )
-                ],
-              ),
+                  ),
+                ].expand(
+                  (widget) => [
+                    widget,
+                    const SizedBox(
+                      height: 24,
+                    )
+                  ],
+                )
+              ],
             ),
           ),
         ),
