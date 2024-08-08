@@ -49,6 +49,7 @@ const env: { [key: string]: string } = {
   BRAND_TABLE_NAME: tables['Brand'].tableName,
   COLOR_TABLE_NAME: tables['Color'].tableName,
   SIZE_TABLE_NAME: tables['Size'].tableName,
+  DESCRIPTION_TABLE_NAME: tables['Description'].tableName,
 }
 
 console.log(`Env - ${env}`);

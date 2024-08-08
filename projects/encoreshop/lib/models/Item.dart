@@ -28,10 +28,10 @@ import 'package:collection/collection.dart';
 class Item extends amplify_core.Model {
   static const classType = const _ItemModelType();
   final String id;
-  final int? _sku;
+  final String? _sku;
   final String? _title;
   final Account? _account;
-  final int? _accountNumber;
+  final String? _accountNumber;
   final String? _category;
   final String? _brand;
   final String? _color;
@@ -47,8 +47,8 @@ class Item extends amplify_core.Model {
   final amplify_core.TemporalDateTime? _printedAt;
   final String? _metadata;
   final bool? _active;
-  final amplify_core.TemporalDateTime? _createdAt;
   final amplify_core.TemporalDateTime? _updatedAt;
+  final amplify_core.TemporalDateTime? _createdAt;
 
   @override
   getInstanceType() => classType;
@@ -63,7 +63,7 @@ class Item extends amplify_core.Model {
       );
   }
   
-  int get sku {
+  String get sku {
     try {
       return _sku!;
     } catch(e) {
@@ -84,7 +84,7 @@ class Item extends amplify_core.Model {
     return _account;
   }
   
-  int? get accountNumber {
+  String? get accountNumber {
     return _accountNumber;
   }
   
@@ -184,17 +184,17 @@ class Item extends amplify_core.Model {
     return _active;
   }
   
-  amplify_core.TemporalDateTime? get createdAt {
-    return _createdAt;
-  }
-  
   amplify_core.TemporalDateTime? get updatedAt {
     return _updatedAt;
   }
   
-  const Item._internal({required this.id, required sku, title, account, accountNumber, required category, brand, color, size, description, details, images, condition, required quantity, required split, required price, status, printedAt, metadata, active, createdAt, updatedAt}): _sku = sku, _title = title, _account = account, _accountNumber = accountNumber, _category = category, _brand = brand, _color = color, _size = size, _description = description, _details = details, _images = images, _condition = condition, _quantity = quantity, _split = split, _price = price, _status = status, _printedAt = printedAt, _metadata = metadata, _active = active, _createdAt = createdAt, _updatedAt = updatedAt;
+  amplify_core.TemporalDateTime? get createdAt {
+    return _createdAt;
+  }
   
-  factory Item({String? id, required int sku, String? title, Account? account, int? accountNumber, required String category, String? brand, String? color, String? size, String? description, String? details, List<String>? images, ItemCondition? condition, required int quantity, required int split, required double price, ItemStatus? status, amplify_core.TemporalDateTime? printedAt, String? metadata, bool? active}) {
+  const Item._internal({required this.id, required sku, title, account, accountNumber, required category, brand, color, size, description, details, images, condition, required quantity, required split, required price, status, printedAt, metadata, active, updatedAt, createdAt}): _sku = sku, _title = title, _account = account, _accountNumber = accountNumber, _category = category, _brand = brand, _color = color, _size = size, _description = description, _details = details, _images = images, _condition = condition, _quantity = quantity, _split = split, _price = price, _status = status, _printedAt = printedAt, _metadata = metadata, _active = active, _updatedAt = updatedAt, _createdAt = createdAt;
+  
+  factory Item({String? id, required String sku, String? title, Account? account, String? accountNumber, required String category, String? brand, String? color, String? size, String? description, String? details, List<String>? images, ItemCondition? condition, required int quantity, required int split, required double price, ItemStatus? status, amplify_core.TemporalDateTime? printedAt, String? metadata, bool? active, amplify_core.TemporalDateTime? updatedAt}) {
     return Item._internal(
       id: id == null ? amplify_core.UUID.getUUID() : id,
       sku: sku,
@@ -215,7 +215,8 @@ class Item extends amplify_core.Model {
       status: status,
       printedAt: printedAt,
       metadata: metadata,
-      active: active);
+      active: active,
+      updatedAt: updatedAt);
   }
   
   bool equals(Object other) {
@@ -245,7 +246,8 @@ class Item extends amplify_core.Model {
       _status == other._status &&
       _printedAt == other._printedAt &&
       _metadata == other._metadata &&
-      _active == other._active;
+      _active == other._active &&
+      _updatedAt == other._updatedAt;
   }
   
   @override
@@ -257,10 +259,10 @@ class Item extends amplify_core.Model {
     
     buffer.write("Item {");
     buffer.write("id=" + "$id" + ", ");
-    buffer.write("sku=" + (_sku != null ? _sku.toString() : "null") + ", ");
+    buffer.write("sku=" + "$_sku" + ", ");
     buffer.write("title=" + "$_title" + ", ");
     buffer.write("account=" + (_account != null ? _account.toString() : "null") + ", ");
-    buffer.write("accountNumber=" + (_accountNumber != null ? _accountNumber.toString() : "null") + ", ");
+    buffer.write("accountNumber=" + "$_accountNumber" + ", ");
     buffer.write("category=" + "$_category" + ", ");
     buffer.write("brand=" + "$_brand" + ", ");
     buffer.write("color=" + "$_color" + ", ");
@@ -276,14 +278,14 @@ class Item extends amplify_core.Model {
     buffer.write("printedAt=" + (_printedAt != null ? _printedAt.format() : "null") + ", ");
     buffer.write("metadata=" + "$_metadata" + ", ");
     buffer.write("active=" + (_active != null ? _active.toString() : "null") + ", ");
-    buffer.write("createdAt=" + (_createdAt != null ? _createdAt.format() : "null") + ", ");
-    buffer.write("updatedAt=" + (_updatedAt != null ? _updatedAt.format() : "null"));
+    buffer.write("updatedAt=" + (_updatedAt != null ? _updatedAt.format() : "null") + ", ");
+    buffer.write("createdAt=" + (_createdAt != null ? _createdAt.format() : "null"));
     buffer.write("}");
     
     return buffer.toString();
   }
   
-  Item copyWith({int? sku, String? title, Account? account, int? accountNumber, String? category, String? brand, String? color, String? size, String? description, String? details, List<String>? images, ItemCondition? condition, int? quantity, int? split, double? price, ItemStatus? status, amplify_core.TemporalDateTime? printedAt, String? metadata, bool? active}) {
+  Item copyWith({String? sku, String? title, Account? account, String? accountNumber, String? category, String? brand, String? color, String? size, String? description, String? details, List<String>? images, ItemCondition? condition, int? quantity, int? split, double? price, ItemStatus? status, amplify_core.TemporalDateTime? printedAt, String? metadata, bool? active, amplify_core.TemporalDateTime? updatedAt}) {
     return Item._internal(
       id: id,
       sku: sku ?? this.sku,
@@ -304,14 +306,15 @@ class Item extends amplify_core.Model {
       status: status ?? this.status,
       printedAt: printedAt ?? this.printedAt,
       metadata: metadata ?? this.metadata,
-      active: active ?? this.active);
+      active: active ?? this.active,
+      updatedAt: updatedAt ?? this.updatedAt);
   }
   
   Item copyWithModelFieldValues({
-    ModelFieldValue<int>? sku,
+    ModelFieldValue<String>? sku,
     ModelFieldValue<String?>? title,
     ModelFieldValue<Account?>? account,
-    ModelFieldValue<int?>? accountNumber,
+    ModelFieldValue<String?>? accountNumber,
     ModelFieldValue<String>? category,
     ModelFieldValue<String?>? brand,
     ModelFieldValue<String?>? color,
@@ -326,7 +329,8 @@ class Item extends amplify_core.Model {
     ModelFieldValue<ItemStatus?>? status,
     ModelFieldValue<amplify_core.TemporalDateTime?>? printedAt,
     ModelFieldValue<String?>? metadata,
-    ModelFieldValue<bool?>? active
+    ModelFieldValue<bool?>? active,
+    ModelFieldValue<amplify_core.TemporalDateTime?>? updatedAt
   }) {
     return Item._internal(
       id: id,
@@ -348,20 +352,21 @@ class Item extends amplify_core.Model {
       status: status == null ? this.status : status.value,
       printedAt: printedAt == null ? this.printedAt : printedAt.value,
       metadata: metadata == null ? this.metadata : metadata.value,
-      active: active == null ? this.active : active.value
+      active: active == null ? this.active : active.value,
+      updatedAt: updatedAt == null ? this.updatedAt : updatedAt.value
     );
   }
   
   Item.fromJson(Map<String, dynamic> json)  
     : id = json['id'],
-      _sku = (json['sku'] as num?)?.toInt(),
+      _sku = json['sku'],
       _title = json['title'],
       _account = json['account'] != null
         ? json['account']['serializedData'] != null
           ? Account.fromJson(new Map<String, dynamic>.from(json['account']['serializedData']))
           : Account.fromJson(new Map<String, dynamic>.from(json['account']))
         : null,
-      _accountNumber = (json['accountNumber'] as num?)?.toInt(),
+      _accountNumber = json['accountNumber'],
       _category = json['category'],
       _brand = json['brand'],
       _color = json['color'],
@@ -377,11 +382,11 @@ class Item extends amplify_core.Model {
       _printedAt = json['printedAt'] != null ? amplify_core.TemporalDateTime.fromString(json['printedAt']) : null,
       _metadata = json['metadata'],
       _active = json['active'],
-      _createdAt = json['createdAt'] != null ? amplify_core.TemporalDateTime.fromString(json['createdAt']) : null,
-      _updatedAt = json['updatedAt'] != null ? amplify_core.TemporalDateTime.fromString(json['updatedAt']) : null;
+      _updatedAt = json['updatedAt'] != null ? amplify_core.TemporalDateTime.fromString(json['updatedAt']) : null,
+      _createdAt = json['createdAt'] != null ? amplify_core.TemporalDateTime.fromString(json['createdAt']) : null;
   
   Map<String, dynamic> toJson() => {
-    'id': id, 'sku': _sku, 'title': _title, 'account': _account?.toJson(), 'accountNumber': _accountNumber, 'category': _category, 'brand': _brand, 'color': _color, 'size': _size, 'description': _description, 'details': _details, 'images': _images, 'condition': amplify_core.enumToString(_condition), 'quantity': _quantity, 'split': _split, 'price': _price, 'status': amplify_core.enumToString(_status), 'printedAt': _printedAt?.format(), 'metadata': _metadata, 'active': _active, 'createdAt': _createdAt?.format(), 'updatedAt': _updatedAt?.format()
+    'id': id, 'sku': _sku, 'title': _title, 'account': _account?.toJson(), 'accountNumber': _accountNumber, 'category': _category, 'brand': _brand, 'color': _color, 'size': _size, 'description': _description, 'details': _details, 'images': _images, 'condition': amplify_core.enumToString(_condition), 'quantity': _quantity, 'split': _split, 'price': _price, 'status': amplify_core.enumToString(_status), 'printedAt': _printedAt?.format(), 'metadata': _metadata, 'active': _active, 'updatedAt': _updatedAt?.format(), 'createdAt': _createdAt?.format()
   };
   
   Map<String, Object?> toMap() => {
@@ -405,8 +410,8 @@ class Item extends amplify_core.Model {
     'printedAt': _printedAt,
     'metadata': _metadata,
     'active': _active,
-    'createdAt': _createdAt,
-    'updatedAt': _updatedAt
+    'updatedAt': _updatedAt,
+    'createdAt': _createdAt
   };
 
   static final amplify_core.QueryModelIdentifier<ItemModelIdentifier> MODEL_IDENTIFIER = amplify_core.QueryModelIdentifier<ItemModelIdentifier>();
@@ -432,6 +437,7 @@ class Item extends amplify_core.Model {
   static final PRINTEDAT = amplify_core.QueryField(fieldName: "printedAt");
   static final METADATA = amplify_core.QueryField(fieldName: "metadata");
   static final ACTIVE = amplify_core.QueryField(fieldName: "active");
+  static final UPDATEDAT = amplify_core.QueryField(fieldName: "updatedAt");
   static var schema = amplify_core.Model.defineSchema(define: (amplify_core.ModelSchemaDefinition modelSchemaDefinition) {
     modelSchemaDefinition.name = "Item";
     modelSchemaDefinition.pluralName = "Items";
@@ -457,7 +463,7 @@ class Item extends amplify_core.Model {
     modelSchemaDefinition.addField(amplify_core.ModelFieldDefinition.field(
       key: Item.SKU,
       isRequired: true,
-      ofType: amplify_core.ModelFieldType(amplify_core.ModelFieldTypeEnum.int)
+      ofType: amplify_core.ModelFieldType(amplify_core.ModelFieldTypeEnum.string)
     ));
     
     modelSchemaDefinition.addField(amplify_core.ModelFieldDefinition.field(
@@ -476,7 +482,7 @@ class Item extends amplify_core.Model {
     modelSchemaDefinition.addField(amplify_core.ModelFieldDefinition.field(
       key: Item.ACCOUNTNUMBER,
       isRequired: false,
-      ofType: amplify_core.ModelFieldType(amplify_core.ModelFieldTypeEnum.int)
+      ofType: amplify_core.ModelFieldType(amplify_core.ModelFieldTypeEnum.string)
     ));
     
     modelSchemaDefinition.addField(amplify_core.ModelFieldDefinition.field(
@@ -570,15 +576,14 @@ class Item extends amplify_core.Model {
       ofType: amplify_core.ModelFieldType(amplify_core.ModelFieldTypeEnum.bool)
     ));
     
-    modelSchemaDefinition.addField(amplify_core.ModelFieldDefinition.nonQueryField(
-      fieldName: 'createdAt',
+    modelSchemaDefinition.addField(amplify_core.ModelFieldDefinition.field(
+      key: Item.UPDATEDAT,
       isRequired: false,
-      isReadOnly: true,
       ofType: amplify_core.ModelFieldType(amplify_core.ModelFieldTypeEnum.dateTime)
     ));
     
     modelSchemaDefinition.addField(amplify_core.ModelFieldDefinition.nonQueryField(
-      fieldName: 'updatedAt',
+      fieldName: 'createdAt',
       isRequired: false,
       isReadOnly: true,
       ofType: amplify_core.ModelFieldType(amplify_core.ModelFieldTypeEnum.dateTime)

@@ -24,6 +24,7 @@ import 'Account.dart';
 import 'Brand.dart';
 import 'Category.dart';
 import 'Color.dart';
+import 'Description.dart';
 import 'Item.dart';
 import 'Size.dart';
 
@@ -34,6 +35,7 @@ export 'AccountStatus.dart';
 export 'Brand.dart';
 export 'Category.dart';
 export 'Color.dart';
+export 'Description.dart';
 export 'Item.dart';
 export 'ItemCondition.dart';
 export 'ItemStatus.dart';
@@ -41,9 +43,9 @@ export 'Size.dart';
 
 class ModelProvider implements amplify_core.ModelProviderInterface {
   @override
-  String version = "b938e1dd607c50095d9ed24d68c221c9";
+  String version = "321494dfee9eca167d9b43f801e5237d";
   @override
-  List<amplify_core.ModelSchema> modelSchemas = [Account.schema, Brand.schema, Category.schema, Color.schema, Item.schema, Size.schema];
+  List<amplify_core.ModelSchema> modelSchemas = [Account.schema, Brand.schema, Category.schema, Color.schema, Description.schema, Item.schema, Size.schema];
   @override
   List<amplify_core.ModelSchema> customTypeSchemas = [];
   static final ModelProvider _instance = ModelProvider();
@@ -60,6 +62,8 @@ class ModelProvider implements amplify_core.ModelProviderInterface {
         return Category.classType;
       case "Color":
         return Color.classType;
+      case "Description":
+        return Description.classType;
       case "Item":
         return Item.classType;
       case "Size":

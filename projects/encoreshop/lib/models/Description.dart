@@ -24,9 +24,9 @@ import 'package:amplify_core/amplify_core.dart' as amplify_core;
 import 'package:collection/collection.dart';
 
 
-/** This is an auto generated class representing the Brand type in your schema. */
-class Brand extends amplify_core.Model {
-  static const classType = const _BrandModelType();
+/** This is an auto generated class representing the Description type in your schema. */
+class Description extends amplify_core.Model {
+  static const classType = const _DescriptionModelType();
   final String? _name;
   final List<String>? _alt;
   final String? _metadata;
@@ -41,9 +41,9 @@ class Brand extends amplify_core.Model {
   @override
   String getId() => modelIdentifier.serializeAsString();
   
-  BrandModelIdentifier get modelIdentifier {
+  DescriptionModelIdentifier get modelIdentifier {
     try {
-      return BrandModelIdentifier(
+      return DescriptionModelIdentifier(
         name: _name!
       );
     } catch(e) {
@@ -89,10 +89,10 @@ class Brand extends amplify_core.Model {
     return _createdAt;
   }
   
-  const Brand._internal({required name, alt, metadata, active, updatedAt, createdAt}): _name = name, _alt = alt, _metadata = metadata, _active = active, _updatedAt = updatedAt, _createdAt = createdAt;
+  const Description._internal({required name, alt, metadata, active, updatedAt, createdAt}): _name = name, _alt = alt, _metadata = metadata, _active = active, _updatedAt = updatedAt, _createdAt = createdAt;
   
-  factory Brand({required String name, List<String>? alt, String? metadata, bool? active, amplify_core.TemporalDateTime? updatedAt}) {
-    return Brand._internal(
+  factory Description({required String name, List<String>? alt, String? metadata, bool? active, amplify_core.TemporalDateTime? updatedAt}) {
+    return Description._internal(
       name: name,
       alt: alt != null ? List<String>.unmodifiable(alt) : alt,
       metadata: metadata,
@@ -107,7 +107,7 @@ class Brand extends amplify_core.Model {
   @override
   bool operator ==(Object other) {
     if (identical(other, this)) return true;
-    return other is Brand &&
+    return other is Description &&
       _name == other._name &&
       DeepCollectionEquality().equals(_alt, other._alt) &&
       _metadata == other._metadata &&
@@ -122,7 +122,7 @@ class Brand extends amplify_core.Model {
   String toString() {
     var buffer = new StringBuffer();
     
-    buffer.write("Brand {");
+    buffer.write("Description {");
     buffer.write("name=" + "$_name" + ", ");
     buffer.write("alt=" + (_alt != null ? _alt.toString() : "null") + ", ");
     buffer.write("metadata=" + "$_metadata" + ", ");
@@ -134,8 +134,8 @@ class Brand extends amplify_core.Model {
     return buffer.toString();
   }
   
-  Brand copyWith({List<String>? alt, String? metadata, bool? active, amplify_core.TemporalDateTime? updatedAt}) {
-    return Brand._internal(
+  Description copyWith({List<String>? alt, String? metadata, bool? active, amplify_core.TemporalDateTime? updatedAt}) {
+    return Description._internal(
       name: name,
       alt: alt ?? this.alt,
       metadata: metadata ?? this.metadata,
@@ -143,13 +143,13 @@ class Brand extends amplify_core.Model {
       updatedAt: updatedAt ?? this.updatedAt);
   }
   
-  Brand copyWithModelFieldValues({
+  Description copyWithModelFieldValues({
     ModelFieldValue<List<String>?>? alt,
     ModelFieldValue<String?>? metadata,
     ModelFieldValue<bool?>? active,
     ModelFieldValue<amplify_core.TemporalDateTime?>? updatedAt
   }) {
-    return Brand._internal(
+    return Description._internal(
       name: name,
       alt: alt == null ? this.alt : alt.value,
       metadata: metadata == null ? this.metadata : metadata.value,
@@ -158,7 +158,7 @@ class Brand extends amplify_core.Model {
     );
   }
   
-  Brand.fromJson(Map<String, dynamic> json)  
+  Description.fromJson(Map<String, dynamic> json)  
     : _name = json['name'],
       _alt = json['alt']?.cast<String>(),
       _metadata = json['metadata'],
@@ -179,15 +179,15 @@ class Brand extends amplify_core.Model {
     'createdAt': _createdAt
   };
 
-  static final amplify_core.QueryModelIdentifier<BrandModelIdentifier> MODEL_IDENTIFIER = amplify_core.QueryModelIdentifier<BrandModelIdentifier>();
+  static final amplify_core.QueryModelIdentifier<DescriptionModelIdentifier> MODEL_IDENTIFIER = amplify_core.QueryModelIdentifier<DescriptionModelIdentifier>();
   static final NAME = amplify_core.QueryField(fieldName: "name");
   static final ALT = amplify_core.QueryField(fieldName: "alt");
   static final METADATA = amplify_core.QueryField(fieldName: "metadata");
   static final ACTIVE = amplify_core.QueryField(fieldName: "active");
   static final UPDATEDAT = amplify_core.QueryField(fieldName: "updatedAt");
   static var schema = amplify_core.Model.defineSchema(define: (amplify_core.ModelSchemaDefinition modelSchemaDefinition) {
-    modelSchemaDefinition.name = "Brand";
-    modelSchemaDefinition.pluralName = "Brands";
+    modelSchemaDefinition.name = "Description";
+    modelSchemaDefinition.pluralName = "Descriptions";
     
     modelSchemaDefinition.authRules = [
       amplify_core.AuthRule(
@@ -205,32 +205,32 @@ class Brand extends amplify_core.Model {
     ];
     
     modelSchemaDefinition.addField(amplify_core.ModelFieldDefinition.field(
-      key: Brand.NAME,
+      key: Description.NAME,
       isRequired: true,
       ofType: amplify_core.ModelFieldType(amplify_core.ModelFieldTypeEnum.string)
     ));
     
     modelSchemaDefinition.addField(amplify_core.ModelFieldDefinition.field(
-      key: Brand.ALT,
+      key: Description.ALT,
       isRequired: false,
       isArray: true,
       ofType: amplify_core.ModelFieldType(amplify_core.ModelFieldTypeEnum.collection, ofModelName: amplify_core.ModelFieldTypeEnum.string.name)
     ));
     
     modelSchemaDefinition.addField(amplify_core.ModelFieldDefinition.field(
-      key: Brand.METADATA,
+      key: Description.METADATA,
       isRequired: false,
       ofType: amplify_core.ModelFieldType(amplify_core.ModelFieldTypeEnum.string)
     ));
     
     modelSchemaDefinition.addField(amplify_core.ModelFieldDefinition.field(
-      key: Brand.ACTIVE,
+      key: Description.ACTIVE,
       isRequired: false,
       ofType: amplify_core.ModelFieldType(amplify_core.ModelFieldTypeEnum.bool)
     ));
     
     modelSchemaDefinition.addField(amplify_core.ModelFieldDefinition.field(
-      key: Brand.UPDATEDAT,
+      key: Description.UPDATEDAT,
       isRequired: false,
       ofType: amplify_core.ModelFieldType(amplify_core.ModelFieldTypeEnum.dateTime)
     ));
@@ -244,29 +244,29 @@ class Brand extends amplify_core.Model {
   });
 }
 
-class _BrandModelType extends amplify_core.ModelType<Brand> {
-  const _BrandModelType();
+class _DescriptionModelType extends amplify_core.ModelType<Description> {
+  const _DescriptionModelType();
   
   @override
-  Brand fromJson(Map<String, dynamic> jsonData) {
-    return Brand.fromJson(jsonData);
+  Description fromJson(Map<String, dynamic> jsonData) {
+    return Description.fromJson(jsonData);
   }
   
   @override
   String modelName() {
-    return 'Brand';
+    return 'Description';
   }
 }
 
 /**
  * This is an auto generated class representing the model identifier
- * of [Brand] in your schema.
+ * of [Description] in your schema.
  */
-class BrandModelIdentifier implements amplify_core.ModelIdentifier<Brand> {
+class DescriptionModelIdentifier implements amplify_core.ModelIdentifier<Description> {
   final String name;
 
-  /** Create an instance of BrandModelIdentifier using [name] the primary key. */
-  const BrandModelIdentifier({
+  /** Create an instance of DescriptionModelIdentifier using [name] the primary key. */
+  const DescriptionModelIdentifier({
     required this.name});
   
   @override
@@ -284,7 +284,7 @@ class BrandModelIdentifier implements amplify_core.ModelIdentifier<Brand> {
   String serializeAsString() => serializeAsMap().values.join('#');
   
   @override
-  String toString() => 'BrandModelIdentifier(name: $name)';
+  String toString() => 'DescriptionModelIdentifier(name: $name)';
   
   @override
   bool operator ==(Object other) {
@@ -292,7 +292,7 @@ class BrandModelIdentifier implements amplify_core.ModelIdentifier<Brand> {
       return true;
     }
     
-    return other is BrandModelIdentifier &&
+    return other is DescriptionModelIdentifier &&
       name == other.name;
   }
   

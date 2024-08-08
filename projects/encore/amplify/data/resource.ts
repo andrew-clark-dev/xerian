@@ -95,6 +95,16 @@ const schema = a.schema({
     })
     .identifier(['name']),
 
+  Description: a
+    .model({
+      name: a.string().required(),
+      alt: a.string().array(),
+      metadata: a.json(),
+      active: a.boolean().default(true),
+      updatedAt: a.datetime(),
+    })
+    .identifier(['name']),
+
   // Functions
   addUserToGroup: a
     .mutation()

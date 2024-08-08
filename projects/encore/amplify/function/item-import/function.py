@@ -32,6 +32,7 @@ category_table_name = os.environ.get("CATEGORY_TABLE_NAME")
 brand_table_name = os.environ.get("BRAND_TABLE_NAME")
 color_table_name = os.environ.get("COLOR_TABLE_NAME")
 size_table_name = os.environ.get("SIZE_TABLE_NAME")
+description_table_name = os.environ.get("DESCRIPTION_TABLE_NAME")
 logger.info("Running account-import function")
 
 
@@ -166,6 +167,16 @@ def process_row(row):
 
     if row["Description"] is not None:
         item_data["description"] = {"S": row["Description"]}
+        description_data = {
+            "__typename": {"S": "Description"},
+            "name": {"S": str(row["Description"])},
+            "createdAt": {"S": datetime.utcnow().isoformat() + "Z"},
+            "updatedAt": {"S": datetime.utcnow().isoformat() + "Z"},
+        }
+        response = dynamodb.put_item(
+            TableName=description_table_name,
+            Item=description_data)
+        logger.info(f"Size Response : {response}")
     if row["Details"] is not None:
         item_data["details"] = {"S": row["Details"]}
     if row["Printed"] is not None:
