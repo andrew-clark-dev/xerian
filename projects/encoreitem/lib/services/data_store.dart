@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 import 'package:amplify_api/amplify_api.dart';
 import 'package:amplify_flutter/amplify_flutter.dart';
@@ -87,6 +88,8 @@ class DataStore extends ChangeNotifier {
   }
 
   Future<void> _updateAll() async {
+    if (dotenv.env['SKIP_LOAD'] == 'true') return;
+
     // Load and obtain the shared preferences for this app.
     final prefs = await SharedPreferences.getInstance();
     final thisUpdate = DateTime.now().toUtc().toIso8601String();
