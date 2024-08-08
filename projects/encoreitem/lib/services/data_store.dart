@@ -88,8 +88,6 @@ class DataStore extends ChangeNotifier {
   }
 
   Future<void> _updateAll() async {
-    if (dotenv.env['SKIP_LOAD'] == 'true') return;
-
     // Load and obtain the shared preferences for this app.
     final prefs = await SharedPreferences.getInstance();
     final thisUpdate = DateTime.now().toUtc().toIso8601String();
@@ -98,60 +96,50 @@ class DataStore extends ChangeNotifier {
 
     safePrint("Update data from $lastUpdate to $thisUpdate");
 
-    final newAccounts = (await _load(Account.classType, lastUpdate)).map((account) => account as Account).toList();
-    accounts = (await _insert(Account.classType, newAccounts)).map((account) => account as Account).toList();
-
-    final newCategories = (await _load(c.Category.classType, lastUpdate)).map((m) => m as c.Category).toList();
-    categories = (await _insert(c.Category.classType, newCategories)).map((m) => m as c.Category).toList();
-
-    final newBrands = (await _load(Brand.classType, lastUpdate)).map((m) => m as Brand).toList();
-    brands = (await _insert(Brand.classType, newBrands)).map((m) => m as Brand).toList();
-
-    final newColors = (await _load(Color.classType, lastUpdate)).map((m) => m as Color).toList();
-    colors = (await _insert(Color.classType, newColors)).map((m) => m as Color).toList();
-
-    final newSizes = (await _load(Size.classType, lastUpdate)).map((m) => m as Size).toList();
-    sizes = (await _insert(Size.classType, newSizes)).map((m) => m as Size).toList();
+    accounts = (await _load(Account.classType, lastUpdate)).map((account) => account as Account).toList();
+    categories = (await _load(c.Category.classType, lastUpdate)).map((m) => m as c.Category).toList();
+    brands = (await _load(Brand.classType, lastUpdate)).map((m) => m as Brand).toList();
+    colors = (await _load(Color.classType, lastUpdate)).map((m) => m as Color).toList();
+    sizes = (await _load(Size.classType, lastUpdate)).map((m) => m as Size).toList();
 
     prefs.setString('lastUpdate', thisUpdate);
     safePrint("Updated data  $thisUpdate");
   }
 
   Future<List<Model>> _load(ModelType modelType, String lastUpdate) async {
-    safePrint("Updating $modelType");
-    final queryPredicate = Account.UPDATEDAT.gt(lastUpdate);
+    if (dotenv.env['SKIP_LOAD'] != 'true') {
+      safePrint("Loading $modelType");
+      final queryPredicate = Account.UPDATEDAT.gt(lastUpdate);
 
-    final request = ModelQueries.list(modelType, where: queryPredicate);
-    final response = await Amplify.API.query(request: request).response;
+      final request = ModelQueries.list(modelType, where: queryPredicate);
+      final response = await Amplify.API.query(request: request).response;
 
-    var data = response.data;
+      var data = response.data;
 
-    List<Model> models = data?.items.nonNulls.toList() ?? <Model>[];
+      List<Model> models = data?.items.nonNulls.toList() ?? <Model>[];
 
-    while (data?.hasNextResult ?? false) {
-      final nextResponse = await Amplify.API.query(request: data!.requestForNextResult!).response;
-      data = nextResponse.data;
-      var nextModels = data?.items.nonNulls.toList() ?? <Model>[];
-      models.addAll(nextModels);
+      while (data?.hasNextResult ?? false) {
+        final nextResponse = await Amplify.API.query(request: data!.requestForNextResult!).response;
+        data = nextResponse.data;
+        var nextModels = data?.items.nonNulls.toList() ?? <Model>[];
+        models.addAll(nextModels);
+      }
+
+      safePrint("${models.length} ${modelType.modelName()} updates found");
+
+      safePrint("Updating application data");
+      // Add the updates
+      for (Model model in models) {
+        final json = model.toJson();
+        await database.insert(
+          modelType.modelName(),
+          {'id': json['id'], 'json': jsonEncode(json)},
+          conflictAlgorithm: ConflictAlgorithm.replace,
+        );
+      }
+
+      safePrint("${models.length} ${modelType.modelName()} added to db");
     }
-
-    safePrint("${models.length} ${modelType.modelName()} updates found");
-
-    return models;
-  }
-
-  Future<List<Model>> _insert(ModelType modelType, List<Model> models) async {
-    // Add the updates
-    for (Model model in models) {
-      final json = model.toJson();
-      await database.insert(
-        modelType.modelName(),
-        {'id': json['id'], 'json': jsonEncode(json)},
-        conflictAlgorithm: ConflictAlgorithm.replace,
-      );
-    }
-
-    safePrint("${models.length} ${modelType.modelName()} added to db");
 
     final List<Map<String, Object?>> modelMaps = await database.query(modelType.modelName());
 
