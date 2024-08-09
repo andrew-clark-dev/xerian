@@ -115,6 +115,27 @@ const schema = a.schema({
     .authorization((allow) => [allow.groups(["Admin"])])
     .handler(a.handler.function(addUserToGroup))
     .returns(a.json()),
+
+  Counter: a
+    .model({
+      count: a.integer(),
+    }),
+
+  incrementCounter: a
+    .mutation()
+    // arguments that this query accepts
+    .arguments({
+      id: a.id(),
+    })
+    // return type of the query
+    .returns(a.ref("Counter"))
+    // only allow signed-in users to call this API
+    .authorization((allow) => [allow.authenticated()])
+    .handler(a.handler.custom({
+      dataSource: a.ref('Counter'),
+      entry: './increment-counter.js'
+    })),
+
 })
 
 
