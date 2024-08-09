@@ -11,6 +11,7 @@ import 'package:encoreitem/models/Size.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 
+import 'services/counter_service.dart';
 import 'services/data_store.dart';
 
 class ItemForm extends StatefulWidget {
@@ -24,6 +25,8 @@ class _ItemFormState extends State<StatefulWidget> {
   final _formKey = GlobalKey<FormState>();
 
   final controllers = <String, TextEditingController>{};
+
+  final CounterService counter = CounterService(Account.classType);
 
   @override
   void dispose() {
@@ -202,12 +205,24 @@ class _ItemFormState extends State<StatefulWidget> {
                             const Text('Details'),
                             tagFormField('Price', 25),
                             const SizedBox(height: 10),
-                            BarcodeWidget(
-                              barcode: Barcode.code39(), // Barcode type and settings
-                              data: '123456789', // Content
-                              width: 150,
-                              height: 70,
-                            ),
+                            FutureBuilder(
+                                future: counter.next(),
+                                builder: (context, AsyncSnapshot<String> snapshot) {
+                                  String data;
+                                  if (snapshot.hasData) {
+                                    data = snapshot.data!;
+                                  } else if (snapshot.hasError) {
+                                    data = "Error";
+                                  } else {
+                                    data = "Uninitialized";
+                                  }
+                                  return BarcodeWidget(
+                                    barcode: Barcode.code39(), // Barcode type and settings
+                                    data: data, // Content
+                                    width: 150,
+                                    height: 70,
+                                  );
+                                })
                           ],
                         )),
                       ),

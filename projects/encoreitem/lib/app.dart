@@ -2,6 +2,7 @@ import 'package:encoreitem/form.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import 'services/counter_service.dart';
 import 'services/data_store.dart';
 import 'splash.dart';
 
@@ -17,6 +18,7 @@ class ItemApp extends StatelessWidget {
           if (store.ready) {
             return const ItemForm();
           } else {
+            CounterService.initialize();
             DataStore().init();
             return const SplashScreen();
           }
