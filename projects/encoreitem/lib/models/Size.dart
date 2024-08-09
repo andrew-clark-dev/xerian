@@ -31,8 +31,8 @@ class Size extends amplify_core.Model {
   final List<String>? _alt;
   final String? _metadata;
   final bool? _active;
-  final amplify_core.TemporalDateTime? _createdAt;
   final amplify_core.TemporalDateTime? _updatedAt;
+  final amplify_core.TemporalDateTime? _createdAt;
 
   @override
   getInstanceType() => classType;
@@ -81,22 +81,23 @@ class Size extends amplify_core.Model {
     return _active;
   }
   
-  amplify_core.TemporalDateTime? get createdAt {
-    return _createdAt;
-  }
-  
   amplify_core.TemporalDateTime? get updatedAt {
     return _updatedAt;
   }
   
-  const Size._internal({required name, alt, metadata, active, createdAt, updatedAt}): _name = name, _alt = alt, _metadata = metadata, _active = active, _createdAt = createdAt, _updatedAt = updatedAt;
+  amplify_core.TemporalDateTime? get createdAt {
+    return _createdAt;
+  }
   
-  factory Size({required String name, List<String>? alt, String? metadata, bool? active}) {
+  const Size._internal({required name, alt, metadata, active, updatedAt, createdAt}): _name = name, _alt = alt, _metadata = metadata, _active = active, _updatedAt = updatedAt, _createdAt = createdAt;
+  
+  factory Size({required String name, List<String>? alt, String? metadata, bool? active, amplify_core.TemporalDateTime? updatedAt}) {
     return Size._internal(
       name: name,
       alt: alt != null ? List<String>.unmodifiable(alt) : alt,
       metadata: metadata,
-      active: active);
+      active: active,
+      updatedAt: updatedAt);
   }
   
   bool equals(Object other) {
@@ -110,7 +111,8 @@ class Size extends amplify_core.Model {
       _name == other._name &&
       DeepCollectionEquality().equals(_alt, other._alt) &&
       _metadata == other._metadata &&
-      _active == other._active;
+      _active == other._active &&
+      _updatedAt == other._updatedAt;
   }
   
   @override
@@ -125,31 +127,34 @@ class Size extends amplify_core.Model {
     buffer.write("alt=" + (_alt != null ? _alt.toString() : "null") + ", ");
     buffer.write("metadata=" + "$_metadata" + ", ");
     buffer.write("active=" + (_active != null ? _active.toString() : "null") + ", ");
-    buffer.write("createdAt=" + (_createdAt != null ? _createdAt.format() : "null") + ", ");
-    buffer.write("updatedAt=" + (_updatedAt != null ? _updatedAt.format() : "null"));
+    buffer.write("updatedAt=" + (_updatedAt != null ? _updatedAt.format() : "null") + ", ");
+    buffer.write("createdAt=" + (_createdAt != null ? _createdAt.format() : "null"));
     buffer.write("}");
     
     return buffer.toString();
   }
   
-  Size copyWith({List<String>? alt, String? metadata, bool? active}) {
+  Size copyWith({List<String>? alt, String? metadata, bool? active, amplify_core.TemporalDateTime? updatedAt}) {
     return Size._internal(
       name: name,
       alt: alt ?? this.alt,
       metadata: metadata ?? this.metadata,
-      active: active ?? this.active);
+      active: active ?? this.active,
+      updatedAt: updatedAt ?? this.updatedAt);
   }
   
   Size copyWithModelFieldValues({
     ModelFieldValue<List<String>?>? alt,
     ModelFieldValue<String?>? metadata,
-    ModelFieldValue<bool?>? active
+    ModelFieldValue<bool?>? active,
+    ModelFieldValue<amplify_core.TemporalDateTime?>? updatedAt
   }) {
     return Size._internal(
       name: name,
       alt: alt == null ? this.alt : alt.value,
       metadata: metadata == null ? this.metadata : metadata.value,
-      active: active == null ? this.active : active.value
+      active: active == null ? this.active : active.value,
+      updatedAt: updatedAt == null ? this.updatedAt : updatedAt.value
     );
   }
   
@@ -158,11 +163,11 @@ class Size extends amplify_core.Model {
       _alt = json['alt']?.cast<String>(),
       _metadata = json['metadata'],
       _active = json['active'],
-      _createdAt = json['createdAt'] != null ? amplify_core.TemporalDateTime.fromString(json['createdAt']) : null,
-      _updatedAt = json['updatedAt'] != null ? amplify_core.TemporalDateTime.fromString(json['updatedAt']) : null;
+      _updatedAt = json['updatedAt'] != null ? amplify_core.TemporalDateTime.fromString(json['updatedAt']) : null,
+      _createdAt = json['createdAt'] != null ? amplify_core.TemporalDateTime.fromString(json['createdAt']) : null;
   
   Map<String, dynamic> toJson() => {
-    'name': _name, 'alt': _alt, 'metadata': _metadata, 'active': _active, 'createdAt': _createdAt?.format(), 'updatedAt': _updatedAt?.format()
+    'name': _name, 'alt': _alt, 'metadata': _metadata, 'active': _active, 'updatedAt': _updatedAt?.format(), 'createdAt': _createdAt?.format()
   };
   
   Map<String, Object?> toMap() => {
@@ -170,8 +175,8 @@ class Size extends amplify_core.Model {
     'alt': _alt,
     'metadata': _metadata,
     'active': _active,
-    'createdAt': _createdAt,
-    'updatedAt': _updatedAt
+    'updatedAt': _updatedAt,
+    'createdAt': _createdAt
   };
 
   static final amplify_core.QueryModelIdentifier<SizeModelIdentifier> MODEL_IDENTIFIER = amplify_core.QueryModelIdentifier<SizeModelIdentifier>();
@@ -179,6 +184,7 @@ class Size extends amplify_core.Model {
   static final ALT = amplify_core.QueryField(fieldName: "alt");
   static final METADATA = amplify_core.QueryField(fieldName: "metadata");
   static final ACTIVE = amplify_core.QueryField(fieldName: "active");
+  static final UPDATEDAT = amplify_core.QueryField(fieldName: "updatedAt");
   static var schema = amplify_core.Model.defineSchema(define: (amplify_core.ModelSchemaDefinition modelSchemaDefinition) {
     modelSchemaDefinition.name = "Size";
     modelSchemaDefinition.pluralName = "Sizes";
@@ -223,15 +229,14 @@ class Size extends amplify_core.Model {
       ofType: amplify_core.ModelFieldType(amplify_core.ModelFieldTypeEnum.bool)
     ));
     
-    modelSchemaDefinition.addField(amplify_core.ModelFieldDefinition.nonQueryField(
-      fieldName: 'createdAt',
+    modelSchemaDefinition.addField(amplify_core.ModelFieldDefinition.field(
+      key: Size.UPDATEDAT,
       isRequired: false,
-      isReadOnly: true,
       ofType: amplify_core.ModelFieldType(amplify_core.ModelFieldTypeEnum.dateTime)
     ));
     
     modelSchemaDefinition.addField(amplify_core.ModelFieldDefinition.nonQueryField(
-      fieldName: 'updatedAt',
+      fieldName: 'createdAt',
       isRequired: false,
       isReadOnly: true,
       ofType: amplify_core.ModelFieldType(amplify_core.ModelFieldTypeEnum.dateTime)

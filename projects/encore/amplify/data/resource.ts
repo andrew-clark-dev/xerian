@@ -7,7 +7,7 @@ const schema = a.schema({
   // Models
   Account: a
     .model({
-      number: a.integer().required(),
+      number: a.string().required(),
       firstName: a.string(),
       lastName: a.string(),
       email: a.string(),
@@ -25,16 +25,17 @@ const schema = a.schema({
       items: a.hasMany("Item", "accountId"), // setup relationships between types
       metadata: a.json(),
       active: a.boolean().default(true),
+      updatedAt: a.datetime(),
     })
     .secondaryIndexes((index) => [index("number")]),
 
   Item: a
     .model({
-      sku: a.integer().required(),
+      sku: a.string().required(),
       title: a.string(),
       accountId: a.id(),
       account: a.belongsTo("Account", "accountId"),
-      accountNumber: a.integer(),
+      accountNumber: a.string(),
       category: a.string().required(),
       brand: a.string(),
       color: a.string(),
@@ -50,6 +51,7 @@ const schema = a.schema({
       printedAt: a.datetime(),
       metadata: a.json(),
       active: a.boolean().default(true),
+      updatedAt: a.datetime(),
     })
     .secondaryIndexes((index) => [index("sku"), index("accountId")]),
 
@@ -59,6 +61,7 @@ const schema = a.schema({
       alt: a.string().array(),
       metadata: a.json(),
       active: a.boolean().default(true),
+      updatedAt: a.datetime(),
     })
     .identifier(['name']),
 
@@ -68,6 +71,7 @@ const schema = a.schema({
       alt: a.string().array(),
       metadata: a.json(),
       active: a.boolean().default(true),
+      updatedAt: a.datetime(),
     })
     .identifier(['name']),
 
@@ -77,6 +81,7 @@ const schema = a.schema({
       alt: a.string().array(),
       metadata: a.json(),
       active: a.boolean().default(true),
+      updatedAt: a.datetime(),
     })
     .identifier(['name']),
 
@@ -86,6 +91,17 @@ const schema = a.schema({
       alt: a.string().array(),
       metadata: a.json(),
       active: a.boolean().default(true),
+      updatedAt: a.datetime(),
+    })
+    .identifier(['name']),
+
+  Description: a
+    .model({
+      name: a.string().required(),
+      alt: a.string().array(),
+      metadata: a.json(),
+      active: a.boolean().default(true),
+      updatedAt: a.datetime(),
     })
     .identifier(['name']),
 
@@ -99,6 +115,27 @@ const schema = a.schema({
     .authorization((allow) => [allow.groups(["Admin"])])
     .handler(a.handler.function(addUserToGroup))
     .returns(a.json()),
+
+  Counter: a
+    .model({
+      count: a.integer(),
+    }),
+
+  incrementCounter: a
+    .mutation()
+    // arguments that this query accepts
+    .arguments({
+      id: a.id(),
+    })
+    // return type of the query
+    .returns(a.ref("Counter"))
+    // only allow signed-in users to call this API
+    .authorization((allow) => [allow.authenticated()])
+    .handler(a.handler.custom({
+      dataSource: a.ref('Counter'),
+      entry: './increment-counter.js'
+    })),
+
 })
 
 

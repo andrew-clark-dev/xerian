@@ -4,9 +4,11 @@
 <dict>
 	<key>com.apple.security.app-sandbox</key>
 	<true/>
+	<key>com.apple.security.print</key>
+	<true/>
 	<key>keychain-access-groups</key>
 	<array>
-		<string>$(AppIdentifierPrefix)com.example.encoreitem</string>
+		<string>$(AppIdentifierPrefix)com.xerian.encoreitem</string>
 	</array>
 </dict>
 </plist>

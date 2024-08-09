@@ -74,7 +74,7 @@ class _AccountViewState extends PageViewState<AccountView> {
       request = ModelMutations.update(updatedAccount);
     } else {
       final newAccount = Account(
-          number: 1,
+          number: "",
           firstName: controllers[Account.FIRSTNAME]!.text,
           lastName: controllers[Account.FIRSTNAME]!.text,
           balance: 10.00);

@@ -32,6 +32,7 @@ category_table_name = os.environ.get("CATEGORY_TABLE_NAME")
 brand_table_name = os.environ.get("BRAND_TABLE_NAME")
 color_table_name = os.environ.get("COLOR_TABLE_NAME")
 size_table_name = os.environ.get("SIZE_TABLE_NAME")
+description_table_name = os.environ.get("DESCRIPTION_TABLE_NAME")
 logger.info("Running account-import function")
 
 
@@ -100,7 +101,7 @@ def process_row(row):
     item_data = {
         "__typename": {"S": "Item"},
         "id": {"S": str(uuid.uuid4())},
-        "sku": {"N": str(row["SKU"])},
+        "sku": {"S": str(row["SKU"])},
         "title": {"S": str(row["Title"])},
         "condition": {"S": "UNKNOWN"},
         "split": {"S": str(row["Split"]).replace("%", "")},  # Strp off %
@@ -113,10 +114,10 @@ def process_row(row):
     }
 
     if row["Category"] is not None:
-        item_data["category"] = {"S": row["Category"]}
+        item_data["category"] = {"S": str(row["Category"])}
         category_data = {
             "__typename": {"S": "Category"},
-            "name": {"S": row["Category"]},
+            "name": {"S": str(row["Category"])},
             "createdAt": {"S": datetime.utcnow().isoformat() + "Z"},
             "updatedAt": {"S": datetime.utcnow().isoformat() + "Z"},
         }
@@ -126,10 +127,10 @@ def process_row(row):
         logger.info(f"Category Response : {response}")
 
     if row["Brand"] is not None:
-        item_data["brand"] = {"S": row["Brand"]}
+        item_data["brand"] = {"S": str(row["Brand"])}
         brand_data = {
             "__typename": {"S": "Brand"},
-            "name": {"S": row["Brand"]},
+            "name": {"S": str(row["Brand"])},
             "createdAt": {"S": datetime.utcnow().isoformat() + "Z"},
             "updatedAt": {"S": datetime.utcnow().isoformat() + "Z"},
         }
@@ -139,10 +140,10 @@ def process_row(row):
         logger.info(f"Brand Response : {response}")
 
     if row["Color"] is not None:
-        item_data["color"] = {"S": row["Color"]}
+        item_data["color"] = {"S": str(row["Color"])}
         color_data = {
             "__typename": {"S": "Color"},
-            "name": {"S": row["Color"]},
+            "name": {"S": str(row["Color"])},
             "createdAt": {"S": datetime.utcnow().isoformat() + "Z"},
             "updatedAt": {"S": datetime.utcnow().isoformat() + "Z"},
         }
@@ -152,10 +153,10 @@ def process_row(row):
         logger.info(f"Color Response : {response}")
 
     if row["Size"] is not None:
-        item_data["size"] = {"S": row["Size"]}
+        item_data["size"] = {"S": str(row["Size"])}
         size_data = {
             "__typename": {"S": "Size"},
-            "name": {"S": row["Size"]},
+            "name": {"S": str(row["Size"])},
             "createdAt": {"S": datetime.utcnow().isoformat() + "Z"},
             "updatedAt": {"S": datetime.utcnow().isoformat() + "Z"},
         }
@@ -166,6 +167,16 @@ def process_row(row):
 
     if row["Description"] is not None:
         item_data["description"] = {"S": row["Description"]}
+        description_data = {
+            "__typename": {"S": "Description"},
+            "name": {"S": str(row["Description"])},
+            "createdAt": {"S": datetime.utcnow().isoformat() + "Z"},
+            "updatedAt": {"S": datetime.utcnow().isoformat() + "Z"},
+        }
+        response = dynamodb.put_item(
+            TableName=description_table_name,
+            Item=description_data)
+        logger.info(f"Size Response : {response}")
     if row["Details"] is not None:
         item_data["details"] = {"S": row["Details"]}
     if row["Printed"] is not None:
@@ -179,7 +190,7 @@ def process_row(row):
     # Now let us connect the Account, first query on the secondary index we have created for number
     accountResponse = account_table.query(
         IndexName='accountsByNumber',
-        KeyConditionExpression=Key('number').eq(row["Account"])
+        KeyConditionExpression=Key('number').eq(str(row["Account"]))
     )
     logger.info(f"accountResponse : {accountResponse}")
 

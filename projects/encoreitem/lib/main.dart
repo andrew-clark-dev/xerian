@@ -1,26 +1,40 @@
+import 'package:amplify_api/amplify_api.dart';
 import 'package:amplify_auth_cognito/amplify_auth_cognito.dart';
 import 'package:amplify_flutter/amplify_flutter.dart';
+import 'package:encoreitem/services/data_store.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:encore_core/extentions.dart';
+import 'package:provider/provider.dart';
 import 'amplify_outputs.dart';
+import 'app.dart';
 import 'login.dart';
-import 'home.dart';
+import 'models/ModelProvider.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await dotenv.load(fileName: ".env");
 
   await _configureAmplify();
-  runApp(EncoreItem());
+  runApp(
+    ChangeNotifierProvider(
+      create: (context) => DataStore(),
+      child: EncoreItem(),
+    ),
+  );
 }
 
 Future<void> _configureAmplify() async {
   try {
     final auth = AmplifyAuthCognito();
+    final api = AmplifyAPI(options: APIPluginOptions(modelProvider: ModelProvider.instance));
 
-    await Amplify.addPlugins([auth]);
+    await Amplify.addPlugins([auth, api]);
+
     await Amplify.configure(amplifyConfig);
-    safePrint('Amplify Successfully configured');
+
+    safePrint('Amplify successfully configured');
   } on Exception catch (e) {
     safePrint('Error configuring Amplify: $e');
   }
@@ -33,7 +47,7 @@ class EncoreItem extends StatelessWidget {
     routes: [
       GoRoute(
         path: '/',
-        builder: (context, state) => const Home(),
+        builder: (context, state) => const ItemApp(),
       ),
       GoRoute(
         path: "/login",
@@ -48,8 +62,9 @@ class EncoreItem extends StatelessWidget {
 
       // if the user is logged in but still on the login page, send them to
       // the home
-      if (loggingIn) return "/";
-
+      if (loggingIn) {
+        return "/";
+      }
       // no need to redirect at all
       return null;
     },

@@ -79,7 +79,7 @@ def process_row(row):
     item_data = {
         "__typename": {"S": "Account"},
         "id": {"S": str(uuid.uuid4())},
-        "number": {"N": str(row["Number"])},
+        "number": {"S": str(row["Number"])},
         "balance": {"N": str(row["Balance"]).replace(",", "")},
         "comunicationPreferences": {"S": "NONE"},
         "status": {"S": "ACTIVE"},
