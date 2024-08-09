@@ -22,6 +22,8 @@ class DataStore extends ChangeNotifier {
     return _instance;
   }
 
+  final skipLoad = dotenv.get('SKIP_LOAD', fallback: 'false') == 'true';
+
   DataStore._internal();
 
   late final Database database;
@@ -107,7 +109,7 @@ class DataStore extends ChangeNotifier {
   }
 
   Future<List<Model>> _load(ModelType modelType, String lastUpdate) async {
-    if (dotenv.env['SKIP_LOAD'] != 'true') {
+    if (!skipLoad) {
       safePrint("Loading $modelType");
       final queryPredicate = Account.UPDATEDAT.gt(lastUpdate);
 
