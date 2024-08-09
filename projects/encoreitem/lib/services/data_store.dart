@@ -14,6 +14,7 @@ import '../models/Category.dart' as c;
 import '../models/Brand.dart';
 import '../models/Color.dart';
 import '../models/Size.dart';
+import 'app_config.dart';
 
 class DataStore extends ChangeNotifier {
   static final DataStore _instance = DataStore._internal();
@@ -21,8 +22,6 @@ class DataStore extends ChangeNotifier {
   factory DataStore() {
     return _instance;
   }
-
-  final skipLoad = dotenv.get('SKIP_LOAD', fallback: 'false') == 'true';
 
   DataStore._internal();
 
@@ -109,7 +108,7 @@ class DataStore extends ChangeNotifier {
   }
 
   Future<List<Model>> _load(ModelType modelType, String lastUpdate) async {
-    if (!skipLoad) {
+    if (!AppConfig.skipLoad) {
       safePrint("Loading $modelType");
       final queryPredicate = Account.UPDATEDAT.gt(lastUpdate);
 

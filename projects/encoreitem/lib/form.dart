@@ -212,9 +212,9 @@ class _ItemFormState extends State<StatefulWidget> {
                                   if (snapshot.hasData) {
                                     data = snapshot.data!;
                                   } else if (snapshot.hasError) {
-                                    data = "Error";
+                                    data = "ERROR";
                                   } else {
-                                    data = "Uninitialized";
+                                    data = "UNINITIALIZED";
                                   }
                                   return BarcodeWidget(
                                     barcode: Barcode.code39(), // Barcode type and settings

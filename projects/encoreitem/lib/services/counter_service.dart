@@ -4,8 +4,7 @@ import 'package:amplify_flutter/amplify_flutter.dart';
 import '../models/Account.dart';
 import '../models/Counter.dart';
 import '../models/Item.dart';
-
-import './utilities.dart';
+import 'app_config.dart';
 
 class CounterService {
   /// a list of models to provider counters for
@@ -78,6 +77,6 @@ class CounterService {
   }
 
   Future<String> next() async {
-    return Utilities.formatter.format((await increment()).count!);
+    return AppConfig.format((await increment()).count!);
   }
 }
