@@ -13,35 +13,35 @@ Amplify.configure(outputs);
 const client = generateClient<Schema>();
 
 export default function App() {
-  const [todos, setTodos] = useState<Array<Schema["Todo"]["type"]>>([]);
+  const [accounts, setAccounts] = useState<Array<Schema["Account"]["type"]>>([]);
 
-  function listTodos() {
-    client.models.Todo.observeQuery().subscribe({
-      next: (data) => setTodos([...data.items]),
+  function listAccounts() {
+    client.models.Account.observeQuery().subscribe({
+      next: (data) => setAccounts([...data.items]),
     });
   }
 
   useEffect(() => {
-    listTodos();
+    listAccounts();
   }, []);
 
-  function createTodo() {
-    client.models.Todo.create({
-      content: window.prompt("Todo content"),
-    });
+  function createAccount() {
+    // client.models.Account.create({
+    //   content: window.prompt("Account content"),
+    // });
   }
 
   return (
     <main>
-      <h1>My todos</h1>
-      <button onClick={createTodo}>+ new</button>
+      <h1>My accounts</h1>
+      <button onClick={createAccount}>+ new</button>
       <ul>
-        {todos.map((todo) => (
-          <li key={todo.id}>{todo.content}</li>
+        {accounts.map((account) => (
+          <li key={account.id}>{account.lastName}</li>
         ))}
       </ul>
       <div>
-        🥳 App successfully hosted. Try creating a new todo.
+        🥳 App successfully hosted. Try creating a new account.
         <br />
         <a href="https://docs.amplify.aws/nextjs/start/quickstart/nextjs-app-router-client-components/">
           Review next steps of this tutorial.
