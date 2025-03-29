@@ -11,9 +11,6 @@
     "paths": {
       "$amplify/*": [
         "../.amplify/generated/*"
-      ],
-      "@/utils/*": [
-        "../src/utils/*"
       ]
     }
   }
