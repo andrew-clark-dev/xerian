@@ -1,7 +1,7 @@
 import { a, defineData, type ClientSchema } from '@aws-amplify/backend';
-// import { importAccountFunction, importItemFunction, importSaleFunction } from './import/resource';
-// import { initDataFunction } from './init-data/resource';
-// import { createActionFunction } from './create-action/resource';
+import { importAccountFunction, importItemFunction, importSaleFunction } from './import/resource';
+import { initDataFunction } from './init-data/resource';
+import { createActionFunction } from './create-action/resource';
 import { postConfirmation } from '../auth/post-confirmation/resource';
 
 export const schema = a.schema({
@@ -271,11 +271,11 @@ export const schema = a.schema({
 
 }).authorization(allow => [
   allow.group('Employee'), // default to employee
-  // allow.resource(importAccountFunction),
-  // allow.resource(importItemFunction),
-  // allow.resource(importSaleFunction),
-  // allow.resource(initDataFunction),
-  // allow.resource(createActionFunction),
+  allow.resource(importAccountFunction),
+  allow.resource(importItemFunction),
+  allow.resource(importSaleFunction),
+  allow.resource(initDataFunction),
+  allow.resource(createActionFunction),
   allow.resource(postConfirmation),
 ]);
 
