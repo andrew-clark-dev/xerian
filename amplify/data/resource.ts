@@ -2,7 +2,7 @@ import { a, defineData, type ClientSchema } from '@aws-amplify/backend';
 // import { importAccountFunction, importItemFunction, importSaleFunction } from './import/resource';
 // import { initDataFunction } from './init-data/resource';
 // import { createActionFunction } from './create-action/resource';
-// import { postConfirmation } from '../auth/post-confirmation/resource';
+import { postConfirmation } from '../auth/post-confirmation/resource';
 
 export const schema = a.schema({
 
@@ -276,7 +276,7 @@ export const schema = a.schema({
   // allow.resource(importSaleFunction),
   // allow.resource(initDataFunction),
   // allow.resource(createActionFunction),
-  // allow.resource(postConfirmation),
+  allow.resource(postConfirmation),
 ]);
 
 // Used for code completion / highlighting when making requests from frontend
