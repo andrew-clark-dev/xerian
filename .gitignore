@@ -36,7 +36,8 @@ yarn-error.log*
 next-env.d.ts
 
 # amplify
-.amplify/artifacts
+.amplify
 amplify_outputs*
 amplifyconfiguration*
 .favorites.json
+
