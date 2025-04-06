@@ -3,7 +3,7 @@ import { Schema } from "../resource";
 import { generateClient } from "aws-amplify/data";
 import { Amplify } from "aws-amplify";
 import { getAmplifyDataClientConfig } from '@aws-amplify/backend/function/runtime';
-import { env } from "../../../.amplify/generated/env/import-sale-function";
+import { env } from "$amplify/env/import-sale-function";
 import AWS from "aws-sdk";
 import Papa from "papaparse";
 import { archiveFile, writeErrorFile } from "@server/file.utils";
