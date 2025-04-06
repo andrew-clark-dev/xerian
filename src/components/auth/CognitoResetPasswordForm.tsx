@@ -3,39 +3,52 @@ import React, { useState } from "react";
 import Link from "next/link";
 import Label from "../form/Label";
 import Input from "@/components/form/input/InputField";
-import { resetPassword } from 'aws-amplify/auth';
+import { resetPassword, confirmResetPassword } from 'aws-amplify/auth';
 import { toast } from 'sonner';
 import { useRouter } from "next/navigation";
+import { EyeCloseIcon, EyeIcon } from "@/icons";
 
-export default function ResetPasswordForm() {
+export default function CognitoResetPasswordForm() {
   const router = useRouter();
+  const [confirmWithCode, setConfirmWithCode] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
 
   const [email, setEmail] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [code, setCode] = useState("");
 
-  const sendCode = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const { nextStep } = await resetPassword({ username: email });
-      switch (nextStep.resetPasswordStep) {
-        case 'CONFIRM_RESET_PASSWORD_WITH_CODE':
-          console.log("Next step : CONFIRM_RESET_PASSWORD_WITH_CODE");
-          const codeDeliveryDetails = nextStep.codeDeliveryDetails;
-          toast.success(`Confirmation code was sent to ${codeDeliveryDetails.deliveryMedium}`, {
-            onDismiss: () => {
-              // Redirect after toast is closed
-              router.push("/confirm-password"); // Replace with your desired route
-            }
-          });
-          break;
-        default:
-          console.log(`Next step : ${nextStep}`);
-          toast.error(`Could not reset password please contact your administrator`);
+      if (confirmWithCode) {
+        await confirmResetPassword({
+          username: email,
+          newPassword: newPassword,
+          confirmationCode: code
+        });
+
+        toast.success('Password udated');
+
+        router.push("/"); // Redirect to home
+
+      } else {
+        const { nextStep } = await resetPassword({ username: email });
+        switch (nextStep.resetPasswordStep) {
+          case 'CONFIRM_RESET_PASSWORD_WITH_CODE':
+            console.log("Next step : CONFIRM_RESET_PASSWORD_WITH_CODE");
+            const codeDeliveryDetails = nextStep.codeDeliveryDetails;
+            toast.success(`Confirmation code was sent by ${codeDeliveryDetails.deliveryMedium} to ${codeDeliveryDetails.destination}`);
+            setConfirmWithCode(true);
+            break;
+          default:
+            console.log(`Next step : ${nextStep}`);
+            toast.error(`Could not reset password please contact your administrator`);
+        }
       }
-    } catch (err: unknown) {
+    } catch (err) {
       if (err instanceof Error) {
         console.log("Form error:" + err.message);
         toast.error(err.message || 'Reset failed. Please try again.');
-
       } else {
         toast.error('Reset failed. Please try again.');
       }
@@ -80,7 +93,7 @@ export default function ResetPasswordForm() {
           </p>
         </div>
         <div>
-          <form onSubmit={sendCode}>
+          <form onSubmit={handleSubmit}>
             <div className="space-y-5">
               {/* <!-- Email --> */}
               <div>
@@ -95,11 +108,48 @@ export default function ResetPasswordForm() {
                   onChange={(e) => setEmail(e.target.value)}
                 />
               </div>
-
+              {confirmWithCode ? (
+                <div>
+                  <div>
+                    <Label>
+                      New Password <span className="text-error-500">*</span>{" "}
+                    </Label>
+                    <div className="relative">
+                      <Input
+                        type={showNewPassword ? "text" : "password"}
+                        placeholder="Enter your new password"
+                        onChange={(e) => setNewPassword(e.target.value)}
+                      />
+                      <span
+                        onClick={() => setShowNewPassword(!showNewPassword)}
+                        className="absolute z-30 -translate-y-1/2 cursor-pointer right-4 top-1/2"
+                      >
+                        {showNewPassword ? (
+                          <EyeIcon className="fill-gray-500 dark:fill-gray-400" />
+                        ) : (
+                          <EyeCloseIcon className="fill-gray-500 dark:fill-gray-400" />
+                        )}
+                      </span>
+                    </div>
+                  </div>
+                  <div>
+                    <Label>
+                      Email<span className="text-error-500">*</span>
+                    </Label>
+                    <Input
+                      type="text"
+                      id="code"
+                      name="code"
+                      placeholder="Enter your code"
+                      onChange={(e) => setCode(e.target.value)}
+                    />
+                  </div>
+                </div>
+              ) : null}
               {/* <!-- Button --> */}
               <div>
                 <button className="flex items-center justify-center w-full px-4 py-3 text-sm font-medium text-white transition rounded-lg bg-brand-500 shadow-theme-xs hover:bg-brand-600">
-                  Send Reset Link
+                  {confirmWithCode ? "Confirm Code" : "Send Reset Code"}
                 </button>
               </div>
             </div>

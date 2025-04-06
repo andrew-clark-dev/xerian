@@ -14,7 +14,6 @@ import { signIn, confirmSignIn } from "aws-amplify/auth"
 export default function CognitoSignInForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
-  // const [resetPassword, setResetPassword] = useState(false);
   const [confirmWithPassword, setConfirmWithPassword] = useState(false);
 
   const [loading, setLoading] = useState(false);
@@ -146,7 +145,7 @@ export default function CognitoSignInForm() {
                           onClick={() => setShowNewPassword(!showNewPassword)}
                           className="absolute z-30 -translate-y-1/2 cursor-pointer right-4 top-1/2"
                         >
-                          {showPassword ? (
+                          {showNewPassword ? (
                             <EyeIcon className="fill-gray-500 dark:fill-gray-400" />
                           ) : (
                             <EyeCloseIcon className="fill-gray-500 dark:fill-gray-400" />
