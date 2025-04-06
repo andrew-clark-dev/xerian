@@ -2,7 +2,7 @@ import { Schema } from "../resource";
 import { generateClient } from "aws-amplify/data";
 import { Amplify } from "aws-amplify";
 import { getAmplifyDataClientConfig } from '@aws-amplify/backend/function/runtime';
-import { env } from "$amplify/env/init-data-function";
+import { env } from "../../../.amplify/generated/env/init-data-function";
 import { logger } from "@server/logger";
 
 

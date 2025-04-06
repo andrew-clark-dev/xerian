@@ -4,10 +4,10 @@ import { generateClient } from "aws-amplify/data";
 import { logger } from "@server/logger";
 import { Amplify } from "aws-amplify";
 import { getAmplifyDataClientConfig } from '@aws-amplify/backend/function/runtime';
-import { env } from "$amplify/env/import-account-function";
+import { env } from "../../../.amplify/generated/env/import-account-function";
 import AWS from "aws-sdk";
 import Papa from "papaparse";
-import { archiveFile, writeErrorFile } from "@server/file.utils";
+import { archiveFile } from "@server/file.utils";
 
 import { money, isMobileNumber, comunicationPreferences } from "@server/import.utils";
 import { userService } from "@server/user.service";

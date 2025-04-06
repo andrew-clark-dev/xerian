@@ -9,7 +9,7 @@
     "strict": true,
     "skipLibCheck": true,
     "paths": {
-      "$amplify/*": [
+      "../../../.amplify/generated/*": [
         "../.amplify/generated/*"
       ],
       "@server/*": [

@@ -4,7 +4,7 @@ import { generateClient } from "aws-amplify/data";
 import { Amplify } from "aws-amplify";
 import { getAmplifyDataClientConfig } from '@aws-amplify/backend/function/runtime';
 import AWS from 'aws-sdk';
-import { env } from "$amplify/env/create-action-function";
+import { env } from "../../../.amplify/generated/env/create-action-function";
 import { logger } from "@server/logger";
 
 const { resourceConfig, libraryOptions } = await getAmplifyDataClientConfig(
