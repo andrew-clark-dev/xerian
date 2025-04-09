@@ -1,11 +1,9 @@
 import { S3Handler } from "aws-lambda";
 import { logger } from "@server/logger";
-import { S3 } from "@aws-sdk/client-s3";
 import * as readline from "readline";
 import * as stream from "stream";
 import { s3body, uploadChunk, archiveFile } from "@server/file.utils";
 
-const s3 = new S3({ region: process.env.AWS_REGION });
 
 // Read `MAX_LINES` and `OUTPUT_DIR` from environment variables
 const MAX_LINES = parseInt(process.env.MAX_LINES!, 10);

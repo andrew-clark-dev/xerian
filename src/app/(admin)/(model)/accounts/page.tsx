@@ -7,16 +7,19 @@ import { useEffect, useState } from 'react'
 import Pagination from './Pagination'
 import { Table, TableBody, TableCell, TableHeader, TableRow } from '@/components/ui/table'
 import Badge from '@/components/ui/badge/Badge'
-import { AngleDownIcon, AngleUpIcon, PencilIcon, TrashBinIcon } from '@/icons'
+import { AngleDownIcon, AngleUpIcon, PencilIcon } from '@/icons'
 import Checkbox from '@/components/form/input/Checkbox'
 import Button from '@/components/ui/button/Button'
-import { formatCurrency, formatNational } from '@/app/_utils/formatUtil'
+import { formatCurrency, formatNational } from '@/lib/format-util'
+import { useRouter } from "next/navigation";
 
 const client = generateClient<Schema>()
 
 type Account = Schema["Account"]['type'];
 
-export default function Home() {
+export default function Page() {
+  const router = useRouter();
+
   const [isChecked, setIsChecked] = useState(false);
 
   const [items, setItems] = useState<Account[]>([])
@@ -235,12 +238,8 @@ export default function Home() {
                 >
                   <div className="flex items-center justify-between cursor-pointer">
                     <p className="font-medium text-gray-700 text-theme-xs dark:text-gray-400">
-                      Action
+                      Edit
                     </p>
-                    <button className="flex flex-col gap-0.5">
-                      <AngleUpIcon className="text-gray-300 dark:text-gray-700" />
-                      <AngleDownIcon className="text-gray-300 dark:text-gray-700" />
-                    </button>
                   </div>
                 </TableCell>
               </TableRow>
@@ -295,10 +294,7 @@ export default function Home() {
                   </TableCell>
                   <TableCell className="px-4 py-4 font-normal text-gray-800 border border-gray-100 dark:border-white/[0.05] text-theme-sm dark:text-white/90 whitespace-nowrap">
                     <div className="flex items-center w-full gap-2">
-                      <button className="text-gray-500 hover:text-error-500 dark:text-gray-400 dark:hover:text-error-500">
-                        <TrashBinIcon />
-                      </button>
-                      <button className="text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-white/90">
+                      <button className="text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-white/90" onClick={() => router.push("accounts/" + item.number)}>
                         <PencilIcon />
                       </button>
                     </div>

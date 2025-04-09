@@ -1,20 +1,43 @@
+// middleware.ts
 import { NextRequest, NextResponse } from "next/server";
-import { isAuthenticated } from "./app/_utils/amplifyServerUtil";
+
+import { fetchAuthSession } from "aws-amplify/auth/server";
+
+import { runWithAmplifyServerContext } from "./lib/amplify-server-utils";
 
 export async function middleware(request: NextRequest) {
+  const response = NextResponse.next();
 
-  const authenticated = await isAuthenticated();
+  const authenticated = await runWithAmplifyServerContext({
+    nextServerContext: { request, response },
+    operation: async (contextSpec) => {
+      try {
+        const session = await fetchAuthSession(contextSpec, {});
+        return session.tokens !== undefined;
+      } catch (error) {
+        console.log(error);
+        return false;
+      }
+    },
+  });
 
-  // Redirect based on authentication state
-  if (!authenticated && request.nextUrl.pathname !== '/signin') {
-    return NextResponse.redirect(new URL('/signin', request.url));
+  if (authenticated) {
+    return response;
   }
-  return NextResponse.next(); // Allow request to proceed
 
+  return NextResponse.redirect(new URL("/signin", request.url));
 }
 
-
-// Apply middleware to all routes except API routes (optional)
 export const config = {
-  matcher: ['/', '/dashboard:path*', '/accounts:path*'], // Applies to all pages
+  matcher: [
+    /*
+     * Match all request paths except for the ones starting with:
+     * - api (API routes)
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     * - login
+     */
+    "/((?!api|_next/static|_next/image|favicon.ico|signin|signout|reset).*)",
+  ],
 };

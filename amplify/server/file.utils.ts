@@ -87,7 +87,7 @@ export function fromEvent(event: S3Event): { bucket: string; key: string } {
 };
 
 
-export async function s3body(event: S3Event): Promise<any> {
+export async function s3body(event: S3Event): Promise<unknown> {
 
     const { bucket, key } = fromEvent(event);
 
