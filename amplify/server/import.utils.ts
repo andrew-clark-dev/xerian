@@ -7,6 +7,16 @@ export function money(text?: string | null): number {
     return Math.round(parseFloat(cleanText) * 100);
 }
 
+export function split(text?: string | null): number {
+    if (!text) {
+        return 0;
+    }
+    // handle the case where % is in the text
+    const cleanText = text.replace('%', '');
+    return parseInt(cleanText);
+}
+
+
 /**
 * Checks if an accoutn phone number indicates a mobile number based on Swiss mobile prefixes
 * @param exAccount The account read from thee external system.

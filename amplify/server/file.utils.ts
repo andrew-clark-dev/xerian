@@ -1,7 +1,9 @@
-import { CopyObjectCommand, DeleteObjectCommand, PutObjectCommand, S3 } from "@aws-sdk/client-s3";
+import { CopyObjectCommand, DeleteObjectCommand, GetObjectCommand, PutObjectCommand, S3 } from "@aws-sdk/client-s3";
+
 import { logger } from "@server/logger";
 
 import { S3Event } from "aws-lambda";
+import { Readable } from "stream";
 
 
 const s3 = new S3({ region: process.env.AWS_REGION });
@@ -87,15 +89,15 @@ export function fromEvent(event: S3Event): { bucket: string; key: string } {
 };
 
 
-export async function s3body(event: S3Event): Promise<unknown> {
+export async function s3body(event: S3Event): Promise<Readable> {
 
     const { bucket, key } = fromEvent(event);
+    const { Body } = await s3.send(new GetObjectCommand({ Bucket: bucket, Key: key }));
 
-    const object = await s3.getObject({ Bucket: bucket, Key: key });
-
-    if (!object.Body) {
+    if (Body instanceof Readable) {
+        return Body;
+    } else {
         throw new Error("Empty file or unable to read object body.");
     }
 
-    return object.Body;
 };

@@ -6,10 +6,10 @@ import { getAmplifyDataClientConfig } from '@aws-amplify/backend/function/runtim
 import { env } from "$amplify/env/import-item-function";
 import AWS from "aws-sdk";
 import Papa from "papaparse";
-import { archiveFile, writeErrorFile } from "@server/file.utils";
+import { archiveFile } from "@server/file.utils";
 import { userService } from "@server/user.service";
 import { logger } from "@server/logger";
-import { toISO, money } from "@server/import.utils";
+import { toISO, money, split } from "@server/import.utils";
 import { IMPORT_SERVICE_USER_ID } from "../constants";
 
 type ItemCategoryKind = Schema['ItemCategoryKind']['type']
@@ -88,8 +88,10 @@ export const handler: S3Handler = async (event): Promise<void> => {
         const bucket = event.Records[0].s3.bucket.name;
         const key = decodeURIComponent(event.Records[0].s3.object.key.replace(/\+/g, ' '));
 
-        // Get the file from S3
-        logger.info(`Get: ${key} from ${bucket}`);
+
+        logger.start(`Processing file: s3://${bucket}/${key}`);
+
+
         const s3Object = await s3.getObject({ Bucket: bucket, Key: key }).promise();
         if (!s3Object.Body) {
             throw new Error("File is empty or not accessible.");
@@ -111,14 +113,12 @@ export const handler: S3Handler = async (event): Promise<void> => {
                 added += processed;
                 skipped += (1 - processed);
             } catch (error) {
-                logger.error(`Error creating item - ${JSON.stringify(error)}`);
+                logger.failure('Error creating item', error);
                 errorCount++;
-                writeErrorFile(bucket, key, row, profile.id, error);
-
             }
         }
 
-        logger.info(`Successfully processed ${data.length} items, ${added} added, ${skipped} skipped, with ${errorCount} errors`);
+        logger.success(`Successfully processed ${data.length} rows, ${added} added, ${skipped} skipped, with ${errorCount} errors`);
 
         // Move the file to the archive folder 
         await archiveFile(bucket, key);
@@ -166,7 +166,7 @@ async function createItem(row: Row, id: string): Promise<number> {
         description: row['Description'],
         details: row['Details'],
         condition: 'NotSpecified' as const,
-        split: parseInt(row['Split'].replace('%', '')),
+        split: split(row['Split']),
         price: money(row['Tag Price']),
         status: toStatus(row['Status']),
         printedAt: toISO(row['Printed']),

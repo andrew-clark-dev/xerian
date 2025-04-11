@@ -6,7 +6,7 @@ import { getAmplifyDataClientConfig } from '@aws-amplify/backend/function/runtim
 import { env } from "$amplify/env/import-sale-function";
 import AWS from "aws-sdk";
 import Papa from "papaparse";
-import { archiveFile, writeErrorFile } from "@server/file.utils";
+import { archiveFile, fromEvent } from "@server/file.utils";
 import { userService } from "@server/user.service";
 import { logger } from "@server/logger";
 import { toISO, money } from "@server/import.utils";
@@ -79,11 +79,9 @@ interface Row {
 export const handler: S3Handler = async (event): Promise<void> => {
     logger.info('S3 event:', event);
     try {
-        const bucket = event.Records[0].s3.bucket.name;
-        const key = decodeURIComponent(event.Records[0].s3.object.key.replace(/\+/g, ' '));
+        const { bucket, key } = fromEvent(event)
+        logger.start(`Processing file: s3://${bucket}/${key}`);
 
-        // Get the file from S3
-        logger.info(`Get: ${key} from ${bucket}`);
         const s3Object = await s3.getObject({ Bucket: bucket, Key: key }).promise();
         if (!s3Object.Body) {
             throw new Error("File is empty or not accessible.");
@@ -105,14 +103,12 @@ export const handler: S3Handler = async (event): Promise<void> => {
                 added += processed;
                 skipped += (1 - processed);
             } catch (error) {
-                logger.error('Error creating item', error);
+                logger.failure('Error creating sale', error);
                 errorCount++;
-                writeErrorFile(bucket, key, row, profile.id, error);
-                throw error;
             }
         }
 
-        logger.info(`Successfully processed ${data.length} items, ${added} added, ${skipped} skipped, with ${errorCount} errors`);
+        logger.success(`Successfully processed ${data.length} rows, ${added} added, ${skipped} skipped, with ${errorCount} errors`);
 
         // Move the file to the archive folder 
         await archiveFile(bucket, key);
