@@ -111,7 +111,7 @@ export const handler: S3Handler = async (event): Promise<void> => {
         logger.success(`Successfully processed ${data.length} rows, ${added} added, ${skipped} skipped, with ${errorCount} errors`);
 
         // Move the file to the archive folder 
-        await archiveFile(bucket, key);
+        await archiveFile(bucket, key, errorCount);
 
     } catch (error) {
         logger.ifErrorThrow(`Error processing CSV `, error);

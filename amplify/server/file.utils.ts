@@ -32,9 +32,11 @@ export async function uploadChunk(bucket: string, headers: string, lines: string
     logger.info(`Uploaded: s3://${bucket}/${newFileKey}`);
 }
 
-export async function archiveFile(bucket: string, originalKey: string) {
+export async function archiveFile(bucket: string, originalKey: string, errorCount = 0) {
     try {
-        const destinationKey = `${ARCHIVE_DIR}${originalKey.split('/').pop()}`;
+        const destinationKey = errorCount == 0 ?
+            `${ARCHIVE_DIR}${originalKey.split('/').pop()}` :
+            `${ERROR_DIR}${originalKey.split('/').pop()}.${new Date().toISOString()}-errors-${errorCount}`;
         // Copy the file to the new location
         await s3.send(new CopyObjectCommand({
             Bucket: bucket,
