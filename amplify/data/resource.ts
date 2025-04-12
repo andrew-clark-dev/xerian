@@ -278,8 +278,8 @@ export const schema = a.schema({
       message: a.string().required(),
       data: a.json(),
     })
+    .identifier(['id', 'createdAt'])
     .secondaryIndexes((index) => [
-      index("id").sortKeys(["createdAt"]),
       index("type").sortKeys(["createdAt"]),
       index("functionName").sortKeys(["createdAt"]),
     ]),
