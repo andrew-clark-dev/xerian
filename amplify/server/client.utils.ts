@@ -14,3 +14,9 @@ export async function getClient(env: DataClientEnv) {
     return client;
 }
 
+export async function configureAmplify(env: DataClientEnv) {
+    const { resourceConfig, libraryOptions } = await getAmplifyDataClientConfig(env);
+
+    Amplify.configure(resourceConfig, libraryOptions);
+
+}

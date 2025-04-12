@@ -4,9 +4,12 @@ import { uploadData } from "aws-amplify/storage";
 import { logger } from "@server/logger";
 import { archiveFile, fromEvent, s3body } from "@server/file.utils";
 
-
+import { env } from "$amplify/env/import-receive-function";
+import { configureAmplify } from "@server/client.utils";
 
 export const handler: S3Handler = async (event: S3Event) => {
+    configureAmplify(env);
+
     logger.info('S3Event', event);
     const { bucket, key } = fromEvent(event)
     const PROCESSING_DIR = process.env.PROCESSING_DIR;
