@@ -1,4 +1,4 @@
-import { fetchPagedItems } from '@server/consigncloud/http-client-service';
+import { fetchPagedItemsWithRetry } from '@server/consigncloud/http-client-service';
 import { S3Event, S3Handler } from 'aws-lambda';
 import { uploadData } from "aws-amplify/storage";
 import { logger } from "@server/logger";
@@ -44,7 +44,7 @@ export const handler: S3Handler = async (event: S3Event) => {
 
 
         while (hasMorePages) {
-            const response = await fetchPagedItems({
+            const response = await fetchPagedItemsWithRetry({
                 cursor: cursor,
                 createdGte: from,
                 createdLt: to,

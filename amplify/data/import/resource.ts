@@ -1,4 +1,4 @@
-import { defineFunction } from "@aws-amplify/backend";
+import { defineFunction, secret } from "@aws-amplify/backend";
 
 
 export const IMPORT_DIRS = {
@@ -51,6 +51,6 @@ export const importReceiveFunction = defineFunction({
         ...IMPORT_DIRS,
         MAX_LINES: "1000",
         SERVICE_NAME: "import-receive-function",
-        API_KEY: "YWI3YWViMGItYWIwMS00YTcyLWI0ODktYzZhYzdhYTEyMTlmOkdKZDNYb01TM1dUUlNoR3Zoa016Q1E="
+        API_KEY: secret('api-key')
     },
 });

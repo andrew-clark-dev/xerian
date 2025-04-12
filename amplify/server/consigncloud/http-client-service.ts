@@ -92,7 +92,7 @@ export async function fetchPagedItems(params: {
   if (params.createdLt) searchParams.set('created:lt', params.createdLt);
 
   const response = await ky
-    .get('https://api.example.com/items', { headers, searchParams })
+    .get('https://api.consigncloud.com/api/v1/items', { headers, searchParams })
     .json<PagedResponse<ExternalItem>>();
 
   return response;
