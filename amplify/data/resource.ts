@@ -271,6 +271,7 @@ export const schema = a.schema({
 
   Notification: a
     .model({
+      id: a.id(),
       createdAt: a.datetime(),
       type: a.enum(['Failure', 'Success', 'Start', 'Alert', 'Fatal']),
       functionName: a.string().required(),
@@ -278,8 +279,9 @@ export const schema = a.schema({
       data: a.json(),
     })
     .secondaryIndexes((index) => [
-      index("type"),
-      index("functionName"),
+      index("id").sortKeys(["createdAt"]),
+      index("type").sortKeys(["createdAt"]),
+      index("functionName").sortKeys(["createdAt"]),
     ]),
 
 }).authorization(allow => [
