@@ -275,6 +275,7 @@ export const schema = a.schema({
       createdAt: a.datetime().required(),
       type: a.enum(['Failure', 'Success', 'Start', 'Alert', 'Fatal']),
       functionName: a.string().required(),
+      pid: a.string().required(),
       message: a.string().required(),
       data: a.json(),
     })

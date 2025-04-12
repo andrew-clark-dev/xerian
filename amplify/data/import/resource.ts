@@ -46,10 +46,11 @@ export const importReceiveFunction = defineFunction({
     name: "import-receive-function",
     entry: "./handler.receive.ts",
     resourceGroupName: "data",
-    timeoutSeconds: 120,
+    timeoutSeconds: 900,
     environment: {
         ...IMPORT_DIRS,
         MAX_LINES: "1000",
-        SERVICE_NAME: "import-receive-function"
+        SERVICE_NAME: "import-receive-function",
+        API_KEY: "YWI3YWViMGItYWIwMS00YTcyLWI0ODktYzZhYzdhYTEyMTlmOkdKZDNYb01TM1dUUlNoR3Zoa016Q1E="
     },
 });

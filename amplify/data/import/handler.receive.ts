@@ -1,64 +1,78 @@
-import { S3Handler } from "aws-lambda";
+import { fetchPagedItems } from '@server/consigncloud/http-client-service';
+import { S3Event, S3Handler } from 'aws-lambda';
+import { uploadData } from "aws-amplify/storage";
 import { logger } from "@server/logger";
-import * as readline from "readline";
-import { uploadChunk, archiveFile, fromEvent, s3body } from "@server/file.utils";
-import { Readable } from "stream";
+import { archiveFile, fromEvent, s3body } from "@server/file.utils";
 
-// Read `MAX_LINES` and `OUTPUT_DIR` from environment variables
-const MAX_LINES = parseInt(process.env.MAX_LINES!, 10);
 
-/**
- * Lambda Handler Function
- */
-export const handler: S3Handler = async (event): Promise<void> => {
-    logger.info(`S3 event: ${JSON.stringify(event)}`);
-    logger.info('Lambda Environment Variables:', { environmentVariables: process.env });
 
+export const handler: S3Handler = async (event: S3Event) => {
+    logger.info('S3Event', event);
     const { bucket, key } = fromEvent(event)
-    const body = await s3body(event);
-
+    const PROCESSING_DIR = process.env.PROCESSING_DIR;
     try {
-        logger.info(`Processing file: s3://${bucket}/${key}`);
+        logger.start(`Processing file: s3://${bucket}/${key}`, event);
 
-        const rl = readline.createInterface({
-            input: body as Readable,
-            crlfDelay: Infinity,
-        });
+        // Get the file contents from S3
+        const body = await s3body(event);
 
-        let fileCounter = 0;
-        let lineCounter = 0;
-        let headers: string | null = null;
-        let batchLines: string[] = [];
+        const jsonContent = JSON.parse(body?.toString('utf-8') ?? '');
 
-        for await (const line of rl) {
-            if (!headers) {
-                headers = line; // Store header row
-                continue;
-            }
+        // Extract 'to' and 'from' attributes
+        const { from, to } = jsonContent;
 
-            batchLines.push(line);
-            lineCounter++;
+        // Parse 'to' and 'from' to Date objects
+        const fromDate = new Date(from);
+        const toDate = new Date(to);
 
-            if (lineCounter >= MAX_LINES) {
-                await uploadChunk(bucket, headers, batchLines, ++fileCounter, key);
-                batchLines = [];
-                lineCounter = 0;
-            }
+        if (isNaN(fromDate.getTime()) || isNaN(toDate.getTime())) {
+            logger.error('Invalid date format', { to, from });
+            throw new Error('Invalid date format');
         }
 
-        // Upload remaining lines if any
-        if (batchLines.length > 0) {
-            await uploadChunk(bucket, headers!, batchLines, ++fileCounter, key);
+        // Format the dates to 'YYYYMMDD'
+        const fromDateString = fromDate.toISOString().split('T')[0].replace(/-/g, ''); // '20250411'    
+        const toDateString = toDate.toISOString().split('T')[0].replace(/-/g, ''); // '20250412'
+
+        // Construct the S3 filename
+        const s3FileName = `${PROCESSING_DIR}Items-${fromDateString}-${toDateString}.txt`;
+
+        let cursor = null;
+        let hasMorePages = true;
+        let fileContent: string = '';
+        let added = 0;
+
+
+        while (hasMorePages) {
+            const response = await fetchPagedItems({
+                cursor: cursor,
+                createdGte: from,
+                createdLt: to,
+            });
+
+            // Assuming the API returns { data, hasNextPage }
+            const { data, next_cursor } = response;
+            cursor = next_cursor;
+            hasMorePages = cursor ? true : false;
+            data.forEach((item) => {
+                fileContent += `${JSON.stringify(item)}\n`;
+                added++
+            });
         }
 
-        logger.info(`Successfully split file into ${fileCounter} parts.`);
+        // Use Amplify Storage to upload the content to S3
+        await uploadData({ data: fileContent, path: s3FileName });
 
-        // Move the file to the archive folder 
+        // Log the extracted and parsed dates
+        logger.success(`Successfully processed s3://${bucket}/${key}, ${added} added, file uploaded to s3://${bucket}/${s3FileName}`);
+
+        // Archive the original file
         await archiveFile(bucket, key);
 
-    } catch (error) {
-        logger.error(`Error processing file: ${error}`);
-        throw error; // Rethrow the error to ensure Lambda knows it failed
-    }
-};
+        // You can perform any additional logic here (e.g., store in a database, call an API, etc.)
 
+    } catch (error) {
+        logger.failure(`Error processing s3://${bucket}/${key}`, error);
+    }
+
+};

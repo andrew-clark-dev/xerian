@@ -14,7 +14,8 @@ export const initDataFunction = defineFunction({
             ['ItemGroup', ['id']],
             ['Transaction', ['id']],
             ['ItemCategory', ['kind', 'name']],
-            ['Sale', ['number']]
+            ['Sale', ['number']],
+            ['Notification', ['id', 'createdAt']],
         ])
     }
 });

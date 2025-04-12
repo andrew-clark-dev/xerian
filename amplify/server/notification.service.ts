@@ -12,7 +12,6 @@ class NotificationService {
 
 
     async notify(notificationType: NotificationType, functionName: string, message: string, data?: unknown): Promise<Notification> {
-
         const { data: notification, errors: errors } = await client.models.Notification.create(
             {
                 id: uuid4(),
@@ -21,6 +20,7 @@ class NotificationService {
                 functionName: functionName,
                 message: message,
                 data: JSON.stringify(data),
+                pid: process.pid.toString(),
             }
         );
         if (errors) {

@@ -171,36 +171,27 @@ const importItemLambda = backend.importItemFunction.resources.lambda;
 const importReceiveLambda = backend.importReceiveFunction.resources.lambda;
 const importSaleLambda = backend.importSaleFunction.resources.lambda;
 
-const putEvents = new PolicyStatement({
-  actions: ["events:PutEvents"],
-  resources: ["*"], // or narrow to a custom EventBus
-})
-
 bucket.addEventNotification(
   EventType.OBJECT_CREATED_PUT,
   new LambdaDestination(importReceiveLambda),
-  { prefix: IMPORT_DIRS.IN_DIR, suffix: '.csv' }
+  { prefix: IMPORT_DIRS.IN_DIR + 'Sync', suffix: '.json' }
 );
-importReceiveLambda.addToRolePolicy(putEvents)
 
 bucket.addEventNotification(
   EventType.OBJECT_CREATED_PUT,
   new LambdaDestination(importAccountLambda),
   { prefix: IMPORT_DIRS.PROCESSING_DIR + 'Account', suffix: '.csv' }
 );
-importAccountLambda.addToRolePolicy(putEvents)
 
 bucket.addEventNotification(
   EventType.OBJECT_CREATED_PUT,
   new LambdaDestination(importItemLambda),
   { prefix: IMPORT_DIRS.PROCESSING_DIR + 'Item', suffix: '.csv' }
 );
-importItemLambda.addToRolePolicy(putEvents)
 
 bucket.addEventNotification(
   EventType.OBJECT_CREATED_PUT,
   new LambdaDestination(importSaleLambda),
   { prefix: IMPORT_DIRS.PROCESSING_DIR + 'Sale', suffix: '.csv' }
 );
-importSaleLambda.addToRolePolicy(putEvents)
 
