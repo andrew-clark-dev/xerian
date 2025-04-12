@@ -174,7 +174,7 @@ const importSaleLambda = backend.importSaleFunction.resources.lambda;
 bucket.addEventNotification(
   EventType.OBJECT_CREATED_PUT,
   new LambdaDestination(importReceiveLambda),
-  { prefix: IMPORT_DIRS.IN_DIR + 'Sync', suffix: '.json' }
+  { prefix: IMPORT_DIRS.IN_DIR + 'sync', suffix: '.json' }
 );
 
 bucket.addEventNotification(
