@@ -1,4 +1,4 @@
-import { CopyObjectCommand, DeleteObjectCommand, GetObjectCommand, PutObjectCommand, S3 } from "@aws-sdk/client-s3";
+import { S3Client, CopyObjectCommand, DeleteObjectCommand, GetObjectCommand, PutObjectCommand, GetObjectCommandOutput } from "@aws-sdk/client-s3";
 
 import { logger } from "@server/logger";
 
@@ -6,7 +6,7 @@ import { S3Event } from "aws-lambda";
 import { Readable } from "stream";
 
 
-const s3 = new S3({ region: process.env.AWS_REGION });
+const s3 = new S3Client({ region: process.env.AWS_REGION });
 
 export const PROCESSING_DIR = process.env.PROCESSING_DIR!;
 export const ARCHIVE_DIR = process.env.ARCHIVE_DIR!;
@@ -90,16 +90,24 @@ export function fromEvent(event: S3Event): { bucket: string; key: string } {
     return { bucket, key };
 };
 
-
-export async function s3body(event: S3Event): Promise<Readable> {
-
-    const { bucket, key } = fromEvent(event);
-    const { Body } = await s3.send(new GetObjectCommand({ Bucket: bucket, Key: key }));
-
-    if (Body instanceof Readable) {
-        return Body;
-    } else {
-        throw new Error("Empty file or unable to read object body.");
+export function s3params(event: S3Event): { Bucket: string; Key: string } {
+    if (!event.Records || event.Records.length === 0) {
+        throw new Error("No records found in the S3 event.");
     }
+
+    const Bucket = event.Records[0].s3.bucket.name;
+    const Key = decodeURIComponent(event.Records[0].s3.object.key.replace(/\+/g, " "));
+    return { Bucket, Key };
+};
+
+type BodyType = Buffer | Uint8Array | Blob | string | ReadableStream | Readable;
+
+export async function s3body(event: S3Event): Promise<BodyType> {
+
+    const params = s3params(event);
+    const s3Object: GetObjectCommandOutput = await s3.send(new GetObjectCommand(params));
+    const body = s3Object.Body as BodyType;
+
+    return body;
 
 };

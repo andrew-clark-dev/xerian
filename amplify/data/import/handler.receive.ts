@@ -1,9 +1,8 @@
 import { S3Handler } from "aws-lambda";
 import { logger } from "@server/logger";
 import * as readline from "readline";
-import * as stream from "stream";
-import { s3body, uploadChunk, archiveFile, fromEvent } from "@server/file.utils";
-
+import { uploadChunk, archiveFile, fromEvent, s3body } from "@server/file.utils";
+import { Readable } from "stream";
 
 // Read `MAX_LINES` and `OUTPUT_DIR` from environment variables
 const MAX_LINES = parseInt(process.env.MAX_LINES!, 10);
@@ -16,15 +15,13 @@ export const handler: S3Handler = async (event): Promise<void> => {
     logger.info('Lambda Environment Variables:', { environmentVariables: process.env });
 
     const { bucket, key } = fromEvent(event)
+    const body = await s3body(event);
 
     try {
-        logger.start(`Processing file: s3://${bucket}/${key}`);
-
-        // Get object stream
-        const body = await s3body(event);
+        logger.info(`Processing file: s3://${bucket}/${key}`);
 
         const rl = readline.createInterface({
-            input: body as stream.Readable,
+            input: body as Readable,
             crlfDelay: Infinity,
         });
 
@@ -54,13 +51,13 @@ export const handler: S3Handler = async (event): Promise<void> => {
             await uploadChunk(bucket, headers!, batchLines, ++fileCounter, key);
         }
 
-        logger.success(`Successfully split file ${key}, into ${fileCounter} parts.`);
+        logger.info(`Successfully split file into ${fileCounter} parts.`);
 
         // Move the file to the archive folder 
         await archiveFile(bucket, key);
 
     } catch (error) {
-        logger.failure(`Error processing file ${key}`, error);
+        logger.error(`Error processing file: ${error}`);
         throw error; // Rethrow the error to ensure Lambda knows it failed
     }
 };

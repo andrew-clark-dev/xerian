@@ -1,35 +1,27 @@
 import type { S3Handler } from "aws-lambda";
 import { Schema } from "../resource";
-import { generateClient } from "aws-amplify/data";
 import { logger } from "@server/logger";
-import { Amplify } from "aws-amplify";
-import { getAmplifyDataClientConfig } from '@aws-amplify/backend/function/runtime';
+
 import { env } from "$amplify/env/import-account-function";
-import AWS from "aws-sdk";
 import Papa from "papaparse";
-import { archiveFile, fromEvent } from "@server/file.utils";
+import { archiveFile, fromEvent, s3body } from "@server/file.utils";
 
 import { money, isMobileNumber, comunicationPreferences } from "@server/import.utils";
 import { userService } from "@server/user.service";
 import { IMPORT_SERVICE_USER_ID } from "../constants";
+import { getClient } from "@server/client.utils";
 
 export type AccountStatus = Schema['Account']['type']['status'];
 export type AccountKind = Schema['Account']['type']['kind'];
 
-const { resourceConfig, libraryOptions } = await getAmplifyDataClientConfig(env);
 
-Amplify.configure(resourceConfig, libraryOptions);
-
-const client = generateClient<Schema>();
-
-// Initialize AWS clients
-const s3 = new AWS.S3();
+const client = await getClient(env);
 
 /**
  * Lambda Handler Function
  */
 
-export interface Header {
+export interface Row {
     'Number': string,
     'Created': string,
     'Created By': string,
@@ -60,7 +52,6 @@ export interface Header {
     'Has Recurring Fees': string
 }
 
-
 /**
  * Lambda Handler Function
  */
@@ -68,20 +59,16 @@ export const handler: S3Handler = async (event): Promise<void> => {
     logger.info('S3Event', event);
     try {
         const { bucket, key } = fromEvent(event)
+        logger.start(`Processing file: s3://${bucket}/${key}`, event);
 
-        logger.start(`Processing file: s3://${bucket}/${key}`);
-
-        // Get the file from S3
-        const s3Object = await s3.getObject({ Bucket: bucket, Key: key }).promise();
-        if (!s3Object.Body) {
-            throw new Error("File is empty or not accessible.");
-        }
+        // Get the file contents from S3
+        const body = await s3body(event);
 
         // Parse CSV data
-        const csvContent = s3Object.Body.toString("utf-8");
-        const { data } = Papa.parse<Header>(csvContent, { header: true });
+        const csvContent = body.toString("utf-8");
+        const { data } = Papa.parse<Row>(csvContent, { header: true });
 
-        // Insert data into DynamoDB
+        // Initailize statisitics
         let errorCount = 0;
         let added = 0;
         let skipped = 0;
@@ -144,14 +131,14 @@ export const handler: S3Handler = async (event): Promise<void> => {
                     added++;
                 } catch (error) {
                     errorCount++;
-                    logger.failure('Error creating account', error);
+                    logger.failure(`Error ${error} - creating item from row`, row);
                 }
             }
         }
         logger.success(`Successfully processed ${data.length} rows, ${added} added, ${skipped} skipped, with ${errorCount} errors`);
 
         // Move the file to the archive folder 
-        await archiveFile(bucket, key);
+        await archiveFile(bucket, key, errorCount);
 
     } catch (error) {
         logger.failure('Error processing CSV', error);

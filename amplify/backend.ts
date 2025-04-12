@@ -13,6 +13,7 @@ import { EventType } from 'aws-cdk-lib/aws-s3';
 import { LambdaDestination } from 'aws-cdk-lib/aws-s3-notifications';
 import { BucketDeployment, Source } from 'aws-cdk-lib/aws-s3-deployment';
 
+
 /**
  * @see https://docs.amplify.aws/react/build-a-backend/ to add storage, functions, and more
  */
@@ -47,6 +48,7 @@ cfnUserPool.policies = {
 
 const { tables } = backend.data.resources
 const { bucket } = backend.storage.resources
+
 // const region = backend.stack.region
 // const accountId = backend.stack.account
 
@@ -167,28 +169,38 @@ new BucketDeployment(backend.stack, 'DeployImportReadme', {
 const importAccountLambda = backend.importAccountFunction.resources.lambda;
 const importItemLambda = backend.importItemFunction.resources.lambda;
 const importReceiveLambda = backend.importReceiveFunction.resources.lambda;
-const imporSaleLambda = backend.importSaleFunction.resources.lambda;
+const importSaleLambda = backend.importSaleFunction.resources.lambda;
+
+const putEvents = new PolicyStatement({
+  actions: ["events:PutEvents"],
+  resources: ["*"], // or narrow to a custom EventBus
+})
 
 bucket.addEventNotification(
   EventType.OBJECT_CREATED_PUT,
   new LambdaDestination(importReceiveLambda),
   { prefix: IMPORT_DIRS.IN_DIR, suffix: '.csv' }
 );
+importReceiveLambda.addToRolePolicy(putEvents)
 
 bucket.addEventNotification(
   EventType.OBJECT_CREATED_PUT,
   new LambdaDestination(importAccountLambda),
   { prefix: IMPORT_DIRS.PROCESSING_DIR + 'Account', suffix: '.csv' }
 );
+importAccountLambda.addToRolePolicy(putEvents)
 
 bucket.addEventNotification(
   EventType.OBJECT_CREATED_PUT,
   new LambdaDestination(importItemLambda),
   { prefix: IMPORT_DIRS.PROCESSING_DIR + 'Item', suffix: '.csv' }
 );
+importItemLambda.addToRolePolicy(putEvents)
 
 bucket.addEventNotification(
   EventType.OBJECT_CREATED_PUT,
-  new LambdaDestination(imporSaleLambda),
+  new LambdaDestination(importSaleLambda),
   { prefix: IMPORT_DIRS.PROCESSING_DIR + 'Sale', suffix: '.csv' }
 );
+importSaleLambda.addToRolePolicy(putEvents)
+

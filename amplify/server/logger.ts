@@ -1,4 +1,5 @@
 import { Logger } from "@aws-lambda-powertools/logger";
+import { notificationService } from "./notification.service";
 
 class PrettyLogger {
     private logger: Logger;
@@ -34,7 +35,8 @@ class PrettyLogger {
      * @param obj Extra data to log
      */
     success(message: string, obj?: object | null | unknown): void {
-        this.logger["info"](message, { data: this.formattedData(obj), outcome: "SUCCESS" });
+        this.logger["info"](message, { data: this.formattedData(obj), notification: "Success" });
+        notificationService.notify("Success", serviceName, message, obj);
     }
 
     /**
@@ -43,7 +45,8 @@ class PrettyLogger {
      * @param obj Extra data to log
      */
     failure(message: string, obj?: object | null | unknown): void {
-        this.logger["error"](message, { data: this.formattedData(obj), outcome: "FAILURE" });
+        this.logger["error"](message, { data: this.formattedData(obj), notification: "Failure" });
+        notificationService.notify("Failure", serviceName, message, obj);
     }
 
     /**
@@ -52,7 +55,18 @@ class PrettyLogger {
      * @param obj Extra data to log
      */
     start(message: string, obj?: object | null | unknown): void {
-        this.logger["info"](message, { data: this.formattedData(obj), outcome: "START" });
+        this.logger["info"](message, { data: this.formattedData(obj), notification: "Start" });
+        notificationService.notify("Start", serviceName, message, obj);
+    }
+
+    /**
+     * Logs a message with the outcome START, use to log the start of a process
+     * @param message the message to log
+     * @param obj Extra data to log
+     */
+    alert(message: string, obj?: object | null | unknown): void {
+        this.logger["warn"](message, { data: this.formattedData(obj), notification: "Alert" });
+        notificationService.notify("Alert", serviceName, message, obj);
     }
 
     /**

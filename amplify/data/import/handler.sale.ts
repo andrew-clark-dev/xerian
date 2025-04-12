@@ -4,9 +4,8 @@ import { generateClient } from "aws-amplify/data";
 import { Amplify } from "aws-amplify";
 import { getAmplifyDataClientConfig } from '@aws-amplify/backend/function/runtime';
 import { env } from "$amplify/env/import-sale-function";
-import AWS from "aws-sdk";
 import Papa from "papaparse";
-import { archiveFile, fromEvent } from "@server/file.utils";
+import { archiveFile, fromEvent, s3body } from "@server/file.utils";
 import { userService } from "@server/user.service";
 import { logger } from "@server/logger";
 import { toISO, money } from "@server/import.utils";
@@ -25,8 +24,6 @@ Amplify.configure(resourceConfig, libraryOptions);
 
 const client = generateClient<Schema>();
 
-// Initialize AWS clients
-const s3 = new AWS.S3();
 
 interface Row {
     'Number': string,
@@ -80,21 +77,20 @@ export const handler: S3Handler = async (event): Promise<void> => {
     logger.info('S3 event:', event);
     try {
         const { bucket, key } = fromEvent(event)
-        logger.start(`Processing file: s3://${bucket}/${key}`);
+        logger.start(`Processing file: s3://${bucket}/${key}`, event);
 
-        const s3Object = await s3.getObject({ Bucket: bucket, Key: key }).promise();
-        if (!s3Object.Body) {
-            throw new Error("File is empty or not accessible.");
-        }
+        // Get the file contents from S3
+        const body = await s3body(event);
 
         // Parse CSV data
-        const csvContent = s3Object.Body.toString("utf-8");
+        const csvContent = body.toString("utf-8");
         const { data } = Papa.parse<Row>(csvContent, { header: true });
 
-        // Insert data into DynamoDB
+        // Initailize statisitics
         let errorCount = 0;
         let added = 0;
         let skipped = 0;
+
         for (const row of data) {
             const nickname = row['Cashier']
             const profile = await userService.provisionUser(nickname);

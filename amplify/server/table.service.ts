@@ -1,13 +1,9 @@
 import { AttributeMap } from "aws-sdk/clients/dynamodb";
-import { SSMClient } from "@aws-sdk/client-ssm";
 import { logger } from "@server/logger";
 
 import * as AWS from 'aws-sdk';
 
 const docClient = new AWS.DynamoDB.DocumentClient();
-const ssmClient = new SSMClient();
-const lambdaName = process.env.AWS_LAMBDA_FUNCTION_NAME || "no_lambda";
-
 
 export const truncateTable = async (name: string, index: string[]) => {
     logger.info(`Truncate: ${name}`);

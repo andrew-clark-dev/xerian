@@ -269,6 +269,19 @@ export const schema = a.schema({
       index("type"),
     ]),
 
+  Notification: a
+    .model({
+      createdAt: a.datetime(),
+      type: a.enum(['Failure', 'Success', 'Start', 'Alert', 'Fatal']),
+      functionName: a.string().required(),
+      message: a.string().required(),
+      data: a.json(),
+    })
+    .secondaryIndexes((index) => [
+      index("type"),
+      index("functionName"),
+    ]),
+
 }).authorization(allow => [
   allow.group('Employee'), // default to employee
   allow.resource(importAccountFunction),
