@@ -271,8 +271,8 @@ export const schema = a.schema({
 
   Notification: a
     .model({
-      id: a.id(),
-      createdAt: a.datetime(),
+      id: a.id().required(),
+      createdAt: a.datetime().required(),
       type: a.enum(['Failure', 'Success', 'Start', 'Alert', 'Fatal']),
       functionName: a.string().required(),
       message: a.string().required(),

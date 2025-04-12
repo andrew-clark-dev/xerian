@@ -1,5 +1,6 @@
 import { Schema } from "../../amplify/data/resource"; // Adjusted the path to the correct module
 import { generateClient } from "aws-amplify/data";
+import { v4 as uuid4 } from 'uuid';
 
 export type Notification = Schema['Notification']['type'];
 
@@ -14,6 +15,8 @@ class NotificationService {
 
         const { data: notification, errors: errors } = await client.models.Notification.create(
             {
+                id: uuid4(),
+                createdAt: new Date().toISOString(),
                 type: notificationType,
                 functionName: functionName,
                 message: message,
