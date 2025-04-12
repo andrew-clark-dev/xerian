@@ -1,10 +1,10 @@
 import { Schema } from "../../amplify/data/resource"; // Adjusted the path to the correct module
-import { generateClient } from "aws-amplify/data";
 import { v4 as uuid4 } from 'uuid';
+import { serverClient } from "./amplify-server-utils";
 
 export type Notification = Schema['Notification']['type'];
 
-const client = generateClient<Schema>();
+const client = serverClient;
 
 type NotificationType = 'Failure' | 'Success' | 'Start' | 'Alert' | 'Fatal';
 

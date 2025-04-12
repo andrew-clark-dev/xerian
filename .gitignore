@@ -41,3 +41,4 @@ amplify_outputs*
 amplifyconfiguration*
 .favorites.json
 
+.env
