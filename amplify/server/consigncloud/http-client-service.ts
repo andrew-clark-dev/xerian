@@ -1,5 +1,4 @@
 import ky from 'ky';
-import { HTTPError } from 'ky';
 
 // Define response type
 interface PagedResponse<T> {
@@ -8,13 +7,27 @@ interface PagedResponse<T> {
   data: T[];
 }
 
+const httpCall = ky.create({
+  headers: {
+    'Content-Type': 'application/json',
+    'Accept': 'application/json',
+    'Access-Control-Allow-Origin': '*', // Allow all origins
+    'Authorization': `Bearer ${process.env.API_KEY}`,
+  },
+  retry: {
+    limit: 5,
+    statusCodes: [429], // 👈 still specify this if you want 429 retries
+  }
+});
 
-const headers = {
-  'Content-Type': 'application/json',
-  'Accept': 'application/json',
-  'Access-Control-Allow-Origin': '*', // Allow all origins
-  'Authorization': `Bearer ${process.env.API_KEY}`,
-}
+const searchParams = new URLSearchParams()
+searchParams.set('limit', '100');
+searchParams.set('sort_by', 'created');
+['created_by', 'category', 'account']
+  .forEach(expand => { searchParams.append('expand', expand); });
+
+['created_by', 'days_on_shelf', 'last_sold', 'last_viewed', 'printed', 'split_price', 'tax_exempt', 'quantity']
+  .forEach(include => { searchParams.append('include', include); });
 
 export interface ExternalUser {
   id: string,
@@ -81,55 +94,19 @@ export async function fetchPagedItems(params: {
   createdGte?: string;
   createdLt?: string;
 }): Promise<PagedResponse<ExternalItem>> {
-  const searchParams = new URLSearchParams({
-    'include': 'created_by, days_on_shelf, last_sold, last_viewed, printed, split_price, tax_exempt, quantity',
-    'expand': 'created_by, category, account',
-    'sort_by': 'created',
-    'limit': '100',
-  })
-  if (params.cursor) searchParams.set('cursor', params.cursor);
-  if (params.createdGte) searchParams.set('created:gte', params.createdGte);
-  if (params.createdLt) searchParams.set('created:lt', params.createdLt);
+  try {
 
-  const response = await ky
-    .get('https://api.consigncloud.com/api/v1/items', { headers, searchParams })
-    .json<PagedResponse<ExternalItem>>();
+    if (params.cursor) searchParams.set('cursor', params.cursor);
+    if (params.createdGte) searchParams.set('created:gte', params.createdGte);
+    if (params.createdLt) searchParams.set('created:lt', params.createdLt);
+    console.info('searchParams', searchParams);
+    const response = await httpCall
+      .get('https://api.consigncloud.com/api/v1/items', { searchParams })
+      .json<PagedResponse<ExternalItem>>();
 
-  return response;
-}
-
-export async function fetchPagedItemsWithRetry(params: {
-  cursor: string | null;
-  createdGte?: string;
-  createdLt?: string;
-  retries?: number; // Number of retries before giving up
-}): Promise<PagedResponse<ExternalItem>> {
-  const maxRetries = 5; // Max number of retries
-  let attempt = 0;
-
-  while (attempt <= maxRetries) {
-    try {
-      return await fetchPagedItems(params);
-    } catch (error) {
-      if (error instanceof HTTPError && error.response && error.response.status === 429) {
-        // If it's a 429, wait 5 seconds and retry
-        attempt++;
-        console.log(`404 error received, retrying... Attempt #${attempt}`);
-        if (attempt > maxRetries) {
-          throw new Error('Maximum retries reached for 429 errors.');
-        }
-        await delay(2000); // Wait for 2 seconds before retrying
-      } else {
-        // Throw other errors immediately
-        throw error;
-      }
-    }
+    return response;
+  } catch (error) {
+    console.error('Error fetching paged items:', (error as Error).message);
+    throw error; // Rethrow the error for handling in the calling function
   }
-
-  throw new Error('Unexpected error occurred during retries');
-}
-
-// Helper function to delay for a specified time
-function delay(ms: number) {
-  return new Promise(resolve => setTimeout(resolve, ms));
 }

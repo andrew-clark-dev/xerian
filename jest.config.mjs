@@ -3,18 +3,8 @@
  * https://jestjs.io/docs/configuration
  */
 
-
-
-import type { Config } from 'jest'
-import nextJest from 'next/jest.js'
-
-const createJestConfig = nextJest({
-  // Provide the path to your Next.js app to load next.config.js and .env files in your test environment
-  dir: './',
-})
-
-// Add any custom config to be passed to Jest
-const config: Config = {
+/** @type {import('jest').Config} */
+const config = {
   // All imported modules in your tests should be mocked automatically
   // automock: false,
 
@@ -25,7 +15,7 @@ const config: Config = {
   // cacheDirectory: "/private/var/folders/94/q5r72m19441ckhyf624kyglc0000gn/T/jest_dx",
 
   // Automatically clear mock calls, instances, contexts and results before every test
-  clearMocks: true,
+  // clearMocks: false,
 
   // Indicates whether the coverage information should be collected while executing the test
   collectCoverage: true,
@@ -112,6 +102,7 @@ const config: Config = {
 
   // A preset that is used as a base for Jest's configuration
   // preset: undefined,
+  preset: "ts-jest",
 
   // Run tests from one or more projects
   // projects: undefined,
@@ -143,7 +134,7 @@ const config: Config = {
   // runner: "jest-runner",
 
   // The paths to modules that run some code to configure or set up the testing environment before each test
-  setupFiles: ["<rootDir>jest.setup.ts"],
+  // setupFiles: [],
 
   // A list of paths to modules that run some code to configure or set up the testing framework before each test
   // setupFilesAfterEnv: [],
@@ -155,7 +146,9 @@ const config: Config = {
   // snapshotSerializers: [],
 
   // The test environment that will be used for testing
+  // testEnvironment: "jest-environment-node",
   testEnvironment: "node",
+
 
   // Options that will be passed to the testEnvironment
   // testEnvironmentOptions: {},
@@ -185,7 +178,9 @@ const config: Config = {
 
   // A map from regular expressions to paths to transformers
   // transform: undefined,
-
+  transform: {
+    "^.+\.tsx?$": ["ts-jest",{}],
+  },
   // An array of regexp pattern strings that are matched against all source file paths, matched files will skip transformation
   // transformIgnorePatterns: [
   //   "/node_modules/",
@@ -205,7 +200,4 @@ const config: Config = {
   // watchman: true,
 };
 
-
-// createJestConfig is exported this way to ensure that next/jest can load the Next.js config which is async
-export default createJestConfig(config)
-
+export default config;

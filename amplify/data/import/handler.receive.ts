@@ -1,49 +1,50 @@
-import { fetchPagedItemsWithRetry } from '@server/consigncloud/http-client-service';
+import { fetchPagedItems } from '@server/consigncloud/http-client-service';
 import { S3Event, S3Handler } from 'aws-lambda';
-import { uploadData } from "aws-amplify/storage";
 import { logger } from "@server/logger";
-import { archiveFile, fromEvent } from "@server/file.utils";
-import { GetObjectCommand, GetObjectCommandOutput, S3Client } from '@aws-sdk/client-s3';
+import { archiveFile } from "@server/file.utils";
+import { PutObjectCommand } from '@aws-sdk/client-s3';
+
+import { S3 } from '@aws-sdk/client-s3';
+
+console.log('Loading function');
+const s3 = new S3();
+
+
 
 
 
 export const handler: S3Handler = async (event: S3Event) => {
+    logger.info('S3Event', event);
 
-    const s3 = new S3Client({ region: process.env.AWS_REGION });
-
-
+    // Get the object from the event 
+    const bucket = event.Records[0].s3.bucket.name;
+    const key = decodeURIComponent(event.Records[0].s3.object.key.replace(/\+/g, ' '));
+    const params = {
+        Bucket: bucket,
+        Key: key,
+    };
 
     logger.info('S3Event', event);
-    const { bucket, key } = fromEvent(event)
+
     const PROCESSING_DIR = process.env.PROCESSING_DIR;
     try {
         logger.start(`Processing file: s3://${bucket}/${key}`, event);
 
         // Get the file contents from S3
-        let s3Object: GetObjectCommandOutput = {} as GetObjectCommandOutput;
-        try {
-            s3Object = await s3.send(new GetObjectCommand({ Bucket: bucket, Key: key }));
+        const { Body } = await s3.getObject(params);
+        const content = await Body?.transformToString();
 
-        } catch (error) {
-            logger.error('Error getting S3 object', (error as Error).message);
-        }
-        logger.info('s3Object');
-
-        const body = s3Object.Body;
-
-        logger.info('body');
-
-
-        const jsonContent = JSON.parse(body?.toString() ?? '');
+        const jsonContent = JSON.parse(content ?? '');
         logger.info('jsonContent', jsonContent);
 
         // Extract 'to' and 'from' attributes
         const { from, to } = jsonContent;
+        logger.info('from to ', { from, to });
 
         // Parse 'to' and 'from' to Date objects
         const fromDate = new Date(from);
         const toDate = new Date(to);
-
+        logger.info('fromDate toDate ', { fromDate, toDate });
         if (isNaN(fromDate.getTime()) || isNaN(toDate.getTime())) {
             logger.error('Invalid date format', { to, from });
             throw new Error('Invalid date format');
@@ -55,6 +56,7 @@ export const handler: S3Handler = async (event: S3Event) => {
 
         // Construct the S3 filename
         const s3FileName = `${PROCESSING_DIR}Items-${fromDateString}-${toDateString}.txt`;
+        logger.info('fs3FileName', s3FileName);
 
         let cursor = null;
         let hasMorePages = true;
@@ -63,11 +65,12 @@ export const handler: S3Handler = async (event: S3Event) => {
 
 
         while (hasMorePages) {
-            const response = await fetchPagedItemsWithRetry({
+            const response = await fetchPagedItems({
                 cursor: cursor,
                 createdGte: from,
                 createdLt: to,
             });
+            logger.info('response', response);
 
             // Assuming the API returns { data, hasNextPage }
             const { data, next_cursor } = response;
@@ -80,7 +83,15 @@ export const handler: S3Handler = async (event: S3Event) => {
         }
 
         // Use Amplify Storage to upload the content to S3
-        await uploadData({ data: fileContent, path: s3FileName });
+        const command = new PutObjectCommand({
+            Bucket: bucket,
+            Key: s3FileName,
+            Body: fileContent,
+            ContentType: 'text/plain'
+        });
+
+        const response = await s3.send(command);
+        logger.info('File uploaded:', response);
 
         // Log the extracted and parsed dates
         logger.success(`Successfully processed s3://${bucket}/${key}, ${added} added, file uploaded to s3://${bucket}/${s3FileName}`);
