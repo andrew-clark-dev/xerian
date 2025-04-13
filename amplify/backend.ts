@@ -176,6 +176,8 @@ bucket.addEventNotification(
   new LambdaDestination(importReceiveLambda),
   { prefix: IMPORT_DIRS.IN_DIR + 'sync', suffix: '.json' }
 );
+backend.importReceiveFunction.addEnvironment(`NOTIFICATION_TABLE`, tables.Notification.tableName);
+tables.Notification.grantFullAccess(importReceiveLambda);
 
 bucket.addEventNotification(
   EventType.OBJECT_CREATED_PUT,

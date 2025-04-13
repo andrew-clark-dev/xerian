@@ -91,13 +91,18 @@ export function fromEvent(event: S3Event): { bucket: string; key: string } {
 };
 
 export function s3params(event: S3Event): { Bucket: string; Key: string } {
-    if (!event.Records || event.Records.length === 0) {
-        throw new Error("No records found in the S3 event.");
-    }
+    try {
+        if (!event.Records || event.Records.length === 0) {
+            throw new Error("No records found in the S3 event.");
+        }
 
-    const Bucket = event.Records[0].s3.bucket.name;
-    const Key = decodeURIComponent(event.Records[0].s3.object.key.replace(/\+/g, " "));
-    return { Bucket, Key };
+        const Bucket = event.Records[0].s3.bucket.name;
+        const Key = decodeURIComponent(event.Records[0].s3.object.key.replace(/\+/g, " "));
+        return { Bucket, Key };
+    } catch (error) {
+        logger.error('Error getting S3 params: ', error);
+        throw error;
+    }
 };
 
 type BodyType = Buffer | Uint8Array | Blob | string | ReadableStream | Readable;

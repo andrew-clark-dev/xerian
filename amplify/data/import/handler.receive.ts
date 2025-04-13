@@ -2,13 +2,16 @@ import { fetchPagedItemsWithRetry } from '@server/consigncloud/http-client-servi
 import { S3Event, S3Handler } from 'aws-lambda';
 import { uploadData } from "aws-amplify/storage";
 import { logger } from "@server/logger";
-import { archiveFile, fromEvent, s3body } from "@server/file.utils";
+import { archiveFile, fromEvent } from "@server/file.utils";
+import { GetObjectCommand, GetObjectCommandOutput, S3Client } from '@aws-sdk/client-s3';
 
-import { env } from "$amplify/env/import-receive-function";
-import { configureAmplify } from "@server/client.utils";
+
 
 export const handler: S3Handler = async (event: S3Event) => {
-    configureAmplify(env);
+
+    const s3 = new S3Client({ region: process.env.AWS_REGION });
+
+
 
     logger.info('S3Event', event);
     const { bucket, key } = fromEvent(event)
@@ -17,9 +20,22 @@ export const handler: S3Handler = async (event: S3Event) => {
         logger.start(`Processing file: s3://${bucket}/${key}`, event);
 
         // Get the file contents from S3
-        const body = await s3body(event);
+        let s3Object: GetObjectCommandOutput = {} as GetObjectCommandOutput;
+        try {
+            s3Object = await s3.send(new GetObjectCommand({ Bucket: bucket, Key: key }));
 
-        const jsonContent = JSON.parse(body?.toString('utf-8') ?? '');
+        } catch (error) {
+            logger.error('Error getting S3 object', (error as Error).message);
+        }
+        logger.info('s3Object');
+
+        const body = s3Object.Body;
+
+        logger.info('body');
+
+
+        const jsonContent = JSON.parse(body?.toString() ?? '');
+        logger.info('jsonContent', jsonContent);
 
         // Extract 'to' and 'from' attributes
         const { from, to } = jsonContent;
