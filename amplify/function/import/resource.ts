@@ -8,37 +8,14 @@ export const IMPORT_DIRS = {
     ERROR_DIR: 'import/error/',
 }
 
-export const importAccountFunction = defineFunction({
-    name: "import-account-function",
-    entry: "./handler.account.ts",
-    resourceGroupName: "data",
-    timeoutSeconds: 900,
-    memoryMB: 1024,
-    environment: {
-        ...IMPORT_DIRS,
-        SERVICE_NAME: "import-account-function"
-    },
-});
-
 export const importItemFunction = defineFunction({
     name: "import-item-function",
     entry: "./handler.item.ts",
     resourceGroupName: "data",
-    timeoutSeconds: 900,
+    timeoutSeconds: 30,
     environment: {
         ...IMPORT_DIRS,
         SERVICE_NAME: "import-item-function"
-    },
-});
-
-export const importSaleFunction = defineFunction({
-    name: "import-sale-function",
-    entry: "./handler.sale.ts",
-    resourceGroupName: "data",
-    timeoutSeconds: 900,
-    environment: {
-        ...IMPORT_DIRS,
-        SERVICE_NAME: "import-sale-function"
     },
 });
 

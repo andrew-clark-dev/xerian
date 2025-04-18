@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "test": "jest"
+    "test": "vitest"
   },
   "dependencies": {
     "@aws-amplify/adapter-nextjs": "^1.5.8",
@@ -34,6 +34,7 @@
     "flatpickr": "^4.6.13",
     "ky": "^1.8.0",
     "libphonenumber-js": "^1.12.6",
+    "lodash": "^4.17.21",
     "next": "^15.2.5",
     "papaparse": "^5.5.2",
     "react": "^19.0.0",
@@ -52,6 +53,7 @@
     "@aws-amplify/backend": "^1.14.3",
     "@aws-amplify/backend-cli": "^1.5.0",
     "@eslint/eslintrc": "^3",
+    "@jest/globals": "^29.7.0",
     "@svgr/webpack": "^8.1.0",
     "@tailwindcss/postcss": "^4.1.3",
     "@testing-library/dom": "^10.4.0",
@@ -76,7 +78,8 @@
     "ts-jest": "^29.3.2",
     "ts-node": "^10.9.2",
     "tsx": "^4.19.0",
-    "typescript": "^5.6.2"
+    "typescript": "^5.6.2",
+    "vitest": "^3.1.1"
   },
   "type": "module"
 }

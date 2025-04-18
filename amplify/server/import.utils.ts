@@ -1,3 +1,5 @@
+import { ExternalItemStatus } from './consigncloud/http-client-types';
+
 export function money(text?: string | null): number {
     if (!text) {
         return 0;
@@ -22,9 +24,9 @@ export function split(text?: string | null): number {
 * @param exAccount The account read from thee external system.
 * @returns A boolean indicating if the number is a mobile number
 */
-export function isMobileNumber(phoneNumber?: string | null): boolean {
-    const mobileRegex = /078|076|079|(0).*78|(0).*76|(0).*79/gm;
-    return mobileRegex.test(phoneNumber ?? '');
+export function isMobileNumber(phoneNumber?: string | null | undefined): boolean {
+    const mobileRegex = /^(0|\(0\))7[5-9]/;
+    return mobileRegex.test(phoneNumber?.trim() ?? '');
 }
 
 /**
@@ -32,7 +34,7 @@ export function isMobileNumber(phoneNumber?: string | null): boolean {
 * @param exAccount The account read from thee external system.
 * @returns The communication preferences
 */
-export function comunicationPreferences(phoneNumber: string | null, email?: string | null): "TextMessage" | "Email" | "None" {
+export function comunicationPreferences(phoneNumber: string | null | undefined, email?: string | null | undefined): "TextMessage" | "Email" | "None" {
     if (isMobileNumber(phoneNumber)) {
         return "TextMessage";
     }
@@ -58,4 +60,17 @@ export function toISO(datestring?: string | null): string | null {
         console.error(`Error parsing date: ${datestring}`, error);
         return null;
     }
+}
+
+type ItemStatus = 'Created' | 'Tagged' | 'Active' | 'Sold' | 'ToDonate' | 'Donated' | 'Parked' | 'Returned' | 'Expired' | 'Lost' | 'Stolen' | 'Multi' | 'Unknown';
+
+
+export function toStatus(status: ExternalItemStatus): ItemStatus {
+    if (((status.sold ?? 0) + (status.sold_on_legacy ?? 0) + (status.sold_on_shopify ?? 0) + (status.sold_on_square ?? 0) + (status.sold_on_third_party ?? 0)) > 0) return 'Sold';
+    if (status.active ?? 0 > 0) return 'Active';
+    if (status.parked ?? 0 > 0) return 'Parked';
+    if (status.lost ?? 0 > 0) return 'Lost';
+    if (status.stolen ?? 0 > 0) return 'Stolen';
+    if (status.donated ?? 0 > 0) return 'Donated';
+    return 'Unknown';
 }

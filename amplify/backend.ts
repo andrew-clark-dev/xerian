@@ -3,7 +3,7 @@ import { auth } from './auth/resource';
 import { data } from './data/resource';
 import { storage } from './storage/resource';
 import { createActionFunction } from './data/create-action/resource';
-import { importReceiveFunction, importAccountFunction, importItemFunction, importSaleFunction, IMPORT_DIRS } from './data/import/resource';
+import { importReceiveFunction, importItemFunction, IMPORT_DIRS } from './function/import/resource'; // 
 import { truncateTableFunction } from './data/truncate-table/resource';
 import { Effect, Policy, PolicyStatement } from 'aws-cdk-lib/aws-iam';
 import { Stack } from 'aws-cdk-lib';
@@ -12,6 +12,10 @@ import { initDataFunction } from './data/init-data/resource';
 import { EventType } from 'aws-cdk-lib/aws-s3';
 import { LambdaDestination } from 'aws-cdk-lib/aws-s3-notifications';
 import { BucketDeployment, Source } from 'aws-cdk-lib/aws-s3-deployment';
+import { createQueue } from './backend-helpers';
+import { SqsEventSource } from 'aws-cdk-lib/aws-lambda-event-sources';
+// import { createQueue } from './backend-sqs'
+// import { SqsEventSource } from 'aws-cdk-lib/aws-lambda-event-sources';
 
 
 /**
@@ -25,9 +29,7 @@ const backend = defineBackend({
   initDataFunction,
   createActionFunction,
   importReceiveFunction,
-  importAccountFunction,
   importItemFunction,
-  importSaleFunction,
 });
 
 
@@ -48,15 +50,14 @@ cfnUserPool.policies = {
 
 const { tables } = backend.data.resources
 const { bucket } = backend.storage.resources
-
-// const region = backend.stack.region
-// const accountId = backend.stack.account
+// // const { region } = backend.stack
+// // const { account } = backend.stack
 
 
 const createActionLambda = backend.createActionFunction.resources.lambda
 tables.Total.grantFullAccess(createActionLambda);
 
-const policy = new Policy(
+const createActionFunctionStreamingPolicy = new Policy(
   Stack.of(createActionLambda),
   "createActionFunctionStreamingPolicy",
   {
@@ -75,101 +76,57 @@ const policy = new Policy(
   }
 );
 
-createActionLambda.role?.attachInlinePolicy(policy);
+createActionLambda.role?.attachInlinePolicy(createActionFunctionStreamingPolicy);
 backend.createActionFunction.addEnvironment("TOTAL_TABLE_NAME", tables.Total.tableName);
 
-const accountMapping = new EventSourceMapping(
-  Stack.of(tables["Account"]),
-  "createActionAccountEventStreamMapping",
-  {
-    target: createActionLambda,
-    eventSourceArn: tables["Account"].tableStreamArn,
-    startingPosition: StartingPosition.LATEST,
-  }
-);
+// List of tables to create event source mappings for the createActionFunction
+['Account', 'Item', 'Sale', 'Transaction', 'Comment'].forEach((f) => {
+  const eventSourceMapping = new EventSourceMapping(
+    Stack.of(tables[f]),
+    `createAction${f}EventStreamMapping`,
+    {
+      target: createActionLambda,
+      eventSourceArn: tables[f].tableStreamArn,
+      startingPosition: StartingPosition.LATEST,
+    }
+  );
+  eventSourceMapping.node.addDependency(createActionFunctionStreamingPolicy);
+})
 
-accountMapping.node.addDependency(policy);
-
-const itemMapping = new EventSourceMapping(
-  Stack.of(tables["Item"]),
-  "createActionItemEventStreamMapping",
-  {
-    target: createActionLambda,
-    eventSourceArn: tables["Item"].tableStreamArn,
-    startingPosition: StartingPosition.LATEST,
-  }
-);
-
-itemMapping.node.addDependency(policy);
-
-const saleMapping = new EventSourceMapping(
-  Stack.of(tables["Sale"]),
-  "createActionSaleEventStreamMapping",
-  {
-    target: createActionLambda,
-    eventSourceArn: tables["Sale"].tableStreamArn,
-    startingPosition: StartingPosition.LATEST,
-  }
-);
-
-saleMapping.node.addDependency(policy);
-
-const transactionMapping = new EventSourceMapping(
-  Stack.of(tables["Transaction"]),
-  "createActionTransactionEventStreamMapping",
-  {
-    target: createActionLambda,
-    eventSourceArn: tables["Transaction"].tableStreamArn,
-    startingPosition: StartingPosition.LATEST,
-  }
-);
-
-transactionMapping.node.addDependency(policy);
-
-const commentMapping = new EventSourceMapping(
-  Stack.of(tables["Comment"]),
-  "createActionCommentEventStreamMapping",
-  {
-    target: createActionLambda,
-    eventSourceArn: tables["Comment"].tableStreamArn,
-    startingPosition: StartingPosition.LATEST,
-  }
-);
-
-commentMapping.node.addDependency(policy);
-
-
-// Extend add environment and access for table functions
+// Extend environment and add access to tables for backend functions
 for (const key in tables) {
   const t = tables[key];
-  backend.truncateTableFunction.addEnvironment(`${key.toUpperCase()}_TABLE`, t.tableName)
-  backend.initDataFunction.addEnvironment(`${key.toUpperCase()}_TABLE`, t.tableName)
-  t.grantFullAccess(backend.truncateTableFunction.resources.lambda);
-  t.grantFullAccess(backend.initDataFunction.resources.lambda);
+  [
+    backend.truncateTableFunction,
+    backend.initDataFunction,
+    backend.importItemFunction
+  ].forEach((f) => {
+    f.addEnvironment(`${key.toUpperCase()}_TABLE`, t.tableName);
+    t.grantFullAccess(f.resources.lambda);
+  })
 }
 
 // Set up import storage and integrate with Lambda functions
 // Preload a README file into S3 during deployment
-// Define a Markdown file content
-const markdownContent = `# Xerian import directory
+const markdownContent = `
+# Xerian import directory
+Upload sync*.json files to the 'in' directory to import items in to the application.
 
-Upload .csv files to the 'in' directory to import objects in to the application.
-
-## Supported objects
-- Account (Account*.csv)
-- Item (Item*.csv)
-- Sale (Sale*.csv)`;
-
+Files content specifying the import period should be in JSON format, e.g.:
+{
+    "from": "2020-01-01T00:00:00.000Z",
+    "to": "2020-02-01T00:00:00.000Z"
+}
+`;
 new BucketDeployment(backend.stack, 'DeployImportReadme', {
   sources: [Source.data('README.md', markdownContent), Source.data('in/UPLOAD_IMPORT_FILES_HERE', "")],
   destinationBucket: bucket,
   destinationKeyPrefix: 'import/', // Creates import/README.md
 });
 
-const importAccountLambda = backend.importAccountFunction.resources.lambda;
-const importItemLambda = backend.importItemFunction.resources.lambda;
+
+
 const importReceiveLambda = backend.importReceiveFunction.resources.lambda;
-const importSaleLambda = backend.importSaleFunction.resources.lambda;
 
 bucket.addEventNotification(
   EventType.OBJECT_CREATED_PUT,
@@ -179,21 +136,16 @@ bucket.addEventNotification(
 backend.importReceiveFunction.addEnvironment(`NOTIFICATION_TABLE`, tables.Notification.tableName);
 tables.Notification.grantFullAccess(importReceiveLambda);
 
-bucket.addEventNotification(
-  EventType.OBJECT_CREATED_PUT,
-  new LambdaDestination(importAccountLambda),
-  { prefix: IMPORT_DIRS.PROCESSING_DIR + 'Account', suffix: '.csv' }
-);
 
-bucket.addEventNotification(
-  EventType.OBJECT_CREATED_PUT,
-  new LambdaDestination(importItemLambda),
-  { prefix: IMPORT_DIRS.PROCESSING_DIR + 'Item', suffix: '.csv' }
-);
+const importItemLambda = backend.importItemFunction.resources.lambda;
+const { queue: importQueue } = createQueue(backend.stack, { queueName: 'import' });
+importItemLambda.addEventSource(new SqsEventSource(importQueue, { batchSize: 5 }));
+importQueue.grantSendMessages(importReceiveLambda);
 
-bucket.addEventNotification(
-  EventType.OBJECT_CREATED_PUT,
-  new LambdaDestination(importSaleLambda),
-  { prefix: IMPORT_DIRS.PROCESSING_DIR + 'Sale', suffix: '.csv' }
-);
+
+
+
+
+
+
 

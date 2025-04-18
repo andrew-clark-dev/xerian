@@ -1,5 +1,4 @@
 import { a, defineData, type ClientSchema } from '@aws-amplify/backend';
-import { importAccountFunction, importItemFunction, importSaleFunction, importReceiveFunction } from './import/resource';
 import { initDataFunction } from './init-data/resource';
 import { createActionFunction } from './create-action/resource';
 import { postConfirmation } from '../auth/post-confirmation/resource';
@@ -117,7 +116,6 @@ export const schema = a.schema({
       items: a.hasMany("Item", "accountNumber"), // setup relationships between main types
       transactions: a.string().array(), // this is the list of transaction ids that this item has been involved in.
       balance: a.integer().default(0),
-      noSales: a.integer().default(0),
       noItems: a.integer().default(0),
       lastActivityAt: a.datetime(),
       lastItemAt: a.datetime(),
@@ -178,7 +176,7 @@ export const schema = a.schema({
   ItemGroup: a
     .model({
       quantity: a.integer().required(),
-      statuses: a.ref('ItemStatus').array(), // for the rare cases where multiple instances of items are sold we use this arrray for tracking.
+      statuses: a.json(), // for the rare cases where multiple instances of items are sold we use this arrray for tracking.
       itemSku: a.string(),
       item: a.belongsTo('Item', 'itemSku'),
     }),
@@ -223,27 +221,28 @@ export const schema = a.schema({
       number: a.string().required(),
       lastActivityBy: a.id().required(),
       customerEmail: a.string(),
-      accountNumber: a.string(), // the account number of the customer if exists     
-      status: a.enum(['Pending', 'Finalized', 'Parked', 'Voided']),
+      customerAccount: a.string(), // the account of the customer if exists     
+      finalizedAt: a.datetime(),
+      parkedAt: a.datetime(),
+      voidedAt: a.datetime(),
+      status: a.enum(['Open', 'Finalized', 'Parked', 'Voided']),
       discount: a.ref('Discount'),
-      gross: a.integer().required(),
       subTotal: a.integer().required(),
       total: a.integer().required(),
-      tax: a.integer().required(), // we only track MWST
+      taxes: a.string().array(), // we only track MWST
       change: a.integer(),
       refund: a.integer(),
       accountTotal: a.integer().required(),
-      storeTotal: a.integer().required(),
+      storeTotal: a.integer(),
       transaction: a.id().required(), // tranction id
       items: a.ref('SaleItem').array().required(),
-      refundedSale: a.string(),
+      receipt_url: a.url(),
       createdAt: a.datetime(),
       updatedAt: a.datetime(),
     })
     .identifier(['number'])
     .secondaryIndexes((index) => [
       index("transaction"),
-      index("refundedSale"),
     ]),
 
   Discount: a
@@ -252,18 +251,29 @@ export const schema = a.schema({
       value: a.integer(),
     }),
 
+
+  AmountsTendered: a
+    .customType({
+      card: a.integer(),
+      cash: a.integer(),
+      check: a.integer(),
+      giftcard: a.integer(),
+      manual: a.integer(),
+      storecredit: a.integer()
+    }),
+
+
   Transaction: a
     .model({
       createdAt: a.datetime(),
       updatedAt: a.datetime(),
       lastActivityBy: a.id().required(),
-      paymentType: a.enum(["Cash", "Card", "GiftCard", "StoreCredit", "Other"]),
       type: a.enum(["Sale", "Refund", "Payout", "Reversal", "TransferIn", "TransferOut"]),
       amount: a.integer().required(),
-      tax: a.integer().required(),
+      amountsTendered: a.ref('AmountsTendered'),
+      taxes: a.string().array(), // we only track MWST
       status: a.enum(['Pending', 'Completed', 'Failed']),
       linked: a.string(),  // not currently used
-
     })
     .secondaryIndexes((index) => [
       index("type"),
@@ -287,13 +297,9 @@ export const schema = a.schema({
 
 }).authorization(allow => [
   allow.group('Employee'), // default to employee
-  allow.resource(importAccountFunction),
-  allow.resource(importItemFunction),
-  allow.resource(importSaleFunction),
   allow.resource(initDataFunction),
   allow.resource(createActionFunction),
   allow.resource(postConfirmation),
-  allow.resource(importReceiveFunction),
 ]);
 
 // Used for code completion / highlighting when making requests from frontend

@@ -16,7 +16,6 @@ export type Sale = Schema['Sale']['type']
 export type SaleItem = Schema['Item']['type']
 export type Item = Schema['SaleItem']['type']
 export type Transaction = Schema['Transaction']['type']
-export type PaymentType = Schema['Transaction']['type']['paymentType'];
 
 const { resourceConfig, libraryOptions } = await getAmplifyDataClientConfig(env);
 
@@ -130,10 +129,8 @@ async function createSale(row: Row, id: string): Promise<number> {
     const newTransaction: Transaction = {
         id: uuidv4(),
         lastActivityBy: IMPORT_SERVICE_USER_ID,
-        paymentType: paymentType(row),
         type: transactionType,
         amount: money(row.Total),
-        tax: money(row['MWST'].replace('CHF', '')),
         status: 'Completed',
     }
 
@@ -220,13 +217,13 @@ async function createSale(row: Row, id: string): Promise<number> {
     return 1;
 }
 
-function paymentType(row: Row): PaymentType {
-    if (money(row["Cash Payments"]) > 0) { return "Cash"; }
-    if (money(row["Credit Card Payments"]) > 0) { return "Card"; }
-    if (money(row["Store Credit Payments"]) > 0) { return "StoreCredit"; }
-    if (money(row["Gift Card Payments"]) > 0) { return "GiftCard"; }
-    return 'Other'
-}
+// function paymentType(row: Row): PaymentType {
+//     if (money(row["Cash Payments"]) > 0) { return "Cash"; }
+//     if (money(row["Credit Card Payments"]) > 0) { return "Card"; }
+//     if (money(row["Store Credit Payments"]) > 0) { return "StoreCredit"; }
+//     if (money(row["Gift Card Payments"]) > 0) { return "GiftCard"; }
+//     return 'Other'
+// }
 
 function discount(row: Row): { label: string, value: number } | null {
 
