@@ -32,7 +32,6 @@ export default async function Page({ params }: { params: Promise<{ number: strin
         'defaultSplit',
         'transactions',
         'balance',
-        'noSales',
         'noItems',
         'lastActivityAt',
         'lastItemAt',
