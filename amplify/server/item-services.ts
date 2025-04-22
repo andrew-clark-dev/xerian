@@ -30,7 +30,6 @@ export class ItemServices {
         if (await this.db.item.exists({ sku: externalItem.sku })) { return false }
 
         // Import user
-        logger.info('externalItem.created_by', externalItem.created_by);
         await this.importUser(externalItem.created_by);
 
         // Import account

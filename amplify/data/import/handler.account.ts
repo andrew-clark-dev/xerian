@@ -89,7 +89,7 @@ export const handler: S3Handler = async (event): Promise<void> => {
                         addressLine2: row['Address Line 2'],
                         balance: money(row['Balance']),
                         city: row['City'],
-                        createdAt: dateOf(row['Created']),
+                        createdAt: dateOf(row['Created']) || new Date().toISOString(),
                         email: row['Email'],
                         firstName: row['First Name'],
                         lastActivityAt: dateOf(row['Last Activity']),

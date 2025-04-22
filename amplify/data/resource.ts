@@ -33,8 +33,13 @@ export const schema = a.schema({
       createdBy: a.belongsTo('UserProfile', 'userId'),
       before: a.json(),
       after: a.json(),
+      createdAt: a.datetime(),
     })
-    .secondaryIndexes((index) => [index("refId"), index("userId"), index("typeIndex"), index("modelName")]),
+    .secondaryIndexes((index) => [
+      index("refId"),
+      index("userId").sortKeys(["createdAt"]),
+      index("typeIndex"),
+      index("modelName")]),
 
   Comment: a
     .model({
@@ -121,15 +126,15 @@ export const schema = a.schema({
       lastItemAt: a.datetime(),
       lastSettlementAt: a.datetime(),
       tags: a.string().array(),
-      createdAt: a.datetime(),
+      createdAt: a.datetime().required(),
       updatedAt: a.datetime(),
       deletedAt: a.datetime(),
     })
     .identifier(['number'])
     .secondaryIndexes((index) => [
       index("id"),
-      index("status"),
-      index("deletedAt").sortKeys(["number", "createdAt", "balance"]),
+      index("status").sortKeys(["createdAt"]),
+      index("createdAt")
     ]),
 
   ItemStatus: a.enum(['Created', 'Tagged', 'Active', 'Sold', 'ToDonate', 'Donated', 'Parked', 'Returned', 'Expired', 'Lost', 'Stolen', 'Multi', 'Unknown']),
@@ -142,10 +147,10 @@ export const schema = a.schema({
       title: a.string(),
       account: a.belongsTo("Account", "accountNumber"),
       accountNumber: a.string(),
-      category: a.string(),
-      brand: a.string(),
-      color: a.string(),
-      size: a.string(),
+      category: a.string().default('-'),
+      brand: a.string().default('-'),
+      color: a.string().default('-'),
+      size: a.string().default('-'),
       description: a.string(),
       details: a.string(),
       images: a.url().array(), // fields can be arrays,
@@ -165,6 +170,7 @@ export const schema = a.schema({
     .identifier(['sku'])
     .secondaryIndexes((index) => [
       index("id"),
+      index("accountNumber").sortKeys(["createdAt"]),
       index("createdAt"),
       index("category"),
       index("brand"),
@@ -240,7 +246,7 @@ export const schema = a.schema({
       createdAt: a.datetime(),
       updatedAt: a.datetime(),
     })
-    .identifier(['number'])
+    .identifier(['number',])
     .secondaryIndexes((index) => [
       index("transaction"),
     ]),

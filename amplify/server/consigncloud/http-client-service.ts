@@ -1,4 +1,4 @@
-import ky from 'ky';
+import ky, { HTTPError } from 'ky';
 import { ExternalAccount, ExternalItem, ExternalItemSale, ExternalSale } from './http-client-types';
 
 // Define response type
@@ -49,6 +49,13 @@ export async function fetchPagedItems(params: {
 
     return response;
   } catch (error) {
+    if (error instanceof HTTPError && error.response.status === 404) {
+      return {
+        count: 0,
+        next_cursor: null,
+        data: [],
+      };
+    }
     console.error('Error fetching paged items:', (error as Error).message);
     throw error; // Rethrow the error for handling in the calling function
   }
@@ -93,7 +100,14 @@ export async function fetchItemSales(params: {
 
     return response;
   } catch (error) {
-    console.error('Error fetching paged items:', (error as Error).message);
+    if (error instanceof HTTPError && error.response.status === 404) {
+      return {
+        count: 0,
+        next_cursor: null,
+        data: [],
+      };
+    }
+    console.error('Error fetching paged sales:', error);
     throw error; // Rethrow the error for handling in the calling function
   }
 }
@@ -116,7 +130,7 @@ export async function getSale(id: string): Promise<ExternalSale> {
 
     return response;
   } catch (error) {
-    console.error('Error fetching paged items:', (error as Error).message);
+    console.error('Error getting sale:', (error as Error).message);
     throw error; // Rethrow the error for handling in the calling function
   }
 }
