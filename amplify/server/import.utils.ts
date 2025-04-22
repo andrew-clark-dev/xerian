@@ -1,4 +1,5 @@
 import { ExternalItemStatus } from './consigncloud/http-client-types';
+import { logger } from './logger';
 
 export function money(text?: string | null): number {
     if (!text) {
@@ -57,7 +58,7 @@ export function toISO(datestring?: string | null): string | null {
         }
         return null;
     } catch (error) {
-        console.error(`Error parsing date: ${datestring}`, error);
+        logger.error(`Error parsing date: ${datestring}`, error);
         return null;
     }
 }

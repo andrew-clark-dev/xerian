@@ -184,9 +184,9 @@ export class DynamoService {
 
         try {
             await ddb.send(new UpdateCommand(params));
-            console.log(`✅ Appended to array '${arrayAttrName}' successfully`);
+            console.log(`Appended to array '${arrayAttrName}' successfully`);
         } catch (error) {
-            console.error(`❌ Error appending to array '${arrayAttrName}':`, error);
+            console.error(`Error appending to array '${arrayAttrName}':`, error);
             throw error;
         }
     }
