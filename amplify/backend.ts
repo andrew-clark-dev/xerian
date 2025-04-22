@@ -51,7 +51,7 @@ cfnUserPool.policies = {
 const { tables } = backend.data.resources
 const { bucket } = backend.storage.resources
 // // const { region } = backend.stack
-// // const { account } = backend.stack
+const stackId = backend.stack.artifactId.split('-').pop();
 
 
 const createActionLambda = backend.createActionFunction.resources.lambda
@@ -138,7 +138,7 @@ tables.Notification.grantFullAccess(importReceiveLambda);
 
 
 const importItemLambda = backend.importItemFunction.resources.lambda;
-const { queue: importQueue } = createQueue(backend.stack, { queueName: 'import' });
+const { queue: importQueue } = createQueue(backend.stack, { queueName: `import-${stackId}-` });
 importItemLambda.addEventSource(new SqsEventSource(importQueue, { batchSize: 5 }));
 importQueue.grantSendMessages(importReceiveLambda);
 
