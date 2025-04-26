@@ -1,11 +1,13 @@
 // services/DynamoService.ts
 import { DynamoDBClient, } from '@aws-sdk/client-dynamodb';
 import { DynamoDBDocumentClient, PutCommand, PutCommandInput, GetCommandInput, GetCommand, UpdateCommand, UpdateCommandInput } from '@aws-sdk/lib-dynamodb';
+import { UserProfile } from './user.service';
+import { Schema } from "../../amplify/data/resource"; // Adjusted the path to the correct module
 
 const client = new DynamoDBClient({});
 const ddb = DynamoDBDocumentClient.from(client);
 
-export class DynamoService {
+export class DynamoService<T extends Record<string, unknown>> {
     private tableName: string;
 
 
@@ -36,7 +38,7 @@ export class DynamoService {
      * @param key The key to read.
      * @returns The item if found, undefined otherwise.
      */
-    async read<T extends Record<string, unknown>>(key: Partial<T>): Promise<T | undefined> {
+    async read(key: Partial<T>): Promise<T | undefined> {
         const params: GetCommandInput = {
             TableName: this.tableName,
             Key: key,
@@ -93,7 +95,7 @@ export class DynamoService {
      * @param key The key to check for existence.
      * @returns True if the item exists, false otherwise.
      */
-    async exists<T extends Record<string, unknown>>(key: Partial<T>): Promise<boolean> {
+    async exists(key: Partial<T>): Promise<boolean> {
         const item = await this.read({ ...key });
         return !!item;
     }
@@ -120,10 +122,8 @@ export class DynamoService {
      *  { status: 'complete', updatedAt: Date.now() }
      * );
      */
-    async update<T extends Record<string, unknown>>(
-        key: Partial<T>,
-        updates: Partial<T>
-    ): Promise<void> {
+    async update(key: Partial<T>, updates: Partial<T>): Promise<void> {
+
         const updateExpressions = Object.keys(updates).map((k, i) => `#key${i} = :val${i}`);
         const expressionAttributeNames = Object.keys(updates).reduce((acc, k, i) => {
             acc[`#key${i}`] = k;
@@ -192,22 +192,23 @@ export class DynamoService {
     }
 }
 
-export const userDbService = new DynamoService(process.env.USERPROFILE_TABLE!);
-export const accountDbService = new DynamoService(process.env.ACCOUNT_TABLE!);
-export const itemDbService = new DynamoService(process.env.ITEM_TABLE!);
-export const itemGroupDbService = new DynamoService(process.env.ITEM_GROUP_TABLE!);
-export const saleDbService = new DynamoService(process.env.SALE_TABLE!);
-export const transactionDbService = new DynamoService(process.env.TRANSACTION_TABLE!);
-export const itemCategoryDbService = new DynamoService(process.env.ITEMCATEGORY_TABLE!);
+export const userDbService = new DynamoService<UserProfile>(process.env.USERPROFILE_TABLE!);
+export const accountDbService = new DynamoService<Schema['Account']['type']>(process.env.ACCOUNT_TABLE!);
+export const itemDbService = new DynamoService<Schema['Item']['type']>(process.env.ITEM_TABLE!);
+export const itemGroupDbService = new DynamoService<Schema['ItemGroup']['type']>(process.env.ITEM_GROUP_TABLE!);
+export const saleDbService = new DynamoService<Schema['Sale']['type']>(process.env.SALE_TABLE!);
+export const transactionDbService = new DynamoService<Schema['Transaction']['type']>(process.env.TRANSACTION_TABLE!);
+export const itemCategoryDbService = new DynamoService<Schema['ItemCategory']['type']>(process.env.ITEMCATEGORY_TABLE!);
+
 
 export interface DynamoServices {
-    user: DynamoService;
-    account: DynamoService;
-    item: DynamoService;
-    itemGroup: DynamoService;
-    sale: DynamoService;
-    transaction: DynamoService;
-    itemCategory: DynamoService;
+    user: DynamoService<UserProfile>;
+    account: DynamoService<Schema['Account']['type']>;
+    item: DynamoService<Schema['Item']['type']>;
+    itemGroup: DynamoService<Schema['ItemGroup']['type']>;
+    sale: DynamoService<Schema['Sale']['type']>;
+    transaction: DynamoService<Schema['Transaction']['type']>;
+    itemCategory: DynamoService<Schema['ItemCategory']['type']>;
 }
 
 export const dynamoServices: DynamoServices = {

@@ -22,7 +22,7 @@ const httpCall = ky.create({
 });
 
 
-const searchParams = new URLSearchParams()
+const searchParams = new URLSearchParams();
 searchParams.set('limit', '100');
 searchParams.set('sort_by', 'created');
 ['created_by', 'category', 'account']
@@ -56,6 +56,27 @@ export async function fetchPagedItems(params: {
         data: [],
       };
     }
+    console.error('Error fetching paged items:', (error as Error).message);
+    throw error; // Rethrow the error for handling in the calling function
+  }
+}
+
+const getItemParams = new URLSearchParams();
+['category', 'account']
+  .forEach(expand => { getItemParams.append('expand', expand); });
+
+['printed', 'split_price', 'tax_exempt', 'tags', 'quantity']
+  .forEach(include => { searchParams.append('include', include); });
+
+export async function getItem(id: string): Promise<ExternalItem> {
+  try {
+
+    const response = await httpCall
+      .get(`https://api.consigncloud.com/api/v1/items/${id}`, { searchParams: getItemParams })
+      .json<ExternalItem>();
+
+    return response;
+  } catch (error) {
     console.error('Error fetching paged items:', (error as Error).message);
     throw error; // Rethrow the error for handling in the calling function
   }

@@ -3,7 +3,7 @@ import { ExternalUser, ExternalAccount, ExternalItem, ExternalSale } from "./con
 import { isMobileNumber, comunicationPreferences, toISO, toStatus } from "./import.utils";
 import { v4 as uuid4 } from 'uuid';
 import { capitalize } from 'lodash';
-import { fetchItemSales, getSale } from "./consigncloud/http-client-service";
+import { fetchItemSales, getSale, getItem } from "./consigncloud/http-client-service";
 import { logger } from "./logger";
 
 export const IMPORT_SERVICE_USER_ID = 'f838ed77-7eec-4d85-85f8-ca022ff42a84'
@@ -41,7 +41,7 @@ export class ItemServices {
         await this.importCategory('Color', externalItem.color);
         await this.importCategory('Size', externalItem.size);
 
-        // Create a new account    
+        // Create a new item    
         await this.db.item.write({
             __typename: 'Item',
             id: externalItem.id,
@@ -74,7 +74,56 @@ export class ItemServices {
 
         return true;
     }
+    async updateItem(id: string): Promise<boolean> {
 
+        const externalItem = await getItem(id);
+        logger.info('importItem', externalItem);
+
+        // Import user
+        await this.importUser(externalItem.created_by);
+
+        // Import account
+        await this.importAccount(externalItem.account);
+
+        // Import categories
+        await this.importCategory('Category', externalItem.category?.name);
+        await this.importCategory('Brand', externalItem.brand);
+        await this.importCategory('Color', externalItem.color);
+        await this.importCategory('Size', externalItem.size);
+
+        // Update item    
+        await this.db.item.update(
+            { sku: externalItem.sku },
+            {
+                lastActivityBy: externalItem.created_by?.id ?? IMPORT_SERVICE_USER_ID,
+                title: externalItem.title,
+                accountNumber: externalItem.account?.number,
+                category: externalItem.category?.name ?? 'Unknown',
+                brand: externalItem.brand ?? 'Unknown',
+                color: externalItem.color ?? 'Unknown',
+                size: externalItem.size ?? 'Unknown',
+                description: externalItem.description,
+                details: externalItem.details,
+                condition: 'Unknown',
+                split: externalItem.split ? Math.round(externalItem.split * 100) : null,
+                price: externalItem.tag_price,
+                status: toStatus(externalItem.status),
+                sales: [],
+                printedAt: toISO(externalItem.printed),
+                lastSoldAt: toISO(externalItem.last_sold),
+                lastViewedAt: toISO(externalItem.last_viewed),
+                createdAt: toISO(externalItem.created),
+                updatedAt: new Date().toISOString(),
+                deletedAt: toISO(externalItem.deleted),
+            }
+        );
+
+        await this.importItemGroup(externalItem);
+        await this.importSales(externalItem);
+
+
+        return true;
+    }
     async importUser(user: ExternalUser | null | undefined): Promise<boolean> {
         logger.info('importUser', user);
 
