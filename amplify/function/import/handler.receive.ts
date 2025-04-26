@@ -1,32 +1,33 @@
 import { fetchPagedItems } from '@server/consigncloud/http-client-service';
-import { S3Event, S3Handler } from 'aws-lambda';
+import { EventBridgeEvent, EventBridgeHandler } from 'aws-lambda';
 import { logger } from "@server/logger";
-import { archiveFile } from "@server/file.utils";
-import { PutObjectCommand } from '@aws-sdk/client-s3';
+
+import { v4 as uuid4 } from 'uuid';
+
 
 import { S3 } from '@aws-sdk/client-s3';
+import { DynamoService } from '@server/dynamodb-service';
 
-console.log('Loading function');
 const s3 = new S3();
 
+type DetailType = 'Scheduled Event';
 
+const tableName = process.env.IMPORTDATA_TABLE;
+const dynamoService = new DynamoService(tableName!);
 
-
-
-export const handler: S3Handler = async (event: S3Event) => {
-    logger.info('S3Event', event);
+export const handler: EventBridgeHandler<DetailType, unknown, void> = async (
+    event: EventBridgeEvent<DetailType, unknown>
+) => {
+    logger.info('EventBridgeEvent', event);
 
     // Get the object from the event 
-    const bucket = event.Records[0].s3.bucket.name;
-    const key = decodeURIComponent(event.Records[0].s3.object.key.replace(/\+/g, ' '));
+    const bucket = process.env.DRIVE_BUCKET_NAME!
+    const key = 'import/sync-next.json'
     const params = {
         Bucket: bucket,
         Key: key,
     };
 
-    logger.info('S3Event', event);
-
-    const PROCESSING_DIR = process.env.PROCESSING_DIR;
     try {
         logger.start(`Processing file: s3://${bucket}/${key}`, event);
 
@@ -46,21 +47,12 @@ export const handler: S3Handler = async (event: S3Event) => {
         const toDate = new Date(to);
         logger.info('fromDate toDate ', { fromDate, toDate });
         if (isNaN(fromDate.getTime()) || isNaN(toDate.getTime())) {
-            logger.error('Invalid date format', { to, from });
+            logger.error('Invalid date format', { from, to });
             throw new Error('Invalid date format');
         }
 
-        // Format the dates to 'YYYYMMDD'
-        const fromDateString = fromDate.toISOString().split('T')[0].replace(/-/g, ''); // '20250411'    
-        const toDateString = toDate.toISOString().split('T')[0].replace(/-/g, ''); // '20250412'
-
-        // Construct the S3 filename
-        const s3FileName = `${PROCESSING_DIR}Items-${fromDateString}-${toDateString}.txt`;
-        logger.info('fs3FileName', s3FileName);
-
         let cursor = null;
         let hasMorePages = true;
-        let fileContent: string = '';
         let added = 0;
 
 
@@ -76,28 +68,24 @@ export const handler: S3Handler = async (event: S3Event) => {
             const { data, next_cursor } = response;
             cursor = next_cursor;
             hasMorePages = cursor ? true : false;
-            data.forEach((item) => {
-                fileContent += `${JSON.stringify(item)}\n`;
-                added++
-            });
+            for (const item of data) {
+                const importData = {
+                    __typename: 'ImportData',
+                    id: uuid4(),
+                    createdAt: new Date().toISOString(),
+                    type: 'Item',
+                    data: JSON.stringify(item),
+                    imported: false,
+                };
+
+                await dynamoService.write(importData);
+                added++;
+            }
         }
 
-        // Use Amplify Storage to upload the content to S3
-        const command = new PutObjectCommand({
-            Bucket: bucket,
-            Key: s3FileName,
-            Body: fileContent,
-            ContentType: 'text/plain'
-        });
-
-        const response = await s3.send(command);
-        logger.info('File uploaded:', response);
-
         // Log the extracted and parsed dates
-        logger.success(`Successfully processed s3://${bucket}/${key}, ${added} added, file uploaded to s3://${bucket}/${s3FileName}`);
+        logger.success(`Successfully processed ${added} items, from ${from}. to ${to}`);
 
-        // Archive the original file
-        await archiveFile(bucket, key);
 
         // You can perform any additional logic here (e.g., store in a database, call an API, etc.)
 

@@ -1,22 +1,37 @@
 import { itemServices } from '@server/item-services';
-import { SQSEvent, SQSHandler } from 'aws-lambda';
+import { DynamoDBStreamHandler, DynamoDBStreamEvent, DynamoDBBatchItemFailure } from 'aws-lambda';
 import { logger } from "@server/logger";
+import { ExternalItem } from '@server/consigncloud/http-client-types';
 
-export const handler: SQSHandler = async (event: SQSEvent) => {
-  logger.info('SQSEvent', event);
+export const handler: DynamoDBStreamHandler = async (event: DynamoDBStreamEvent) => {
+  logger.info('DynamoDBStreamEvent', event);
+  const fail: DynamoDBBatchItemFailure[] = [];
+
   for (const record of event.Records) {
-    const body = record.body;
-    console.log('Processing SQS message:');
+    logger.info(`Processing Event Type: ${record.eventName} - record: ${JSON.stringify(record)}`);
 
     try {
-      logger.info('body', body);
-      const data = JSON.parse(body);
-      console.log('Parsed data:', data);
-      await itemServices.importItem(data);
-    } catch (err) {
-      console.error('Error parsing message body as JSON:', err);
+      if (record.eventName === "INSERT") {
+        // business logic to process new records
+        const newImage = record.dynamodb?.NewImage;
+
+        if (!newImage) {
+          logger.error('No new image found in the record');
+          continue;
+        } else {
+          const data = JSON.parse(newImage.data.S || '{}') as ExternalItem;
+          console.log('Parsed data:', data);
+          await itemServices.importItem(data);
+        }
+      }
+    } catch (error) {
+      logger.error('Errors in importing item', error);
+      const newImage = record.dynamodb!.NewImage!;
+      fail.push({ itemIdentifier: newImage.id.S! });
     }
   }
 
-  return;
+  return {
+    batchItemFailures: fail,
+  };
 };

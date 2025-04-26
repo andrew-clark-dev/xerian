@@ -3,19 +3,13 @@ import { auth } from './auth/resource';
 import { data } from './data/resource';
 import { storage } from './storage/resource';
 import { createActionFunction } from './data/create-action/resource';
-import { importReceiveFunction, importItemFunction, IMPORT_DIRS } from './function/import/resource'; // 
+import { importReceiveFunction, importItemFunction } from './function/import/resource'; // 
 import { truncateTableFunction } from './data/truncate-table/resource';
 import { Effect, Policy, PolicyStatement } from 'aws-cdk-lib/aws-iam';
 import { Stack } from 'aws-cdk-lib';
 import { EventSourceMapping, StartingPosition } from 'aws-cdk-lib/aws-lambda';
 import { initDataFunction } from './data/init-data/resource';
-import { EventType } from 'aws-cdk-lib/aws-s3';
-import { LambdaDestination } from 'aws-cdk-lib/aws-s3-notifications';
 import { BucketDeployment, Source } from 'aws-cdk-lib/aws-s3-deployment';
-import { createQueue } from './backend-helpers';
-import { SqsEventSource } from 'aws-cdk-lib/aws-lambda-event-sources';
-// import { createQueue } from './backend-sqs'
-// import { SqsEventSource } from 'aws-cdk-lib/aws-lambda-event-sources';
 
 
 /**
@@ -50,16 +44,15 @@ cfnUserPool.policies = {
 
 const { tables } = backend.data.resources
 const { bucket } = backend.storage.resources
-// // const { region } = backend.stack
-const stackId = backend.stack.artifactId.split('-').pop();
-
+// const { region } = backend.stack
+// const stackId = backend.stack.artifactId.split('-').pop();
 
 const createActionLambda = backend.createActionFunction.resources.lambda
 tables.Total.grantFullAccess(createActionLambda);
 
-const createActionFunctionStreamingPolicy = new Policy(
+const createActionStreamingPolicy = new Policy(
   Stack.of(createActionLambda),
-  "createActionFunctionStreamingPolicy",
+  "createActionStreamingPolicy",
   {
     statements: [
       new PolicyStatement({
@@ -76,21 +69,21 @@ const createActionFunctionStreamingPolicy = new Policy(
   }
 );
 
-createActionLambda.role?.attachInlinePolicy(createActionFunctionStreamingPolicy);
-backend.createActionFunction.addEnvironment("TOTAL_TABLE_NAME", tables.Total.tableName);
+createActionLambda.role?.attachInlinePolicy(createActionStreamingPolicy);
+backend.createActionFunction.addEnvironment("TOTAL_TABLE", tables.Total.tableName);
 
 // List of tables to create event source mappings for the createActionFunction
-['Account', 'Item', 'Sale', 'Transaction', 'Comment'].forEach((f) => {
+['Account', 'Item', 'Sale', 'Transaction', 'Comment'].forEach((tname) => {
   const eventSourceMapping = new EventSourceMapping(
-    Stack.of(tables[f]),
-    `createAction${f}EventStreamMapping`,
+    Stack.of(tables[tname]),
+    `createAction${tname}EventStreamMapping`,
     {
       target: createActionLambda,
-      eventSourceArn: tables[f].tableStreamArn,
+      eventSourceArn: tables[tname].tableStreamArn,
       startingPosition: StartingPosition.LATEST,
     }
   );
-  eventSourceMapping.node.addDependency(createActionFunctionStreamingPolicy);
+  eventSourceMapping.node.addDependency(createActionStreamingPolicy);
 })
 
 // Extend environment and add access to tables for backend functions
@@ -99,7 +92,7 @@ for (const key in tables) {
   [
     backend.truncateTableFunction,
     backend.initDataFunction,
-    backend.importItemFunction
+    // backend.importItemFunction
   ].forEach((f) => {
     f.addEnvironment(`${key.toUpperCase()}_TABLE`, t.tableName);
     t.grantFullAccess(f.resources.lambda);
@@ -110,7 +103,7 @@ for (const key in tables) {
 // Preload a README file into S3 during deployment
 const markdownContent = `
 # Xerian import directory
-Upload sync*.json files to the 'in' directory to import items in to the application.
+Upload sync-next.json file to this directory to initiate import items in to the application.
 
 Files content specifying the import period should be in JSON format, e.g.:
 {
@@ -119,33 +112,61 @@ Files content specifying the import period should be in JSON format, e.g.:
 }
 `;
 new BucketDeployment(backend.stack, 'DeployImportReadme', {
-  sources: [Source.data('README.md', markdownContent), Source.data('in/UPLOAD_IMPORT_FILES_HERE', "")],
+  sources: [Source.data('README.md', markdownContent)],
   destinationBucket: bucket,
   destinationKeyPrefix: 'import/', // Creates import/README.md
 });
 
-
-
 const importReceiveLambda = backend.importReceiveFunction.resources.lambda;
 
-bucket.addEventNotification(
-  EventType.OBJECT_CREATED_PUT,
-  new LambdaDestination(importReceiveLambda),
-  { prefix: IMPORT_DIRS.IN_DIR + 'sync', suffix: '.json' }
-);
 backend.importReceiveFunction.addEnvironment(`NOTIFICATION_TABLE`, tables.Notification.tableName);
+backend.importReceiveFunction.addEnvironment(`IMPORTDATA_TABLE`, tables.ImportData.tableName);
 tables.Notification.grantFullAccess(importReceiveLambda);
-
+tables.ImportData.grantFullAccess(importReceiveLambda);
 
 const importItemLambda = backend.importItemFunction.resources.lambda;
-const { queue: importQueue } = createQueue(backend.stack, { queueName: `import-${stackId}-` });
-importItemLambda.addEventSource(new SqsEventSource(importQueue, { batchSize: 5 }));
-importQueue.grantSendMessages(importReceiveLambda);
+
+const importItemStreamingPolicy = new Policy(
+  Stack.of(importItemLambda),
+  "importItemStreamingPolicy",
+  {
+    statements: [
+      new PolicyStatement({
+        effect: Effect.ALLOW,
+        actions: [
+          "dynamodb:DescribeStream",
+          "dynamodb:GetRecords",
+          "dynamodb:GetShardIterator",
+          "dynamodb:ListStreams",
+        ],
+        resources: ["*"],
+      }),
+    ],
+  }
+);
+importItemLambda.role?.attachInlinePolicy(importItemStreamingPolicy);
 
 
+const importItemEventSourceMapping = new EventSourceMapping(
+  Stack.of(tables.ImportData),
+  `importItemImportDataEventStreamMapping`,
+  {
+    target: importItemLambda,
+    eventSourceArn: tables.ImportData.tableStreamArn,
+    startingPosition: StartingPosition.LATEST,
+  }
+);
+importItemEventSourceMapping.node.addDependency(importItemStreamingPolicy);
 
 
-
-
-
-
+// Tables that import has to write to
+['Account', 'Item', 'Sale', 'Transaction', 'UserProfile', 'ItemGroup', 'ItemCategory', 'Notification'].forEach((tname) => {
+  const t = tables[tname];
+  [
+    backend.importItemFunction
+  ].forEach((f) => {
+    f.addEnvironment(`${tname.toUpperCase()}_TABLE`, t.tableName);
+    t.grantFullAccess(f.resources.lambda);
+  })
+}
+)

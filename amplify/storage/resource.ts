@@ -1,5 +1,6 @@
 import { defineStorage } from '@aws-amplify/backend';
-import { IMPORT_DIRS, importReceiveFunction } from '../function/import/resource';
+import { importReceiveFunction } from '../function/import/resource';
+import { IMPORT_DIR } from '../data/constants';
 
 export const storage = defineStorage({
     name: 'drive',
@@ -12,17 +13,8 @@ export const storage = defineStorage({
             allow.entity('identity').to(['read', 'write', 'delete'])
         ],
 
-        [IMPORT_DIRS.IN_DIR + '*']: [
+        [IMPORT_DIR + '*']: [
             allow.resource(importReceiveFunction).to(['read', 'write', 'delete']),
         ],
-        [IMPORT_DIRS.PROCESSING_DIR + '*']: [
-            allow.resource(importReceiveFunction).to(['write']),
-        ],
-        // [IMPORT_DIRS.ARCHIVE_DIR + '*']: [
-        //     allow.resource(importReceiveFunction).to(['write']),
-        // ],
-        [IMPORT_DIRS.ERROR_DIR + '*']: [
-            allow.resource(importReceiveFunction).to(['write']),
-        ]
     })
 });

@@ -46,7 +46,7 @@ export const handler: DynamoDBStreamHandler = async (event) => {
 
                 try {
                     const params = {
-                        TableName: env.TOTAL_TABLE_NAME,
+                        TableName: env.TOTAL_TABLE,
                         Key: { name: `${modelName}` },
                         UpdateExpression: `ADD val :plusOne`,
                         ExpressionAttributeValues: { ':plusOne': 1 },

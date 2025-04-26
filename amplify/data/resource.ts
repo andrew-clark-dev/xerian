@@ -6,6 +6,13 @@ import { postConfirmation } from '../auth/post-confirmation/resource';
 export const schema = a.schema({
 
   // Models
+  ImportData: a
+    .model({
+      type: a.string().required(),
+      data: a.json().required(),
+      imported: a.boolean().default(false),
+    }),
+
   Counter: a
     .model({
       name: a.string().required(),
@@ -147,10 +154,10 @@ export const schema = a.schema({
       title: a.string(),
       account: a.belongsTo("Account", "accountNumber"),
       accountNumber: a.string(),
-      category: a.string().default('-'),
-      brand: a.string().default('-'),
-      color: a.string().default('-'),
-      size: a.string().default('-'),
+      category: a.string().default('Unknown'),
+      brand: a.string().default('Unknown'),
+      color: a.string().default('Unknown'),
+      size: a.string().default('Unknown'),
       description: a.string(),
       details: a.string(),
       images: a.url().array(), // fields can be arrays,
