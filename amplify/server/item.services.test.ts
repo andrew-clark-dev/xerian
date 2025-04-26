@@ -2,8 +2,8 @@ import { vi } from 'vitest';
 import { ItemServices } from './item-services';
 import { DynamoService, DynamoServices } from './dynamodb-service';
 
-function createMockDynamoService(): DynamoService {
-    const mockInstance = new DynamoService('MockTable');
+function createMockDynamoService<T extends Record<string, unknown>>(): DynamoService<T> {
+    const mockInstance = new DynamoService<T>('MockTable');
 
     // Overwrite methods with mocks
     mockInstance.exists = vi.fn();
