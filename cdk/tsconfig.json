@@ -1,0 +1,29 @@
+{
+  "compilerOptions": {
+    "target": "ES2022", // Modern JS
+    "module": "CommonJS", // Important: Node.js needs CommonJS for CDK
+    "outDir": "lib", // Compiled JS output
+    "strict": true, // All strict TypeScript checks
+    "esModuleInterop": true, // Allows clean imports
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,
+    "declaration": true, // Optional: creates .d.ts files
+    "sourceMap": true, // Optional: source maps for debugging
+    "paths": {
+      "@cdk/*": [
+        "./src/*"
+      ],
+      "@data-schema": [
+        "../amplify/data/resource"
+      ],
+    }
+  },
+  "include": [
+    "src/**/*.ts",
+    "src/stacks/data-import-stack.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "lib" // Avoid re-compiling output
+  ]
+}

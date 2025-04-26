@@ -1,0 +1,14 @@
+{
+    "app": "npx ts-node bin/xerian-cdk.ts",
+    "context": {
+        "aws:cdk:deploy:requireApproval": "never",
+        "stage": "dev",
+        "region": "eu-central-1"
+    },
+    "build": {
+        "commands": [
+            "npx tsc"
+        ]
+    },
+    "output": "cdk.out"
+}
