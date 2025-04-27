@@ -12,8 +12,11 @@
       "$amplify/*": [
         "../.amplify/generated/*"
       ],
-      "@server/*": [
-        "./server/*"
+      "@backend/*": [
+        "./backend/*"
+      ],
+      "@schema": [
+        "./data/resource"
       ]
     }
   }

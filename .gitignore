@@ -43,3 +43,7 @@ amplifyconfiguration*
 
 .env
 ui-components
+
+# cdk
+cdk/lib/
+cdk/cdk.out/

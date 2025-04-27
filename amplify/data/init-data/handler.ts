@@ -3,11 +3,11 @@ import { generateClient } from "aws-amplify/data";
 import { Amplify } from "aws-amplify";
 import { getAmplifyDataClientConfig } from '@aws-amplify/backend/function/runtime';
 import { env } from "$amplify/env/init-data-function";
-import { logger } from "@server/logger";
+import { logger } from "@backend/services/logger";
 
 
-import { truncateTable } from "@server/table.service";
-import { userService } from "@server/user.service";
+import { truncateTable } from "@backend/services/table.service";
+import { userService } from "@backend/services/user.service";
 import { IMPORT_SERVICE_USER_ID } from "../constants";
 
 

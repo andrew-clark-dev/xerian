@@ -1,96 +1,76 @@
-import { fetchPagedItems } from '@server/consigncloud/http-client-service';
-import { EventBridgeEvent, EventBridgeHandler } from 'aws-lambda';
-import { logger } from "@server/logger";
-
+import { logger } from '@backend/services/logger';
+import { fetchPagedItems } from '@backend/services//http-client-service';
+import { DynamoService } from '@backend/services//dynamodb-service';
 import { v4 as uuid4 } from 'uuid';
 
-
-import { S3 } from '@aws-sdk/client-s3';
-import { DynamoService } from '@server/dynamodb-service';
-
-const s3 = new S3();
-
-type DetailType = 'Scheduled Event';
+interface FetchDataEvent {
+  from: string;
+  to: string;
+}
 
 const tableName = process.env.IMPORTDATA_TABLE;
 const dynamoService = new DynamoService(tableName!);
 
-export const handler: EventBridgeHandler<DetailType, unknown, void> = async (
-    event: EventBridgeEvent<DetailType, unknown>
-) => {
-    logger.info('EventBridgeEvent', event);
+export const handler = async (event: FetchDataEvent) => {
+  logger.info('Event', event);
+  // Parse 'to' and 'from' to Date objects
+  const { from, to } = event;
+  logger.info(`from: ${from} to: ${to}`);
 
-    // Get the object from the event 
-    const bucket = process.env.DRIVE_BUCKET_NAME!
-    const key = 'import/sync-next.json'
-    const params = {
-        Bucket: bucket,
-        Key: key,
-    };
+  const toDate = new Date(to);
 
-    try {
-        logger.start(`Processing file: s3://${bucket}/${key}`, event);
+  try {
 
-        // Get the file contents from S3
-        const { Body } = await s3.getObject(params);
-        const content = await Body?.transformToString();
+    let cursor = null;
+    let hasMorePages = true;
+    let added = 0;
+    let errors = 0;
 
-        const jsonContent = JSON.parse(content ?? '');
-        logger.info('jsonContent', jsonContent);
+    while (hasMorePages) {
+      const response = await fetchPagedItems({
+        cursor: cursor,
+        createdGte: from,
+        createdLt: to,
+      });
+      logger.info('response', response);
 
-        // Extract 'to' and 'from' attributes
-        const { from, to } = jsonContent;
-        logger.info('from to ', { from, to });
+      // Assuming the API returns { data, hasNextPage }
+      const { data, next_cursor } = response;
+      cursor = next_cursor;
+      hasMorePages = cursor ? true : false;
 
-        // Parse 'to' and 'from' to Date objects
-        const fromDate = new Date(from);
-        const toDate = new Date(to);
-        logger.info('fromDate toDate ', { fromDate, toDate });
-        if (isNaN(fromDate.getTime()) || isNaN(toDate.getTime())) {
-            logger.error('Invalid date format', { from, to });
-            throw new Error('Invalid date format');
+      for (const item of data) {
+        try {
+          const importData = {
+            __typename: 'ImportData',
+            id: uuid4(),
+            createdAt: new Date().toISOString(),
+            type: 'Item',
+            data: JSON.stringify(item),
+            status: 'Pending',
+          };
+
+          await dynamoService.write(importData);
+          added++;
+        } catch (error) {
+          logger.error('Error writing item to DynamoDB', error);
+          errors++;
         }
-
-        let cursor = null;
-        let hasMorePages = true;
-        let added = 0;
-
-
-        while (hasMorePages) {
-            const response = await fetchPagedItems({
-                cursor: cursor,
-                createdGte: from,
-                createdLt: to,
-            });
-            logger.info('response', response);
-
-            // Assuming the API returns { data, hasNextPage }
-            const { data, next_cursor } = response;
-            cursor = next_cursor;
-            hasMorePages = cursor ? true : false;
-            for (const item of data) {
-                const importData = {
-                    __typename: 'ImportData',
-                    id: uuid4(),
-                    createdAt: new Date().toISOString(),
-                    type: 'Item',
-                    data: JSON.stringify(item),
-                    imported: false,
-                };
-
-                await dynamoService.write(importData);
-                added++;
-            }
-        }
-
-        // Log the extracted and parsed dates
-        logger.success(`Successfully processed ${added} items, from ${from}. to ${to}`);
-
-
-        // You can perform any additional logic here (e.g., store in a database, call an API, etc.)
-
-    } catch (error) {
-        logger.failure(`Error processing s3://${bucket}/${key}`, error);
+      }
     }
 
+    // Log the number of items processed
+    logger.success(`Successfully processed ${added} items, from ${from} to ${to}, with ${errors} errors`);
+
+    // Return whether there are more pages, and the cursor for pagination
+    toDate.setMonth(toDate.getMonth() + 1)
+    return {
+      hasMorePages: (toDate < new Date()), // Determine if there are more pages
+      from: to,                           // Set new 'from' date
+      to: toDate.toISOString(),           // Set the next 'to' date
+    };
+  } catch (error) {
+    logger.failure(`Error processing items, from ${from} to ${to}`, error);
+    throw error;
+  }
 };

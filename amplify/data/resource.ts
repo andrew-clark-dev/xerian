@@ -10,7 +10,7 @@ export const schema = a.schema({
     .model({
       type: a.string().required(),
       data: a.json().required(),
-      imported: a.boolean().default(false),
+      status: a.enum(['Pending', 'Completed', 'Failed']),
     }),
 
   Counter: a

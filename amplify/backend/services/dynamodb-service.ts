@@ -2,7 +2,7 @@
 import { DynamoDBClient, } from '@aws-sdk/client-dynamodb';
 import { DynamoDBDocumentClient, PutCommand, PutCommandInput, GetCommandInput, GetCommand, UpdateCommand, UpdateCommandInput } from '@aws-sdk/lib-dynamodb';
 import { UserProfile } from './user.service';
-import { Schema } from "../../amplify/data/resource"; // Adjusted the path to the correct module
+import { Schema } from "@schema"; // Adjusted the path to the correct module
 
 const client = new DynamoDBClient({});
 const ddb = DynamoDBDocumentClient.from(client);

@@ -1,9 +1,9 @@
 import { dynamoServices, DynamoServices } from "./dynamodb-service";
-import { ExternalUser, ExternalAccount, ExternalItem, ExternalSale } from "./consigncloud/http-client-types";
+import { ExternalUser, ExternalAccount, ExternalItem, ExternalSale } from "./http-client-types";
 import { isMobileNumber, comunicationPreferences, toISO, toStatus } from "./import.utils";
 import { v4 as uuid4 } from 'uuid';
 import { capitalize } from 'lodash';
-import { fetchItemSales, getSale, getItem } from "./consigncloud/http-client-service";
+import { fetchItemSales, getSale, getItem } from "./http-client-service";
 import { logger } from "./logger";
 
 export const IMPORT_SERVICE_USER_ID = 'f838ed77-7eec-4d85-85f8-ca022ff42a84'

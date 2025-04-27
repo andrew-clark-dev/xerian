@@ -1,4 +1,4 @@
-import { Schema } from "../../amplify/data/resource"; // Adjusted the path to the correct module
+import { Schema } from "@schema"; // Adjusted the path to the correct module
 import { Logger } from "@aws-lambda-powertools/logger";
 import { generateClient } from "aws-amplify/data";
 

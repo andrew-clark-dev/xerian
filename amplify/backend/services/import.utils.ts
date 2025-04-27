@@ -1,4 +1,4 @@
-import { ExternalItemStatus } from './consigncloud/http-client-types';
+import { ExternalItemStatus } from './http-client-types';
 import { logger } from './logger';
 
 export function money(text?: string | null): number {

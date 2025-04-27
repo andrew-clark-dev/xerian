@@ -1,5 +1,5 @@
 import { AttributeMap } from "aws-sdk/clients/dynamodb";
-import { logger } from "@server/logger";
+import { logger } from "@backend/services/logger";
 
 import * as AWS from 'aws-sdk';
 

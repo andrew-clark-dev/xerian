@@ -1,6 +1,6 @@
 import { S3Client, GetObjectCommand, GetObjectCommandOutput } from "@aws-sdk/client-s3";
 
-import { logger } from "@server/logger";
+import { logger } from "@backend/services/logger";
 
 import { S3Event } from "aws-lambda";
 import { Readable } from "stream";

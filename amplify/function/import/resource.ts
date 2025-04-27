@@ -1,5 +1,6 @@
 import { defineFunction, secret } from "@aws-amplify/backend";
 import { IMPORT_DIR } from "../../data/constants";
+import { Duration } from "aws-cdk-lib";
 
 
 export const importItemFunction = defineFunction({
@@ -16,7 +17,7 @@ export const importReceiveFunction = defineFunction({
     name: "import-receive-function",
     entry: "./handler.receive.ts",
     resourceGroupName: "data",
-    timeoutSeconds: 900,
+    timeoutSeconds: Duration.minutes(10).toSeconds(),
     environment: {
         IMPORT_DIR: IMPORT_DIR,
         SERVICE_NAME: "import-receive-function",

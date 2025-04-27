@@ -1,5 +1,5 @@
-import { truncateTable } from "@server/table.service";
-import { logger } from "@server/logger";
+import { truncateTable } from "@backend/services/table.service";
+import { logger } from "@backend/services/logger";
 
 export const handler = async (event: { table_env_var: string, index: string[] }) => {
 

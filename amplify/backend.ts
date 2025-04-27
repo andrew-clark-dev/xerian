@@ -9,7 +9,7 @@ import { Effect, Policy, PolicyStatement } from 'aws-cdk-lib/aws-iam';
 import { Stack } from 'aws-cdk-lib';
 import { EventSourceMapping, StartingPosition } from 'aws-cdk-lib/aws-lambda';
 import { initDataFunction } from './data/init-data/resource';
-import { BucketDeployment, Source } from 'aws-cdk-lib/aws-s3-deployment';
+import { FetchDataStack } from './backend/stacks/fetch-data-stack';
 
 
 /**
@@ -43,9 +43,13 @@ cfnUserPool.policies = {
 
 
 const { tables } = backend.data.resources
-const { bucket } = backend.storage.resources
+// const { bucket } = backend.storage.resources
 // const { region } = backend.stack
 // const stackId = backend.stack.artifactId.split('-').pop();
+// const amplifyBranch = process.env.AMPLIFY_BRANCH ?? 'dev';
+
+
+
 
 const createActionLambda = backend.createActionFunction.resources.lambda
 tables.Total.grantFullAccess(createActionLambda);
@@ -99,23 +103,7 @@ for (const key in tables) {
   })
 }
 
-// Set up import storage and integrate with Lambda functions
-// Preload a README file into S3 during deployment
-const markdownContent = `
-# Xerian import directory
-Upload sync-next.json file to this directory to initiate import items in to the application.
 
-Files content specifying the import period should be in JSON format, e.g.:
-{
-    "from": "2020-01-01T00:00:00.000Z",
-    "to": "2020-02-01T00:00:00.000Z"
-}
-`;
-new BucketDeployment(backend.stack, 'DeployImportReadme', {
-  sources: [Source.data('README.md', markdownContent)],
-  destinationBucket: bucket,
-  destinationKeyPrefix: 'import/', // Creates import/README.md
-});
 
 const importReceiveLambda = backend.importReceiveFunction.resources.lambda;
 
@@ -124,49 +112,18 @@ backend.importReceiveFunction.addEnvironment(`IMPORTDATA_TABLE`, tables.ImportDa
 tables.Notification.grantFullAccess(importReceiveLambda);
 tables.ImportData.grantFullAccess(importReceiveLambda);
 
-const importItemLambda = backend.importItemFunction.resources.lambda;
-
-const importItemStreamingPolicy = new Policy(
-  Stack.of(importItemLambda),
-  "importItemStreamingPolicy",
-  {
-    statements: [
-      new PolicyStatement({
-        effect: Effect.ALLOW,
-        actions: [
-          "dynamodb:DescribeStream",
-          "dynamodb:GetRecords",
-          "dynamodb:GetShardIterator",
-          "dynamodb:ListStreams",
-        ],
-        resources: ["*"],
-      }),
-    ],
-  }
-);
-importItemLambda.role?.attachInlinePolicy(importItemStreamingPolicy);
+new FetchDataStack(backend.stack, 'FetchDataStack', { fetchDataFunction: backend.importReceiveFunction.resources.lambda });
 
 
-const importItemEventSourceMapping = new EventSourceMapping(
-  Stack.of(tables.ImportData),
-  `importItemImportDataEventStreamMapping`,
-  {
-    target: importItemLambda,
-    eventSourceArn: tables.ImportData.tableStreamArn,
-    startingPosition: StartingPosition.LATEST,
-  }
-);
-importItemEventSourceMapping.node.addDependency(importItemStreamingPolicy);
 
-
-// Tables that import has to write to
-['Account', 'Item', 'Sale', 'Transaction', 'UserProfile', 'ItemGroup', 'ItemCategory', 'Notification'].forEach((tname) => {
-  const t = tables[tname];
-  [
-    backend.importItemFunction
-  ].forEach((f) => {
-    f.addEnvironment(`${tname.toUpperCase()}_TABLE`, t.tableName);
-    t.grantFullAccess(f.resources.lambda);
-  })
-}
-)
+// // Tables that import has to write to
+// ['Account', 'Item', 'Sale', 'Transaction', 'UserProfile', 'ItemGroup', 'ItemCategory', 'Notification'].forEach((tname) => {
+//   const t = tables[tname];
+//   [
+//     backend.importItemFunction
+//   ].forEach((f) => {
+//     f.addEnvironment(`${tname.toUpperCase()}_TABLE`, t.tableName);
+//     t.grantFullAccess(f.resources.lambda);
+//   })
+// }
+// )

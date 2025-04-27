@@ -1,7 +1,7 @@
-import { itemServices } from '@server/item-services';
+import { itemServices } from '@backend/services/item-services';
 import { DynamoDBStreamHandler, DynamoDBStreamEvent, DynamoDBBatchItemFailure } from 'aws-lambda';
-import { logger } from "@server/logger";
-import { ExternalItem } from '@server/consigncloud/http-client-types';
+import { logger } from "@backend/services/logger";
+import { ExternalItem } from '@backend/services/http-client-types';
 
 export const handler: DynamoDBStreamHandler = async (event: DynamoDBStreamEvent) => {
   logger.info('DynamoDBStreamEvent', event);
