@@ -1,10 +1,7 @@
-
 import { logger } from '../../services/logger';
 import { fetchPagedItems } from '../../services/http-client-service';
 import { DynamoService } from '../../services/dynamodb-service';
 import { v4 as uuid4 } from 'uuid';
-
-
 
 interface FetchDataEvent {
   from: string;
@@ -15,17 +12,15 @@ const tableName = process.env.DYNAMODB_TABLE;
 const dynamoService = new DynamoService(tableName!);
 
 export const handler = async (event: FetchDataEvent) => {
+  logger.info('Event', event);
+  // Parse 'to' and 'from' to Date objects
+  const { from, to } = event;
+  logger.info(`from: ${from} to: ${to}`);
+
+  const toDate = new Date(to);
+
   try {
-    // Parse 'to' and 'from' to Date objects
-    // Extract 'to' and 'from' attributes
-    const { from, to } = event;
-    const fromDate = new Date(from);
-    const toDate = new Date(to);
-    logger.info('fromDate toDate ', { fromDate, toDate });
-    if (isNaN(fromDate.getTime()) || isNaN(toDate.getTime())) {
-      logger.error('Invalid date format', { from, to });
-      throw new Error('Invalid date format');
-    }
+
     let cursor = null;
     let hasMorePages = true;
     let added = 0;
@@ -42,7 +37,9 @@ export const handler = async (event: FetchDataEvent) => {
       const { data, next_cursor } = response;
       cursor = next_cursor;
       hasMorePages = cursor ? true : false;
+
       for (const item of data) {
+
         const importData = {
           id: uuid4(),
           createdAt: new Date().toISOString(),
@@ -55,18 +52,19 @@ export const handler = async (event: FetchDataEvent) => {
         added++;
       }
     }
-    // Log the extracted and parsed dates
-    logger.success(`Successfully processed ${added} items, from ${from}. to ${to}`);
 
-    // Return next cursor and whether more pages exist
-    toDate.setMonth(toDate.getMonth() + 1) // Increment the month for the next range
+    // Log the number of items processed
+    logger.success(`Successfully processed ${added} items, from ${from} to ${to}`);
+
+    // Return whether there are more pages, and the cursor for pagination
+    toDate.setMonth(toDate.getMonth() + 1)
     return {
-      from: to,
-      to: toDate.toISOString(),
+      hasMorePages: (toDate < new Date()), // Determine if there are more pages
+      from: to,                           // Set new 'from' date
+      to: toDate.toISOString(),           // Set the next 'to' date
     };
-
   } catch (error) {
-    console.error('Error fetching data:', error);
-    throw new Error('Error fetching data');
+    logger.failure(`Error processing items, from ${from} to ${to}`, error);
+    throw error;
   }
 };

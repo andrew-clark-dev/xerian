@@ -5,13 +5,14 @@ import { Schema } from '../../../amplify/data/resource';
 
 const client = new DynamoDBClient({});
 const ddb = DynamoDBDocumentClient.from(client);
+const TABLE_DISC = process.env.TABLE_DISC;
 
 export class DynamoService<T extends Record<string, unknown>> {
     private tableName: string;
 
 
     constructor(tableName: string) {
-        this.tableName = tableName;
+        this.tableName = `${tableName}-${TABLE_DISC}-NONE`;
     }
 
     /**
