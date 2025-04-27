@@ -1,7 +1,7 @@
 // services/DynamoService.ts
 import { DynamoDBClient, } from '@aws-sdk/client-dynamodb';
 import { DynamoDBDocumentClient, PutCommand, PutCommandInput, GetCommandInput, GetCommand, UpdateCommand, UpdateCommandInput } from '@aws-sdk/lib-dynamodb';
-import { Schema } from '@data-schema';
+import { Schema } from '../../../amplify/data/resource';
 
 const client = new DynamoDBClient({});
 const ddb = DynamoDBDocumentClient.from(client);

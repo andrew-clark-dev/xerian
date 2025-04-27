@@ -1,14 +1,9 @@
 {
-    "app": "npx ts-node bin/xerian-cdk.ts",
+    "app": "npx tsx bin/xerian-cdk.ts",
     "context": {
-        "aws:cdk:deploy:requireApproval": "never",
         "stage": "dev",
-        "region": "eu-central-1"
-    },
-    "build": {
-        "commands": [
-            "npx tsc"
-        ]
-    },
-    "output": "cdk.out"
+        "region": "eu-central-1",
+        "@aws-cdk/core:newStyleStackSynthesis": true,
+        "aws-cdk:enableDiffNoFail": true
+    }
 }

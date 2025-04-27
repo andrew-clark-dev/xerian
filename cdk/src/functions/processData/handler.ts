@@ -4,9 +4,10 @@ import { v4 as uuid4 } from 'uuid';
 
 
 import { S3Client, GetObjectCommand, CopyObjectCommand, PutObjectCommand } from '@aws-sdk/client-s3';
-import { DynamoService } from '@cdk/services/dynamodb-service';
-import { logger } from '@cdk/services/logger';
-import { fetchPagedItems } from '@cdk/services/http-client-service';
+import { DynamoService } from '../../services/dynamodb-service';
+import { logger } from '../../services/logger';
+import { fetchPagedItems } from '../../services/http-client-service';
+
 
 const s3 = new S3Client({});
 

@@ -9,14 +9,14 @@
     "skipLibCheck": true,
     "declaration": true, // Optional: creates .d.ts files
     "sourceMap": true, // Optional: source maps for debugging
-    "paths": {
-      "@cdk/*": [
-        "./src/*"
-      ],
-      "@data-schema": [
-        "../amplify/data/resource"
-      ],
-    }
+    // "paths": {
+    //   "@cdk/*": [
+    //     "./src/*"
+    //   ],
+    //   "@data-schema": [
+    //     "../amplify/data/resource"
+    //   ],
+    // }
   },
   "include": [
     "src/**/*.ts",

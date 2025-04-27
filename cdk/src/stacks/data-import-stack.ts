@@ -1,47 +1,34 @@
-import { join } from 'path';
-
-import * as cdk from 'aws-cdk-lib';
+import { Stack, StackProps, RemovalPolicy } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
-import { NodejsFunction } from 'aws-cdk-lib/aws-lambda-nodejs';
 import { Runtime } from 'aws-cdk-lib/aws-lambda';
-import { AttributeType, Table } from 'aws-cdk-lib/aws-dynamodb';
-import { Queue } from 'aws-cdk-lib/aws-sqs';
-import { Rule, Schedule } from 'aws-cdk-lib/aws-events';
-import { SfnStateMachine } from 'aws-cdk-lib/aws-events-targets';
+import { Table, AttributeType } from 'aws-cdk-lib/aws-dynamodb';
+import { StateMachine, Choice, Succeed, Pass, Condition, TaskInput } from 'aws-cdk-lib/aws-stepfunctions';
 import { LambdaInvoke } from 'aws-cdk-lib/aws-stepfunctions-tasks';
-import { StateMachine } from 'aws-cdk-lib/aws-stepfunctions';
+import { Role, ServicePrincipal } from 'aws-cdk-lib/aws-iam';
+import * as path from 'path';
+import { NodejsFunction } from 'aws-cdk-lib/aws-lambda-nodejs';
 
-export class DataImportStack extends cdk.Stack {
-    constructor(scope: Construct, id: string, props?: cdk.StackProps) {
+export class DataImportStack extends Stack {
+    constructor(scope: Construct, id: string, props?: StackProps) {
         super(scope, id, props);
 
-        // Create DynamoDB table for storing imported data
-        const importTable = new Table(this, 'ImportedData', {
+        // 1. DynamoDB Table for Import
+        // Get the stage from the environment or context
+        const stage = this.node.tryGetContext('stage') || 'dev'; // Default to 'dev' if no stage is provided
+
+        // Create a unique table name based on the stage
+        const importTableName = `ImportTable-${stage}`;
+
+        const importTable = new Table(this, 'ImportTable', {
             partitionKey: { name: 'id', type: AttributeType.STRING },
+            tableName: importTableName,
+            removalPolicy: RemovalPolicy.DESTROY, // only for dev/test, not production
         });
 
-        // Create SQS Queue to hold the chunks of data
-        const importQueue = new Queue(this, 'ImportQueue');
-
+        // 2. Lambda Function for Fetching Data
         // Lambda to fetch data from HTTP interface
-        const fetchDataLambda = new NodejsFunction(this, 'FetchDataLambda', {
-            entry: join(__dirname, '../functions/fetchData/handler.ts'),
-            handler: 'handler', // Name of the exported function
-            runtime: Runtime.NODEJS_20_X,
-            environment: {
-                DYNAMODB_TABLE: importTable.tableName,
-                QUEUE_URL: importQueue.queueUrl,
-            },
-            bundling: {
-                minify: true,
-                sourceMap: true,
-                target: 'es2022', // nice and modern
-            }
-        });
-
-        // Lambda to process data and store in DynamoDB
-        const processDataLambda = new NodejsFunction(this, 'ProcessDataLambda', {
-            entry: join(__dirname, '../functions/processData/handler.ts'),
+        const fetchDataFunction = new NodejsFunction(this, 'FetchDataLambda', {
+            entry: path.join(__dirname, '../functions/fetch-data/handler.ts'),
             handler: 'handler', // Name of the exported function
             runtime: Runtime.NODEJS_20_X,
             environment: {
@@ -54,34 +41,66 @@ export class DataImportStack extends cdk.Stack {
             }
         });
 
-        // Grant the Lambda functions access to the necessary resources
-        importTable.grantReadWriteData(processDataLambda);
-        importQueue.grantSendMessages(fetchDataLambda);
-        importQueue.grantConsumeMessages(processDataLambda);
+        // Grant the Fetch Function permissions to write to DynamoDB
+        importTable.grantWriteData(fetchDataFunction);
 
-        // Step Function task to invoke Fetch Data Lambda
-        const fetchDataTask = new LambdaInvoke(this, 'FetchData', {
-            lambdaFunction: fetchDataLambda,
-            resultPath: '$.fetchResult',
+        // // 3. Lambda Function for Processing Data (Processing logic is not detailed)
+        // const processDataFunction = new Function(this, 'ProcessDataFunction', {
+        //     runtime: Runtime.NODEJS_22_X, 
+        //     handler: 'index.handler',
+        //     code: Code.fromAsset(path.join(__dirname, 'lambda-functions/processDataFunction')),
+        //     environment: {
+        //         IMPORT_TABLE_NAME: importTable.tableName,
+        //     },
+        // });
+
+        // // Grant the Process Function permissions to read from DynamoDB
+        // importTable.grantReadData(processDataFunction);
+
+        // 4. Step Function Task to Invoke the Fetch Function
+        const fetchDataTask = new LambdaInvoke(this, 'Fetch Data', {
+            lambdaFunction: fetchDataFunction,
+            payload: TaskInput.fromObject({
+                cursor: TaskInput.fromJsonPathAt('$.cursor'), // Correct method to reference the cursor dynamically
+            }),
+            outputPath: '$.Payload',
         });
 
-        // Step Function task to invoke Process Data Lambda
-        const processDataTask = new LambdaInvoke(this, 'ProcessData', {
-            lambdaFunction: processDataLambda,
-            resultPath: '$.processResult',
+        // 5. Step Function Task to Update the Cursor
+        const updateCursorTask = new Pass(this, 'Update Cursor', {
+            parameters: {
+                'cursor.$': '$.nextCursor',  // pass the next cursor for pagination
+                'hasMore.$': '$.hasMore',    // check if there are more pages
+            },
         });
 
-        // Define Step Functions state machine
-        const definition = fetchDataTask.next(processDataTask);
+        // 6. Step Function Choice State to Handle More Pages
+        const isMorePages = new Choice(this, 'More Pages?');
 
-        const importStateMachine = new StateMachine(this, 'DataImportStateMachine', {
+        // 7. Step Function Succeed State when Finished
+        const finishedState = new Succeed(this, 'Import Finished');
+
+        // 8. Defining the Step Function Workflow
+        const definition = fetchDataTask
+            .next(updateCursorTask)
+            .next(
+                isMorePages
+                    .when(Condition.booleanEquals('$.hasMore', true), fetchDataTask)  // Correctly checking boolean
+                    .otherwise(finishedState) // Finish when no more pages
+            );
+
+        // 9. Step Function
+        const dataImportStateMachine = new StateMachine(this, 'DataImportStateMachine', {
             definition,
+            stateMachineName: 'DataImportStateMachine',
         });
 
-        // Trigger the Step Function periodically (for example, every hour)
-        new Rule(this, 'TriggerImportRule', {
-            schedule: Schedule.rate(cdk.Duration.hours(1)),
-            targets: [new SfnStateMachine(importStateMachine)],
+        // 10. Step Function Role (optional if you need custom permissions)
+        const stepFunctionRole = new Role(this, 'StepFunctionRole', {
+            assumedBy: new ServicePrincipal('states.amazonaws.com'),
         });
+
+        // Optional: Grant Step Function permissions (if needed)
+        dataImportStateMachine.grantStartExecution(stepFunctionRole);
     }
 }
