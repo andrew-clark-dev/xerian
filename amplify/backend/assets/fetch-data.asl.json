@@ -7,7 +7,10 @@
             "Resource": "{{lambdaArn}}",
             "ResultPath": "$.fetchDataResult",
             "Next": "MoreData",
-            "Parameters": {}
+            "Parameters": {
+                "from.$": "$.from",
+                "to.$": "$.to"
+            }
         },
         "MoreData": {
             "Type": "Choice",
@@ -23,8 +26,8 @@
         "PrepareNextInput": {
             "Type": "Pass",
             "Parameters": {
-                "inputParam1.$": "$.fetchDataResult.from",
-                "inputParam2.$": "$.fetchDataResult.to"
+                "from.$": "$.fetchDataResult.from",
+                "to.$": "$.fetchDataResult.to"
             },
             "ResultPath": "$",
             "Next": "FetchDataPage"
