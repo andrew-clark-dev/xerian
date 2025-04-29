@@ -1,7 +1,6 @@
 // services/DynamoService.ts
 import { DynamoDBClient, } from '@aws-sdk/client-dynamodb';
 import { DynamoDBDocumentClient, PutCommand, PutCommandInput, GetCommandInput, GetCommand, UpdateCommand, UpdateCommandInput } from '@aws-sdk/lib-dynamodb';
-import { UserProfile } from './user.service';
 import { Schema } from "@schema"; // Adjusted the path to the correct module
 
 const client = new DynamoDBClient({});
@@ -152,6 +151,24 @@ export class DynamoService<T extends Record<string, unknown>> {
     }
 
     /**
+     * Update or Insert an item in the table.
+     * @param key The key of the item to update.
+     * @param updates The updates to apply.
+     * @usage 
+     * await myDynamoService.update(
+     *  { id: '123' },
+     *  { status: 'complete', updatedAt: Date.now() }
+     * );
+     */
+    async upsert(key: Partial<T>, updates: Partial<T>): Promise<void> {
+        if (await this.exists(key)) {
+            await this.update(key, updates);
+        } else {
+            await this.write({ ...key, ...updates });
+        }
+    }
+
+    /**
      * Append values to an array attribute in the table.
      * @param key The key of the item to update.
      * @param arrayAttrName The name of the array attribute to append to.
@@ -192,7 +209,7 @@ export class DynamoService<T extends Record<string, unknown>> {
     }
 }
 
-export const userDbService = new DynamoService<UserProfile>(process.env.USERPROFILE_TABLE!);
+export const userDbService = new DynamoService<Schema['UserProfile']['type']>(process.env.USERPROFILE_TABLE!);
 export const accountDbService = new DynamoService<Schema['Account']['type']>(process.env.ACCOUNT_TABLE!);
 export const itemDbService = new DynamoService<Schema['Item']['type']>(process.env.ITEM_TABLE!);
 export const itemGroupDbService = new DynamoService<Schema['ItemGroup']['type']>(process.env.ITEM_GROUP_TABLE!);
@@ -202,7 +219,7 @@ export const itemCategoryDbService = new DynamoService<Schema['ItemCategory']['t
 
 
 export interface DynamoServices {
-    user: DynamoService<UserProfile>;
+    user: DynamoService<Schema['UserProfile']['type']>;
     account: DynamoService<Schema['Account']['type']>;
     item: DynamoService<Schema['Item']['type']>;
     itemGroup: DynamoService<Schema['ItemGroup']['type']>;

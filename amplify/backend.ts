@@ -3,13 +3,12 @@ import { auth } from './auth/resource';
 import { data } from './data/resource';
 import { storage } from './storage/resource';
 import { createActionFunction } from './data/create-action/resource';
-import { importReceiveFunction, importItemFunction } from './function/import/resource'; // 
-import { truncateTableFunction } from './data/truncate-table/resource';
+import { importFetchFunction, importItemFunction } from './function/import/resource'; // 
 import { Effect, Policy, PolicyStatement } from 'aws-cdk-lib/aws-iam';
 import { Stack } from 'aws-cdk-lib';
 import { EventSourceMapping, StartingPosition } from 'aws-cdk-lib/aws-lambda';
-import { initDataFunction } from './data/init-data/resource';
 import { FetchDataStack } from './backend/stacks/fetch-data-stack';
+import { initDataFunction, truncateTableFunction } from './function/utils/resource';
 
 
 /**
@@ -22,7 +21,7 @@ const backend = defineBackend({
   truncateTableFunction,
   initDataFunction,
   createActionFunction,
-  importReceiveFunction,
+  importFetchFunction,
   importItemFunction,
 });
 
@@ -105,14 +104,17 @@ for (const key in tables) {
 
 
 
-const importReceiveLambda = backend.importReceiveFunction.resources.lambda;
+const importFetchLambda = backend.importFetchFunction.resources.lambda;
 
-backend.importReceiveFunction.addEnvironment(`NOTIFICATION_TABLE`, tables.Notification.tableName);
-backend.importReceiveFunction.addEnvironment(`IMPORTDATA_TABLE`, tables.ImportData.tableName);
-tables.Notification.grantFullAccess(importReceiveLambda);
-tables.ImportData.grantFullAccess(importReceiveLambda);
+backend.importFetchFunction.addEnvironment(`NOTIFICATION_TABLE`, tables.Notification.tableName);
+backend.importFetchFunction.addEnvironment(`IMPORTDATA_TABLE`, tables.ImportData.tableName);
+tables.Notification.grantFullAccess(importFetchLambda);
+tables.ImportData.grantFullAccess(importFetchLambda);
 
-new FetchDataStack(backend.stack, 'FetchDataStack', { fetchDataFunction: backend.importReceiveFunction.resources.lambda });
+
+const customStack = backend.createStack('CustomStack')
+
+new FetchDataStack(customStack, 'FetchDataStack', { fetchDataFunction: backend.importFetchFunction.resources.lambda });
 
 
 

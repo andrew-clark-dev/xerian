@@ -1,7 +1,6 @@
 import { logger } from '@backend/services/logger';
 import { fetchPagedItems } from '@backend/services//http-client-service';
 import { DynamoService } from '@backend/services//dynamodb-service';
-import { v4 as uuid4 } from 'uuid';
 
 interface FetchDataEvent {
   from: string;
@@ -14,10 +13,12 @@ const dynamoService = new DynamoService(tableName!);
 export const handler = async (event: FetchDataEvent) => {
   logger.info('Event', event);
   // Parse 'to' and 'from' to Date objects
-  const { from, to } = event;
-  logger.info(`from: ${from} to: ${to}`);
+  const fromDate = new Date(event.from)
+  const toDate = new Date(event.to)
 
-  const toDate = new Date(to);
+  const from = fromDate.toISOString();
+  const to = toDate.toISOString();
+  logger.info(`from: ${from} to: ${to}`);
 
   try {
 
@@ -43,7 +44,7 @@ export const handler = async (event: FetchDataEvent) => {
         try {
           const importData = {
             __typename: 'ImportData',
-            id: uuid4(),
+            id: item.sku,
             createdAt: new Date().toISOString(),
             type: 'Item',
             data: JSON.stringify(item),
@@ -65,7 +66,7 @@ export const handler = async (event: FetchDataEvent) => {
     // Return whether there are more pages, and the cursor for pagination
     toDate.setMonth(toDate.getMonth() + 1)
     return {
-      hasMorePages: (toDate < new Date()), // Determine if there are more pages
+      more: (toDate < new Date()), // Determine if there are more pages
       from: to,                           // Set new 'from' date
       to: toDate.toISOString(),           // Set the next 'to' date
     };

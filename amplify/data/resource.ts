@@ -1,5 +1,4 @@
 import { a, defineData, type ClientSchema } from '@aws-amplify/backend';
-import { initDataFunction } from './init-data/resource';
 import { createActionFunction } from './create-action/resource';
 import { postConfirmation } from '../auth/post-confirmation/resource';
 
@@ -8,10 +7,14 @@ export const schema = a.schema({
   // Models
   ImportData: a
     .model({
+      id: a.id().required(),
       type: a.string().required(),
       data: a.json().required(),
       status: a.enum(['Pending', 'Completed', 'Failed']),
-    }),
+      createdAt: a.datetime().required(),
+    })
+    .identifier(['id', 'createdAt'])
+    .secondaryIndexes((index) => [index("status"),]),
 
   Counter: a
     .model({
@@ -310,7 +313,6 @@ export const schema = a.schema({
 
 }).authorization(allow => [
   allow.group('Employee'), // default to employee
-  allow.resource(initDataFunction),
   allow.resource(createActionFunction),
   allow.resource(postConfirmation),
 ]);
