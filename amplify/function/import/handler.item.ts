@@ -1,37 +1,92 @@
-import { itemServices } from '@backend/services/item-services';
-import { DynamoDBStreamHandler, DynamoDBStreamEvent, DynamoDBBatchItemFailure } from 'aws-lambda';
+import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
+import { DynamoDBDocumentClient, QueryCommand, UpdateCommand } from '@aws-sdk/lib-dynamodb';
 import { logger } from "@backend/services/logger";
-import { ExternalItem } from '@backend/services/http-client-types';
+import { itemServices } from '@backend/services/item-services';
 
-export const handler: DynamoDBStreamHandler = async (event: DynamoDBStreamEvent) => {
-  logger.info('DynamoDBStreamEvent', event);
-  const fail: DynamoDBBatchItemFailure[] = [];
+const client = DynamoDBDocumentClient.from(new DynamoDBClient({}));
 
-  for (const record of event.Records) {
-    logger.info(`Processing Event Type: ${record.eventName} - record: ${JSON.stringify(record)}`);
+const TABLE_NAME = process.env.IMPORTDATA_TABLE;
+const STATUS_INDEX = 'importDataByStatus'; // Standard Amplify naming convention
 
-    try {
-      if (record.eventName === "INSERT") {
-        // business logic to process new records
-        const newImage = record.dynamodb?.NewImage;
 
-        if (!newImage) {
-          logger.error('No new image found in the record');
-          continue;
-        } else {
-          const data = JSON.parse(newImage.data.S || '{}') as ExternalItem;
-          console.log('Parsed data:', data);
-          await itemServices.importItem(data);
-        }
-      }
-    } catch (error) {
-      logger.error('Errors in importing item', error);
-      const newImage = record.dynamodb!.NewImage!;
-      fail.push({ itemIdentifier: newImage.id.S! });
-    }
+
+export const handler = async () => {
+  let more = true;
+  let added = 0;
+  let errors = 0;
+
+  const pendingItems = await client.send(
+    new QueryCommand({
+      TableName: TABLE_NAME,
+      IndexName: STATUS_INDEX,
+      KeyConditionExpression: '#status = :pending',
+      ExpressionAttributeNames: {
+        '#status': 'status',
+      },
+      ExpressionAttributeValues: {
+        ':pending': 'Pending',
+      },
+    })
+  );
+
+  if (!pendingItems.Items || pendingItems.Items.length === 0) {
+    logger.info('No pending items found.');
+    return more = false;
   }
 
-  return {
-    batchItemFailures: fail,
-  };
+  logger.info(`Found ${pendingItems.Items.length} items to process.`);
+
+  for (const item of pendingItems.Items) {
+    try {
+      await itemServices.importItem(item.data);
+
+      await client.send(
+        new UpdateCommand({
+          TableName: TABLE_NAME,
+          Key: {
+            id: item.id,
+            createdAt: item.createdAt,
+          },
+          UpdateExpression: 'SET #status = :completed',
+          ExpressionAttributeNames: {
+            '#status': 'status',
+          },
+          ExpressionAttributeValues: {
+            ':completed': 'Completed',
+          },
+        })
+      );
+
+      logger.info(`Marked item ${item.id} as Completed.`);
+      added++;
+
+    } catch (error) {
+      logger.error(`Error processing item ${item.id}:`, error);
+      errors++;
+      await client.send(
+        new UpdateCommand({
+          TableName: TABLE_NAME,
+          Key: {
+            id: item.id,
+            createdAt: item.createdAt,
+          },
+          UpdateExpression: 'SET #status = :failed',
+          ExpressionAttributeNames: {
+            '#status': 'status',
+          },
+          ExpressionAttributeValues: {
+            ':failed': 'Failed',
+          },
+        })
+      );
+    }
+    logger.success(`Successfully processed ${added} items, with ${errors} errors`);
+    return {
+      "finished": more,
+      "itemsProcessed": added,
+      "errors": errors,
+      "total": pendingItems.Items.length,
+    }
+  }
 };
+

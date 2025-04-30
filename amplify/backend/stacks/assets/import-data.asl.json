@@ -1,0 +1,26 @@
+{
+    "Comment": "Import fetched external data.",
+    "StartAt": "ImportData",
+    "States": {
+        "ImportData": {
+            "Type": "Task",
+            "Resource": "{{lambdaArn}}",
+            "ResultPath": "$.lambdaResult",
+            "Next": "Finished?"
+        },
+        "Finished?": {
+            "Type": "Choice",
+            "Choices": [
+                {
+                    "Variable": "$.lambdaResult.finished",
+                    "BooleanEquals": true,
+                    "Next": "Done"
+                }
+            ],
+            "Default": "ImportData"
+        },
+        "Done": {
+            "Type": "Succeed"
+        }
+    }
+}

@@ -7,8 +7,8 @@ interface FetchDataEvent {
   to: string;
 }
 
-const tableName = process.env.IMPORTDATA_TABLE;
-const dynamoService = new DynamoService(tableName!);
+const TABLE_NAME = process.env.IMPORTDATA_TABLE;
+const dynamoService = new DynamoService(TABLE_NAME!);
 
 export const handler = async (event: FetchDataEvent) => {
   logger.info('Event', event);

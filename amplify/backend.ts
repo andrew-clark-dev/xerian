@@ -7,8 +7,9 @@ import { importFetchFunction, importItemFunction } from './function/import/resou
 import { Effect, Policy, PolicyStatement } from 'aws-cdk-lib/aws-iam';
 import { Stack } from 'aws-cdk-lib';
 import { EventSourceMapping, StartingPosition } from 'aws-cdk-lib/aws-lambda';
-import { FetchDataStack } from './backend/stacks/fetch-data-stack';
 import { initDataFunction, truncateTableFunction } from './function/utils/resource';
+import { ImportDataStepFunctionStack } from './backend/stacks/import-data-stack';
+import { FetchDataStepFunctionStack } from './backend/stacks/fetch-data-stack';
 
 
 /**
@@ -114,8 +115,8 @@ tables.ImportData.grantFullAccess(importFetchLambda);
 
 const customStack = backend.createStack('CustomStack')
 
-new FetchDataStack(customStack, 'FetchDataStack', { fetchDataFunction: backend.importFetchFunction.resources.lambda });
-
+new FetchDataStepFunctionStack(customStack, 'FetchDataStack', { fetchDataFunction: backend.importFetchFunction.resources.lambda });
+new ImportDataStepFunctionStack(customStack, 'ImportDataStack', { importDataFunction: backend.importItemFunction.resources.lambda });
 
 
 // // Tables that import has to write to

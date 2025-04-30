@@ -15,7 +15,7 @@ interface FetchDataStackProps extends StackProps {
     fetchDataFunction: IFunction
 }
 
-export class FetchDataStack extends Stack {
+export class FetchDataStepFunctionStack extends Stack {
     constructor(scope: Construct, id: string, props: FetchDataStackProps) {
         super(scope, id, props);
 
@@ -26,7 +26,7 @@ export class FetchDataStack extends Stack {
             ],
         });
 
-        const aslPath = join(__dirname, '../assets/fetch-data.asl.json');
+        const aslPath = join(__dirname, './assets/fetch-data.asl.json');
         const aslTemplate = readFileSync(aslPath, 'utf8');
 
         const renderedDefinition = Mustache.render(aslTemplate, {
