@@ -26,7 +26,7 @@ export const initDataFunction = defineFunction({
             ['ItemCategory', ['kind', 'name']],
             ['Sale', ['number']],
             ['Notification', ['id', 'createdAt']],
-            ['ImportData', ['id', 'createdAt']],
+            ['ImportData', ['id']],
         ])
     }
 });

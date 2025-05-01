@@ -1,5 +1,4 @@
 import { a, defineData, type ClientSchema } from '@aws-amplify/backend';
-import { createActionFunction } from './create-action/resource';
 import { postConfirmation } from '../auth/post-confirmation/resource';
 
 export const schema = a.schema({
@@ -13,8 +12,8 @@ export const schema = a.schema({
       status: a.enum(['Pending', 'Completed', 'Failed']),
       createdAt: a.datetime().required(),
     })
-    .identifier(['id', 'createdAt'])
-    .secondaryIndexes((index) => [index("status"),]),
+    .identifier(['id'])
+    .secondaryIndexes((index) => [index("status").sortKeys(["createdAt"])]),
 
   Counter: a
     .model({
@@ -48,7 +47,7 @@ export const schema = a.schema({
     .secondaryIndexes((index) => [
       index("refId"),
       index("userId").sortKeys(["createdAt"]),
-      index("typeIndex"),
+      index("typeIndex").sortKeys(["createdAt"]),
       index("modelName")]),
 
   Comment: a
@@ -297,7 +296,6 @@ export const schema = a.schema({
 
   Notification: a
     .model({
-      id: a.id().required(),
       createdAt: a.datetime().required(),
       type: a.enum(['Failure', 'Success', 'Start', 'Alert', 'Fatal']),
       functionName: a.string().required(),
@@ -305,7 +303,6 @@ export const schema = a.schema({
       message: a.string().required(),
       data: a.json(),
     })
-    .identifier(['id', 'createdAt'])
     .secondaryIndexes((index) => [
       index("type").sortKeys(["createdAt"]),
       index("functionName").sortKeys(["createdAt"]),
@@ -313,7 +310,6 @@ export const schema = a.schema({
 
 }).authorization(allow => [
   allow.group('Employee'), // default to employee
-  allow.resource(createActionFunction),
   allow.resource(postConfirmation),
 ]);
 

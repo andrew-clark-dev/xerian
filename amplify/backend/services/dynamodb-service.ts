@@ -212,7 +212,7 @@ export class DynamoService<T extends Record<string, unknown>> {
 export const userDbService = new DynamoService<Schema['UserProfile']['type']>(process.env.USERPROFILE_TABLE!);
 export const accountDbService = new DynamoService<Schema['Account']['type']>(process.env.ACCOUNT_TABLE!);
 export const itemDbService = new DynamoService<Schema['Item']['type']>(process.env.ITEM_TABLE!);
-export const itemGroupDbService = new DynamoService<Schema['ItemGroup']['type']>(process.env.ITEM_GROUP_TABLE!);
+export const itemGroupDbService = new DynamoService<Schema['ItemGroup']['type']>(process.env.ITEMGROUP_TABLE!);
 export const saleDbService = new DynamoService<Schema['Sale']['type']>(process.env.SALE_TABLE!);
 export const transactionDbService = new DynamoService<Schema['Transaction']['type']>(process.env.TRANSACTION_TABLE!);
 export const itemCategoryDbService = new DynamoService<Schema['ItemCategory']['type']>(process.env.ITEMCATEGORY_TABLE!);

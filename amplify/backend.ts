@@ -2,14 +2,14 @@ import { defineBackend } from '@aws-amplify/backend';
 import { auth } from './auth/resource';
 import { data } from './data/resource';
 import { storage } from './storage/resource';
-import { createActionFunction } from './data/create-action/resource';
 import { importFetchFunction, importItemFunction } from './function/import/resource'; // 
 import { Effect, Policy, PolicyStatement } from 'aws-cdk-lib/aws-iam';
 import { Stack } from 'aws-cdk-lib';
 import { EventSourceMapping, StartingPosition } from 'aws-cdk-lib/aws-lambda';
 import { initDataFunction, truncateTableFunction } from './function/utils/resource';
-import { ImportDataStepFunctionStack } from './backend/stacks/import-data-stack';
 import { FetchDataStepFunctionStack } from './backend/stacks/fetch-data-stack';
+import { createActionFunction } from './function/create-action/resource';
+import { ImportItemStepFunctionStack } from './backend/stacks/import-item-stack';
 
 
 /**
@@ -77,7 +77,7 @@ createActionLambda.role?.attachInlinePolicy(createActionStreamingPolicy);
 backend.createActionFunction.addEnvironment("TOTAL_TABLE", tables.Total.tableName);
 
 // List of tables to create event source mappings for the createActionFunction
-['Account', 'Item', 'Sale', 'Transaction', 'Comment'].forEach((tname) => {
+['Account', 'Item', 'Sale', 'Transaction', 'Comment', 'ImportData'].forEach((tname) => {
   const eventSourceMapping = new EventSourceMapping(
     Stack.of(tables[tname]),
     `createAction${tname}EventStreamMapping`,
@@ -96,37 +96,42 @@ for (const key in tables) {
   [
     backend.truncateTableFunction,
     backend.initDataFunction,
-    // backend.importItemFunction
+    backend.importItemFunction
   ].forEach((f) => {
     f.addEnvironment(`${key.toUpperCase()}_TABLE`, t.tableName);
     t.grantFullAccess(f.resources.lambda);
   })
 }
 
-
-
-const importFetchLambda = backend.importFetchFunction.resources.lambda;
+const fetchDataLambda = backend.importFetchFunction.resources.lambda;
 
 backend.importFetchFunction.addEnvironment(`NOTIFICATION_TABLE`, tables.Notification.tableName);
 backend.importFetchFunction.addEnvironment(`IMPORTDATA_TABLE`, tables.ImportData.tableName);
-tables.Notification.grantFullAccess(importFetchLambda);
-tables.ImportData.grantFullAccess(importFetchLambda);
+tables.Notification.grantFullAccess(fetchDataLambda);
+tables.ImportData.grantFullAccess(fetchDataLambda);
+
+new FetchDataStepFunctionStack(backend.importFetchFunction.stack, 'FetchDataStack', { fetchDataLambda });
+
+const importItemLambda = backend.importItemFunction.resources.lambda;
+
+const importItemQueryPolicy = new Policy(
+  Stack.of(importItemLambda),
+  "importItemQueryPolicy",
+  {
+    statements: [
+      new PolicyStatement({
+        effect: Effect.ALLOW,
+        actions: [
+          "dynamodb:Query",
+        ],
+        resources: ["*"],
+      }),
+    ],
+  }
+);
+
+importItemLambda.role?.attachInlinePolicy(importItemQueryPolicy);
+
+new ImportItemStepFunctionStack(backend.importItemFunction.stack, 'ImportDataStack', { importItemLambda });
 
 
-const customStack = backend.createStack('CustomStack')
-
-new FetchDataStepFunctionStack(customStack, 'FetchDataStack', { fetchDataFunction: backend.importFetchFunction.resources.lambda });
-new ImportDataStepFunctionStack(customStack, 'ImportDataStack', { importDataFunction: backend.importItemFunction.resources.lambda });
-
-
-// // Tables that import has to write to
-// ['Account', 'Item', 'Sale', 'Transaction', 'UserProfile', 'ItemGroup', 'ItemCategory', 'Notification'].forEach((tname) => {
-//   const t = tables[tname];
-//   [
-//     backend.importItemFunction
-//   ].forEach((f) => {
-//     f.addEnvironment(`${tname.toUpperCase()}_TABLE`, t.tableName);
-//     t.grantFullAccess(f.resources.lambda);
-//   })
-// }
-// )

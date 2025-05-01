@@ -13,19 +13,19 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 
-interface ImportDataStackProps extends StackProps {
-    importDataFunction: lambda.IFunction;
+interface ImportItemStackProps extends StackProps {
+    importItemLambda: lambda.IFunction;
 }
 
-export class ImportDataStepFunctionStack extends Stack {
-    constructor(scope: Construct, id: string, props: ImportDataStackProps) {
+export class ImportItemStepFunctionStack extends Stack {
+    constructor(scope: Construct, id: string, props: ImportItemStackProps) {
         super(scope, id, props);
 
         // Load and render ASL template
         const aslPath = path.join(__dirname, './assets/import-data.asl.json');
         const template = fs.readFileSync(aslPath, 'utf-8');
         const definition = mustache.render(template, {
-            lambdaArn: props.importDataFunction.functionArn,
+            lambdaArn: props.importItemLambda.functionArn,
         });
 
         // Deploy the Step Function
@@ -34,9 +34,9 @@ export class ImportDataStepFunctionStack extends Stack {
         });
 
         // Grant permission to invoke the Lambda
-        props.importDataFunction.grantInvoke(stateMachineRole);
+        props.importItemLambda.grantInvoke(stateMachineRole);
 
-        new sfn.CfnStateMachine(this, 'ImportDataStateMachine', {
+        new sfn.CfnStateMachine(this, 'ImportItemStateMachine', {
             definitionString: definition,
             roleArn: stateMachineRole.roleArn,
             stateMachineType: 'STANDARD',

@@ -2,16 +2,14 @@ import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import { DynamoDBDocumentClient, QueryCommand, UpdateCommand } from '@aws-sdk/lib-dynamodb';
 import { logger } from "@backend/services/logger";
 import { itemServices } from '@backend/services/item-services';
+import { ExternalItem } from '@backend/services/http-client-types';
 
 const client = DynamoDBDocumentClient.from(new DynamoDBClient({}));
 
 const TABLE_NAME = process.env.IMPORTDATA_TABLE;
-const STATUS_INDEX = 'importDataByStatus'; // Standard Amplify naming convention
-
-
+const STATUS_INDEX = 'importDataByStatusAndCreatedAt'; // Standard Amplify naming convention
 
 export const handler = async () => {
-  let more = true;
   let added = 0;
   let errors = 0;
 
@@ -26,26 +24,35 @@ export const handler = async () => {
       ExpressionAttributeValues: {
         ':pending': 'Pending',
       },
+      ScanIndexForward: true, // Set to false for descending order
     })
   );
 
   if (!pendingItems.Items || pendingItems.Items.length === 0) {
     logger.info('No pending items found.');
-    return more = false;
+    return {
+      "finished": true,
+      "itemsProcessed": 0,
+      "errors": 0,
+      "total": 0,
+    }
   }
 
   logger.info(`Found ${pendingItems.Items.length} items to process.`);
 
   for (const item of pendingItems.Items) {
     try {
-      await itemServices.importItem(item.data);
+      logger.info(`Processing import data record.`, item.data);
+      const data = JSON.parse(item.data) as ExternalItem;
+      logger.info(`Processing External item.`, data);
+
+      await itemServices.importItem(data);
 
       await client.send(
         new UpdateCommand({
           TableName: TABLE_NAME,
           Key: {
             id: item.id,
-            createdAt: item.createdAt,
           },
           UpdateExpression: 'SET #status = :completed',
           ExpressionAttributeNames: {
@@ -61,14 +68,13 @@ export const handler = async () => {
       added++;
 
     } catch (error) {
-      logger.error(`Error processing item ${item.id}:`, error);
+      logger.error(`Error processing item ${item.id}:`, (error as Error).message);
       errors++;
       await client.send(
         new UpdateCommand({
           TableName: TABLE_NAME,
           Key: {
             id: item.id,
-            createdAt: item.createdAt,
           },
           UpdateExpression: 'SET #status = :failed',
           ExpressionAttributeNames: {
@@ -80,13 +86,12 @@ export const handler = async () => {
         })
       );
     }
-    logger.success(`Successfully processed ${added} items, with ${errors} errors`);
-    return {
-      "finished": more,
-      "itemsProcessed": added,
-      "errors": errors,
-      "total": pendingItems.Items.length,
-    }
+  }
+  logger.success(`Successfully processed ${added} items, with ${errors} errors`);
+  return {
+    "finished": false,
+    "itemsProcessed": added,
+    "errors": errors,
+    "total": pendingItems.Items.length,
   }
 };
-

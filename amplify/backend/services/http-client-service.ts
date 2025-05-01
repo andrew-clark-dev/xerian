@@ -1,5 +1,6 @@
 import ky, { HTTPError } from 'ky';
 import { ExternalAccount, ExternalItem, ExternalItemSale, ExternalSale } from './http-client-types';
+import { logger } from "./logger";
 
 // Define response type
 interface PagedResponse<T> {
@@ -42,7 +43,7 @@ export async function fetchPagedItems(params: {
     if (params.cursor) searchParams.set('cursor', params.cursor);
     if (params.createdGte) searchParams.set('created:gte', params.createdGte);
     if (params.createdLt) searchParams.set('created:lt', params.createdLt);
-    console.info('searchParams', searchParams);
+    logger.info('searchParams', searchParams);
     const response = await httpCall
       .get('https://api.consigncloud.com/api/v1/items', { searchParams })
       .json<PagedResponse<ExternalItem>>();
@@ -56,7 +57,7 @@ export async function fetchPagedItems(params: {
         data: [],
       };
     }
-    console.error('Error fetching paged items:', (error as Error).message);
+    logger.error('Error fetching paged items:', (error as Error).message);
     throw error; // Rethrow the error for handling in the calling function
   }
 }
@@ -77,7 +78,7 @@ export async function getItem(id: string): Promise<ExternalItem> {
 
     return response;
   } catch (error) {
-    console.error('Error fetching paged items:', (error as Error).message);
+    logger.error('Error fetching paged items:', (error as Error).message);
     throw error; // Rethrow the error for handling in the calling function
   }
 }
@@ -98,7 +99,7 @@ export async function getAccount(id: string): Promise<ExternalAccount> {
 
     return response;
   } catch (error) {
-    console.error('Error fetching paged items:', (error as Error).message);
+    logger.error('Error fetching paged items:', (error as Error).message);
     throw error; // Rethrow the error for handling in the calling function
   }
 }
@@ -114,21 +115,22 @@ export async function fetchItemSales(params: {
 
     if (params.cursor) itemSalesParams.set('cursor', params.cursor);
 
-    console.info('itemSalesParams', itemSalesParams);
+    logger.info('itemSalesParams', itemSalesParams);
     const response = await httpCall
-      .get(`https://api.consigncloud.com/api/v1/items/${params.itemId}/sales`, { searchParams: itemSalesParams })
+      .get(`https://api.consigncloud.com/api/v1/items/${params.itemId}/sale`, { searchParams: itemSalesParams })
       .json<PagedResponse<ExternalItemSale>>();
 
     return response;
   } catch (error) {
     if (error instanceof HTTPError && error.response.status === 404) {
+      logger.info('Item has no sales.', error);
       return {
         count: 0,
         next_cursor: null,
         data: [],
       };
     }
-    console.error('Error fetching paged sales:', error);
+    logger.error('Error fetching paged sales:', error);
     throw error; // Rethrow the error for handling in the calling function
   }
 }
@@ -151,7 +153,7 @@ export async function getSale(id: string): Promise<ExternalSale> {
 
     return response;
   } catch (error) {
-    console.error('Error getting sale:', (error as Error).message);
+    logger.error('Error getting sale:', (error as Error).message);
     throw error; // Rethrow the error for handling in the calling function
   }
 }

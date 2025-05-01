@@ -8,11 +8,19 @@ import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import Mustache from 'mustache';
 
+/* Initial data for the fetch-data step function
+  {
+    "from": "2020-01-01T00:00:00.000Z",
+    "to": "2020-02-01T00:00:00.000Z"
+}
+ */
+
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 interface FetchDataStackProps extends StackProps {
-    fetchDataFunction: IFunction
+    fetchDataLambda: IFunction
 }
 
 export class FetchDataStepFunctionStack extends Stack {
@@ -30,7 +38,7 @@ export class FetchDataStepFunctionStack extends Stack {
         const aslTemplate = readFileSync(aslPath, 'utf8');
 
         const renderedDefinition = Mustache.render(aslTemplate, {
-            lambdaArn: props.fetchDataFunction.functionArn,
+            lambdaArn: props.fetchDataLambda.functionArn,
         });
 
         new CfnStateMachine(this, 'FetchDataStateMachine', {
@@ -38,6 +46,6 @@ export class FetchDataStepFunctionStack extends Stack {
             roleArn: role.roleArn,
         });
 
-        props.fetchDataFunction.grantInvoke(role);
+        props.fetchDataLambda.grantInvoke(role);
     }
 }

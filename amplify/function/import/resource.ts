@@ -6,7 +6,7 @@ export const importItemFunction = defineFunction({
     name: "import-item-function",
     entry: "./handler.item.ts",
     resourceGroupName: "data",
-    timeoutSeconds: 30,
+    timeoutSeconds: Duration.minutes(14).toSeconds(),
     environment: {
         SERVICE_NAME: "import-item-function"
     },
