@@ -13,7 +13,11 @@ export const schema = a.schema({
       createdAt: a.datetime().required(),
     })
     .identifier(['id'])
-    .secondaryIndexes((index) => [index("status").sortKeys(["createdAt"])]),
+    .secondaryIndexes((index) => [
+
+      index('type').sortKeys(['createdAt']),
+      index('status').sortKeys(['createdAt']),
+    ]),
 
   Counter: a
     .model({
@@ -36,7 +40,7 @@ export const schema = a.schema({
       actor: a.string(),
       modelName: a.string(),
       refId: a.id(), // Loose coupling for now
-      type: a.enum(["Create", "Read", "Update", "Delete", "Search", "Import", "Export", "Increment", "Decrement", "Auth"]),
+      type: a.enum(['Create', 'Read', 'Update', 'Delete', 'Search', 'Import', 'Export', 'Increment', 'Decrement', 'Auth']),
       typeIndex: a.string().required(),
       userId: a.id(),
       createdBy: a.belongsTo('UserProfile', 'userId'),
@@ -45,10 +49,10 @@ export const schema = a.schema({
       createdAt: a.datetime(),
     })
     .secondaryIndexes((index) => [
-      index("refId"),
-      index("userId").sortKeys(["createdAt"]),
-      index("typeIndex").sortKeys(["createdAt"]),
-      index("modelName")]),
+      index('refId'),
+      index('userId').sortKeys(['createdAt']),
+      index('typeIndex').sortKeys(['createdAt']),
+      index('modelName')]),
 
   Comment: a
     .model({
@@ -62,7 +66,7 @@ export const schema = a.schema({
       createdBy: a.belongsTo('UserProfile', 'userId'),
       updatedAt: a.datetime(),
     })
-    .secondaryIndexes((index) => [index("refId"), index("userId")])
+    .secondaryIndexes((index) => [index('refId'), index('userId')])
     .authorization(allow => [allow.owner(), allow.group('Admin'), allow.authenticated().to(['read'])]),
 
   UserProfile: a
@@ -72,8 +76,8 @@ export const schema = a.schema({
       cognitoName: a.string(), // the cognito name not for display
       nickname: a.string(), // the display name
       phoneNumber: a.string(),
-      status: a.enum(["Active", "Inactive", "Suspended", "Pending"]),
-      role: a.enum(["Admin", "Manager", "Employee", "Service", "Guest"]),
+      status: a.enum(['Active', 'Inactive', 'Suspended', 'Pending']),
+      role: a.enum(['Admin', 'Manager', 'Employee', 'Service', 'Guest']),
       photo: a.url(),
 
       comments: a.hasMany('Comment', 'userId'),
@@ -84,12 +88,12 @@ export const schema = a.schema({
 
     })
     .secondaryIndexes((index) => [
-      index("cognitoName"),
-      index("nickname"),
-      index("email"),
+      index('cognitoName'),
+      index('nickname'),
+      index('email'),
     ])
     .authorization((allow) => [
-      allow.ownerDefinedIn("profileOwner"),
+      allow.ownerDefinedIn('profileOwner'),
       allow.group('Admin')
     ]),
 
@@ -100,10 +104,10 @@ export const schema = a.schema({
       sales: a.string().array(), // Sales ids
     })
     .secondaryIndexes((index) => [
-      index("email"),
+      index('email'),
     ])
     .authorization((allow) => [
-      allow.ownerDefinedIn("profileOwner"),
+      allow.ownerDefinedIn('profileOwner'),
       allow.group('Admin')
     ]),
 
@@ -123,11 +127,11 @@ export const schema = a.schema({
       city: a.string(),
       state: a.string(),
       postcode: a.string(),
-      comunicationPreferences: a.enum(["TextMessage", "Email", "Whatsapp", "None"]),
-      status: a.enum(["Active", "Inactive", "Suspended"]),
-      kind: a.enum(["Standard", "VIP", "Vender", "Employee", "Customer", "Owner"]),
+      comunicationPreferences: a.enum(['TextMessage', 'Email', 'Whatsapp', 'None']),
+      status: a.enum(['Active', 'Inactive', 'Suspended']),
+      kind: a.enum(['Standard', 'VIP', 'Vender', 'Employee', 'Customer', 'Owner']),
       defaultSplit: a.integer(),
-      items: a.hasMany("Item", "accountNumber"), // setup relationships between main types
+      items: a.hasMany('Item', 'accountNumber'), // setup relationships between main types
       transactions: a.string().array(), // this is the list of transaction ids that this item has been involved in.
       balance: a.integer().default(0),
       noItems: a.integer().default(0),
@@ -141,9 +145,9 @@ export const schema = a.schema({
     })
     .identifier(['number'])
     .secondaryIndexes((index) => [
-      index("id"),
-      index("status").sortKeys(["createdAt"]),
-      index("createdAt")
+      index('id'),
+      index('status').sortKeys(['createdAt']),
+      index('createdAt')
     ]),
 
   ItemStatus: a.enum(['Created', 'Tagged', 'Active', 'Sold', 'ToDonate', 'Donated', 'Parked', 'Returned', 'Expired', 'Lost', 'Stolen', 'Multi', 'Unknown']),
@@ -154,7 +158,7 @@ export const schema = a.schema({
       sku: a.string().required(),
       lastActivityBy: a.id().required(),
       title: a.string(),
-      account: a.belongsTo("Account", "accountNumber"),
+      account: a.belongsTo('Account', 'accountNumber'),
       accountNumber: a.string(),
       category: a.string().default('Unknown'),
       brand: a.string().default('Unknown'),
@@ -168,7 +172,7 @@ export const schema = a.schema({
       price: a.integer(),
       status: a.ref('ItemStatus'), // this is the status of unique items.
       group: a.hasOne('ItemGroup', 'itemSku'), // this is the group of items that are the same. 
-      sales: a.string().array(),
+      sales: a.string().array(), // this is the list of sale numbers that this item has been involved in.
       printedAt: a.datetime(),
       lastSoldAt: a.datetime(),
       lastViewedAt: a.datetime(),
@@ -178,14 +182,14 @@ export const schema = a.schema({
     })
     .identifier(['sku'])
     .secondaryIndexes((index) => [
-      index("id"),
-      index("accountNumber").sortKeys(["createdAt"]),
-      index("createdAt"),
-      index("category"),
-      index("brand"),
-      index("color"),
-      index("size"),
-      index("status"),
+      index('id'),
+      index('accountNumber').sortKeys(['createdAt']),
+      index('createdAt'),
+      index('category'),
+      index('brand'),
+      index('color'),
+      index('size'),
+      index('status'),
     ]),
 
   ItemGroup: a
@@ -211,8 +215,8 @@ export const schema = a.schema({
     })
     .identifier(['kind', 'name'])
     .secondaryIndexes((index) => [
-      index("matchNames"),
-      index("kind"),
+      index('matchNames'),
+      index('kind'),
     ]),
 
   SaleItem: a
@@ -257,7 +261,7 @@ export const schema = a.schema({
     })
     .identifier(['number',])
     .secondaryIndexes((index) => [
-      index("transaction"),
+      index('transaction'),
     ]),
 
   Discount: a
@@ -265,7 +269,6 @@ export const schema = a.schema({
       label: a.string(),
       value: a.integer(),
     }),
-
 
   AmountsTendered: a
     .customType({
@@ -283,7 +286,7 @@ export const schema = a.schema({
       createdAt: a.datetime(),
       updatedAt: a.datetime(),
       lastActivityBy: a.id().required(),
-      type: a.enum(["Sale", "Refund", "Payout", "Reversal", "TransferIn", "TransferOut"]),
+      type: a.enum(['Sale', 'Refund', 'Payout', 'Reversal', 'TransferIn', 'TransferOut']),
       amount: a.integer().required(),
       amountsTendered: a.ref('AmountsTendered'),
       taxes: a.string().array(), // we only track MWST
@@ -291,7 +294,7 @@ export const schema = a.schema({
       linked: a.string(),  // not currently used
     })
     .secondaryIndexes((index) => [
-      index("type"),
+      index('type'),
     ]),
 
   Notification: a
@@ -304,8 +307,46 @@ export const schema = a.schema({
       data: a.json(),
     })
     .secondaryIndexes((index) => [
-      index("type").sortKeys(["createdAt"]),
-      index("functionName").sortKeys(["createdAt"]),
+      index('type').sortKeys(['createdAt']),
+      index('functionName').sortKeys(['createdAt']),
+    ]),
+
+  // Stats
+  ItemStats: a
+    .model({
+      createdAt: a.datetime().required(),
+      day: a.string().required(),
+      month: a.string().required(),
+      itemSku: a.string().required(),
+      createdBy: a.id().required(),
+      category: a.string().required(),
+      price: a.integer(),
+      soldAt: a.datetime(),
+    })
+    .identifier(['itemSku', 'createdAt'])
+    .secondaryIndexes((index) => [
+      index('day').sortKeys(['createdBy']),
+      index('month').sortKeys(['createdBy']),
+      index('day').sortKeys(['category']),
+      index('month').sortKeys(['category']),
+      index('category').sortKeys(['day', 'month']),
+      index('soldAt'),
+    ]),
+
+  SaleStats: a
+    .model({
+      createdAt: a.datetime().required(),
+      day: a.string().required(),
+      month: a.string().required(),
+      saleNumber: a.string().required(),
+      items: a.string().array().required(),
+      createdBy: a.id().required(),
+      total: a.integer().required(),
+    })
+    .identifier(['saleNumber', 'createdAt'])
+    .secondaryIndexes((index) => [
+      index('day').sortKeys(['createdBy']),
+      index('month').sortKeys(['createdBy']),
     ]),
 
 }).authorization(allow => [
