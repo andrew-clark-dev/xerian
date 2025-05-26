@@ -1,5 +1,6 @@
-import type { DynamoDBBatchItemFailure, DynamoDBStreamHandler } from "aws-lambda";
+import type { DynamoDBStreamHandler } from "aws-lambda";
 import { logger } from "@backend/services/logger";
+import { v4 as uuid4 } from "uuid";
 import { DynamoService } from "@backend/services/dynamodb-service";
 
 const TABLE_NAME = process.env.ACTION_TABLE;
@@ -7,7 +8,6 @@ const dynamoService = new DynamoService(TABLE_NAME!);
 
 export const handler: DynamoDBStreamHandler = async (event) => {
     logger.info('DynamoDBStreamEvent', event);
-    const fail: DynamoDBBatchItemFailure[] = [];
 
     for (const record of event.Records) {
         logger.info(`Processing Event Type: ${record.eventName} - record: ${JSON.stringify(record)}`);
@@ -20,6 +20,7 @@ export const handler: DynamoDBStreamHandler = async (event) => {
                 logger.info(`New ${modelName} Image: ${JSON.stringify(newImage)}`);
                 await dynamoService.write({
                     __typename: 'Action',
+                    id: uuid4(),
                     type: "Create",
                     typeIndex: "Create",
                     description: `Created ${modelName} - (auto-log)`,
@@ -38,9 +39,10 @@ export const handler: DynamoDBStreamHandler = async (event) => {
                 logger.info(`Old ${modelName}, Image`, oldImage);
                 await dynamoService.write({
                     __typename: 'Action',
-                    type: "Create",
-                    typeIndex: "Create",
-                    description: `Created ${modelName} - (auto-log)`,
+                    id: uuid4(),
+                    type: "Update",
+                    typeIndex: "Update",
+                    description: `Updated ${modelName} - (auto-log)`,
                     userId: newImage.lastActivityBy.S,
                     modelName: modelName,
                     refId: newImage.id.S,
@@ -50,14 +52,10 @@ export const handler: DynamoDBStreamHandler = async (event) => {
 
             }
         } catch (error) {
-            logger.error('Errors in creating action', error);
             const newImage = record.dynamodb!.NewImage!;
-            fail.push({ itemIdentifier: newImage.id.S! });
+            logger.error(`Errors in creating action for ${record.eventName} ${newImage.__typename.S}, id: ${newImage.id.S} `, (error as Error).message);
         }
     }
     logger.info(`Successfully processed ${event.Records.length} records.`);
 
-    return {
-        batchItemFailures: [],
-    };
 };

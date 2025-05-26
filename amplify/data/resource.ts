@@ -311,44 +311,6 @@ export const schema = a.schema({
       index('functionName').sortKeys(['createdAt']),
     ]),
 
-  // Stats
-  ItemStats: a
-    .model({
-      createdAt: a.datetime().required(),
-      day: a.string().required(),
-      month: a.string().required(),
-      itemSku: a.string().required(),
-      createdBy: a.id().required(),
-      category: a.string().required(),
-      price: a.integer(),
-      soldAt: a.datetime(),
-    })
-    .identifier(['itemSku', 'createdAt'])
-    .secondaryIndexes((index) => [
-      index('day').sortKeys(['createdBy']),
-      index('month').sortKeys(['createdBy']),
-      index('day').sortKeys(['category']),
-      index('month').sortKeys(['category']),
-      index('category').sortKeys(['day', 'month']),
-      index('soldAt'),
-    ]),
-
-  SaleStats: a
-    .model({
-      createdAt: a.datetime().required(),
-      day: a.string().required(),
-      month: a.string().required(),
-      saleNumber: a.string().required(),
-      items: a.string().array().required(),
-      createdBy: a.id().required(),
-      total: a.integer().required(),
-    })
-    .identifier(['saleNumber', 'createdAt'])
-    .secondaryIndexes((index) => [
-      index('day').sortKeys(['createdBy']),
-      index('month').sortKeys(['createdBy']),
-    ]),
-
 }).authorization(allow => [
   allow.group('Employee'), // default to employee
   allow.resource(postConfirmation),
