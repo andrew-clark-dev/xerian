@@ -9,6 +9,7 @@ import { storage } from './storage/resource';
 // import { EventSourceMapping, StartingPosition } from 'aws-cdk-lib/aws-lambda';
 import { initDataFunction, truncateTableFunction } from './function/utils/resource';
 import { createActionFunction } from './function/create-action/resource';
+import { streamDbToLambdaStack } from './stacks/stream-db-to-lambda';
 
 /**
  * @see https://docs.amplify.aws/react/build-a-backend/ to add storage, functions, and more
@@ -40,7 +41,14 @@ cfnUserPool.policies = {
 };
 
 
-// const { tables } = backend.data.resources
+const { tables } = backend.data.resources
+
+streamDbToLambdaStack(backend.data.stack, 'accountAction', {
+  lambda: backend.createActionFunction.resources.lambda,
+  sourceTables: [tables.Account, tables.Item, tables.Sale, tables.Transaction, tables.Comment],   // Pass thetablex to be tracked
+  targetTable: tables.Action      // Pass the Action table as a named property
+});
+
 // // const { bucket } = backend.storage.resources
 // // const { region } = backend.stack
 // // const stackId = backend.stack.artifactId.split('-').pop();
