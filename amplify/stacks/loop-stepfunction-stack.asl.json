@@ -1,0 +1,61 @@
+{
+    "Comment": "Looping Step Function with fetch and process",
+    "StartAt": "Fetch",
+    "States": {
+        "Fetch": {
+            "Type": "Task",
+            "Resource": "${FetchFunctionArn}",
+            "Next": "Process",
+            "Retry": [
+                {
+                    "ErrorEquals": [
+                        "TooManyRequestsException"
+                    ],
+                    "IntervalSeconds": 2,
+                    "MaxAttempts": 5,
+                    "BackoffRate": 2
+                }
+            ],
+            "Catch": [
+                {
+                    "ErrorEquals": [
+                        "ResourceNotFoundException"
+                    ],
+                    "Next": "Done"
+                }
+            ],
+            "ResultPath": "$.fetchResult"
+        },
+        "Process": {
+            "Type": "Task",
+            "Resource": "${ProcessFunctionArn}",
+            "Next": "Check Cursor",
+            "ResultPath": "$.processResult",
+            "Parameters": {
+                "key.$": "$.fetchResult.key"
+            }
+        },
+        "Check Cursor": {
+            "Type": "Choice",
+            "Choices": [
+                {
+                    "Variable": "$.fetchResult.cursor",
+                    "IsNull": true,
+                    "Next": "Done"
+                }
+            ],
+            "Default": "Pass Cursor"
+        },
+        "Pass Cursor": {
+            "Type": "Pass",
+            "Parameters": {
+                "cursor.$": "$.fetchResult.cursor",
+                "key.$": "$.fetchResult.key"
+            },
+            "Next": "Fetch"
+        },
+        "Done": {
+            "Type": "Succeed"
+        }
+    }
+}

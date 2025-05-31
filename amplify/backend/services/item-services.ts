@@ -2,8 +2,8 @@ import { dynamoServices, DynamoServices } from "./dynamodb-service";
 import { ExternalUser, ExternalAccount, ExternalItem, ExternalSale } from "./http-client-types";
 import { isMobileNumber, comunicationPreferences, toISO, toStatus } from "./import.utils";
 import { v4 as uuid4 } from 'uuid';
-import { capitalize } from 'lodash';
-import { fetchItemSales, getSale, getItem } from "./http-client-service";
+// import { capitalize } from 'lodash';
+import { getItem } from "./http-client-service";
 import { logger } from "./logger";
 
 export const IMPORT_SERVICE_USER_ID = 'f838ed77-7eec-4d85-85f8-ca022ff42a84'
@@ -69,8 +69,6 @@ export class ItemServices {
         });
 
         await this.importItemGroup(externalItem);
-        await this.importSales(externalItem);
-
 
         return true;
     }
@@ -119,7 +117,7 @@ export class ItemServices {
         );
 
         await this.importItemGroup(externalItem);
-        await this.importSales(externalItem);
+        // await this.importSales(externalItem);
 
 
         return true;
@@ -203,105 +201,104 @@ export class ItemServices {
         return true;
     }
 
-    async importSales(externalItem: ExternalItem): Promise<boolean> {
-        logger.info('importSales', externalItem);
-        // Get sales
-        let cursor = null;
-        let hasMorePages = true;
+    // async importSales(externalItem: ExternalItem): Promise<boolean> {
+    //     logger.info('importSales', externalItem);
+    //     // Get sales
+    //     let cursor = null;
+    //     let hasMorePages = true;
 
-        while (hasMorePages) {
-            const { data, next_cursor } = await fetchItemSales({
-                cursor: cursor,
-                itemId: externalItem.id,
-            });
+    //     while (hasMorePages) {
+    //         const { data, next_cursor } = await fetchItemSales({
+    //             cursor: cursor,
+    //             itemId: externalItem.id,
+    //         });
 
+    //         cursor = next_cursor;
+    //         hasMorePages = cursor ? true : false;
+    //         for (const itemSale of data) {
+    //             const externalSale = await getSale(itemSale.id);
+    //             if (!externalSale) { continue }
+    //             // Check if the sale already exists in the database
+    //             const sale = await this.db.sale.read({ id: itemSale.id });
+    //             if (sale) {
+    //                 await this.db.sale.appendToArray(
+    //                     { id: sale.id },
+    //                     'items',
+    //                     [{
+    //                         sku: externalItem.sku,
+    //                         title: externalItem.title,
+    //                         category: externalItem.category?.name,
+    //                         brand: externalItem.brand,
+    //                         color: externalItem.color,
+    //                         size: externalItem.size,
+    //                         description: externalItem.description,
+    //                         details: externalItem.details,
+    //                         condition: 'Unknown',
+    //                         split: externalItem.split ? Math.round(externalItem.split * 100) : null,
+    //                         price: externalItem.tag_price,
+    //                     }],
+    //                 );
+    //                 await this.db.item.appendToArray(
+    //                     { id: externalItem.id },
+    //                     'sales',
+    //                     [sale.id],
+    //                 );
+    //             } else {
+    //                 // Import user
+    //                 await this.importUser(externalSale.cashier);
 
-            cursor = next_cursor;
-            hasMorePages = cursor ? true : false;
-            for (const itemSale of data) {
-                const externalSale = await getSale(itemSale.id);
-                if (!externalSale) { continue }
-                // Check if the sale already exists in the database
-                const sale = await this.db.sale.read({ id: itemSale.id });
-                if (sale) {
-                    await this.db.sale.appendToArray(
-                        { id: sale.id },
-                        'items',
-                        [{
-                            sku: externalItem.sku,
-                            title: externalItem.title,
-                            category: externalItem.category?.name,
-                            brand: externalItem.brand,
-                            color: externalItem.color,
-                            size: externalItem.size,
-                            description: externalItem.description,
-                            details: externalItem.details,
-                            condition: 'Unknown',
-                            split: externalItem.split ? Math.round(externalItem.split * 100) : null,
-                            price: externalItem.tag_price,
-                        }],
-                    );
-                    await this.db.item.appendToArray(
-                        { id: externalItem.id },
-                        'sales',
-                        [sale.id],
-                    );
-                } else {
-                    // Import user
-                    await this.importUser(externalSale.cashier);
+    //                 // Import account
+    //                 await this.importAccount(externalSale.customer);
 
-                    // Import account
-                    await this.importAccount(externalSale.customer);
+    //                 const transactionId = await this.createTransaction(externalSale);
 
-                    const transactionId = await this.createTransaction(externalSale);
-
-                    // Create a new sale
-                    await this.db.sale.write({
-                        __typename: 'Sale',
-                        id: externalSale.id,
-                        number: externalSale.number,
-                        lastActivityBy: externalSale.cashier?.id ?? IMPORT_SERVICE_USER_ID,
-                        // customerEmail: 
-                        customerAccount: externalSale.customer?.id, // the account number of the customer if exists
-                        finalizedAt: toISO(externalSale.finalized),
-                        parkedAt: toISO(externalSale.finalized),
-                        voidedAt: toISO(externalSale.voided),
-                        status: capitalize(externalSale.status),
-                        subTotal: externalSale.subtotal,
-                        total: externalSale.total,
-                        taxes: externalSale.taxes, // we only track MWST
-                        change: externalSale.change,
-                        refund: externalSale.refunded_amount,
-                        accountTotal: externalSale.consignor_portion,
-                        storeTotal: externalSale.store_portion,
-                        transaction: transactionId,
-                        items: [{
-                            sku: externalItem.sku,
-                            title: externalItem.title,
-                            category: externalItem.category?.name,
-                            brand: externalItem.brand,
-                            color: externalItem.color,
-                            size: externalItem.size,
-                            description: externalItem.description,
-                            details: externalItem.details,
-                            condition: 'Unknown',
-                            split: externalItem.split ? Math.round(externalItem.split * 100) : null,
-                            price: externalItem.tag_price,
-                        }],
-                        receipt_url: externalSale.receipt_url,
-                        createdAt: toISO(externalSale.created),
-                        updatedAt: new Date().toISOString(),
-                    });
-                    await this.db.item.appendToArray(
-                        { id: externalItem.id },
-                        'sales',
-                        [externalSale.id],
-                    );
-                }
-            }
-        }
-        return true;
-    }
+    //                 // Create a new sale
+    //                 await this.db.sale.write({
+    //                     __typename: 'Sale',
+    //                     id: externalSale.id,
+    //                     number: externalSale.number,
+    //                     lastActivityBy: externalSale.cashier?.id ?? IMPORT_SERVICE_USER_ID,
+    //                     // customerEmail: 
+    //                     customerAccount: externalSale.customer?.id, // the account number of the customer if exists
+    //                     finalizedAt: toISO(externalSale.finalized),
+    //                     parkedAt: toISO(externalSale.finalized),
+    //                     voidedAt: toISO(externalSale.voided),
+    //                     status: capitalize(externalSale.status),
+    //                     subTotal: externalSale.subtotal,
+    //                     total: externalSale.total,
+    //                     taxes: externalSale.taxes, // we only track MWST
+    //                     change: externalSale.change,
+    //                     refund: externalSale.refunded_amount,
+    //                     accountTotal: externalSale.consignor_portion,
+    //                     storeTotal: externalSale.store_portion,
+    //                     transaction: transactionId,
+    //                     items: [{
+    //                         sku: externalItem.sku,
+    //                         title: externalItem.title,
+    //                         category: externalItem.category?.name,
+    //                         brand: externalItem.brand,
+    //                         color: externalItem.color,
+    //                         size: externalItem.size,
+    //                         description: externalItem.description,
+    //                         details: externalItem.details,
+    //                         condition: 'Unknown',
+    //                         split: externalItem.split ? Math.round(externalItem.split * 100) : null,
+    //                         price: externalItem.tag_price,
+    //                     }],
+    //                     receipt_url: externalSale.receipt_url,
+    //                     createdAt: toISO(externalSale.created),
+    //                     updatedAt: new Date().toISOString(),
+    //                 });
+    //                 await this.db.item.appendToArray(
+    //                     { id: externalItem.id },
+    //                     'sales',
+    //                     [externalSale.id],
+    //                 );
+    //             }
+    //         }
+    //     }
+    //     return true;
+    // }
 
     async createTransaction(externalSale: ExternalSale): Promise<string> {
 
@@ -339,6 +336,111 @@ export class ItemServices {
         return true;
 
     }
+
+    // async importSale(externalSale: ExternalSale): Promise<boolean> {
+    //     logger.info('importSale', externalSale);
+    //     // Get sales
+    //     let cursor = null;
+    //     let hasMorePages = true;
+
+    //     while (hasMorePages) {
+
+
+
+
+    //         const { data, next_cursor } = await fetchItemSales({
+    //             cursor: cursor,
+    //             itemId: externalItem.id,
+    //         });
+
+    //         cursor = next_cursor;
+    //         hasMorePages = cursor ? true : false;
+    //         for (const itemSale of data) {
+    //             const externalSale = await getSale(itemSale.id);
+    //             if (!externalSale) { continue }
+    //             // Check if the sale already exists in the database
+    //             const sale = await this.db.sale.read({ id: itemSale.id });
+    //             if (sale) {
+    //                 await this.db.sale.appendToArray(
+    //                     { id: sale.id },
+    //                     'items',
+    //                     [{
+    //                         sku: externalItem.sku,
+    //                         title: externalItem.title,
+    //                         category: externalItem.category?.name,
+    //                         brand: externalItem.brand,
+    //                         color: externalItem.color,
+    //                         size: externalItem.size,
+    //                         description: externalItem.description,
+    //                         details: externalItem.details,
+    //                         condition: 'Unknown',
+    //                         split: externalItem.split ? Math.round(externalItem.split * 100) : null,
+    //                         price: externalItem.tag_price,
+    //                     }],
+    //                 );
+    //                 await this.db.item.appendToArray(
+    //                     { id: externalItem.id },
+    //                     'sales',
+    //                     [sale.id],
+    //                 );
+    //             } else {
+    //                 // Import user
+    //                 await this.importUser(externalSale.cashier);
+
+    //                 // Import account
+    //                 await this.importAccount(externalSale.customer);
+
+    //                 const transactionId = await this.createTransaction(externalSale);
+
+    //                 // Create a new sale
+    //                 await this.db.sale.write({
+    //                     __typename: 'Sale',
+    //                     id: externalSale.id,
+    //                     number: externalSale.number,
+    //                     lastActivityBy: externalSale.cashier?.id ?? IMPORT_SERVICE_USER_ID,
+    //                     // customerEmail: 
+    //                     customerAccount: externalSale.customer?.id, // the account number of the customer if exists
+    //                     finalizedAt: toISO(externalSale.finalized),
+    //                     parkedAt: toISO(externalSale.finalized),
+    //                     voidedAt: toISO(externalSale.voided),
+    //                     status: capitalize(externalSale.status),
+    //                     subTotal: externalSale.subtotal,
+    //                     total: externalSale.total,
+    //                     taxes: externalSale.taxes, // we only track MWST
+    //                     change: externalSale.change,
+    //                     refund: externalSale.refunded_amount,
+    //                     accountTotal: externalSale.consignor_portion,
+    //                     storeTotal: externalSale.store_portion,
+    //                     transaction: transactionId,
+    //                     items: [{
+    //                         sku: externalItem.sku,
+    //                         title: externalItem.title,
+    //                         category: externalItem.category?.name,
+    //                         brand: externalItem.brand,
+    //                         color: externalItem.color,
+    //                         size: externalItem.size,
+    //                         description: externalItem.description,
+    //                         details: externalItem.details,
+    //                         condition: 'Unknown',
+    //                         split: externalItem.split ? Math.round(externalItem.split * 100) : null,
+    //                         price: externalItem.tag_price,
+    //                     }],
+    //                     receipt_url: externalSale.receipt_url,
+    //                     createdAt: toISO(externalSale.created),
+    //                     updatedAt: new Date().toISOString(),
+    //                 });
+    //                 await this.db.item.appendToArray(
+    //                     { id: externalItem.id },
+    //                     'sales',
+    //                     [externalSale.id],
+    //                 );
+    //             }
+    //         }
+    //     }
+    //     return true;
+    // }
+
+
 }
 
 export const itemServices = new ItemServices(dynamoServices);

@@ -4,21 +4,6 @@ import { postConfirmation } from '../auth/post-confirmation/resource';
 export const schema = a.schema({
 
   // Models
-  ImportData: a
-    .model({
-      id: a.id().required(),
-      type: a.string().required(),
-      data: a.json().required(),
-      status: a.enum(['Pending', 'Completed', 'Failed']),
-      createdAt: a.datetime().required(),
-    })
-    .identifier(['id'])
-    .secondaryIndexes((index) => [
-
-      index('type').sortKeys(['createdAt']),
-      index('status').sortKeys(['createdAt']),
-    ]),
-
   Counter: a
     .model({
       name: a.string().required(),

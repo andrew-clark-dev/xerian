@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "test": "vitest"
+    "test": "jest"
   },
   "dependencies": {
     "@aws-amplify/adapter-nextjs": "^1.5.8",
@@ -17,6 +17,7 @@
     "@aws-sdk/client-dynamodb": "^3.788.0",
     "@aws-sdk/client-s3": "^3.782.0",
     "@aws-sdk/lib-dynamodb": "^3.788.0",
+    "@aws-sdk/util-stream-node": "^3.370.0",
     "@fullcalendar/core": "^6.1.15",
     "@fullcalendar/daygrid": "^6.1.15",
     "@fullcalendar/interaction": "^6.1.15",
@@ -69,6 +70,8 @@
     "@types/react-dom": "^19",
     "aws-cdk": "^2.1007.0",
     "aws-cdk-lib": "^2.180.0",
+    "aws-sdk-client-mock": "^4.1.0",
+    "aws-sdk-client-mock-jest": "^4.1.0",
     "constructs": "^10.4.2",
     "dotenv": "^16.5.0",
     "esbuild": "^0.25.2",
