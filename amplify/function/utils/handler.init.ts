@@ -1,13 +1,13 @@
 
 import { env } from "$amplify/env/init-data-function";
-import { logger } from "../../backend/services/logger";
-import { itemServices } from '../../backend/services/item-services';
+import { logger } from "../lib/logger";
+import { itemServices } from '../lib/item-services';
 import { Schema } from "@schema"; // Adjusted the path to the correct module
 
 
-import { truncateTable } from "../../backend/services/table.service";
-import { IMPORT_SERVICE_USER_ID, UNKNOWN_EXTERNAL_USER_ID } from "../../backend/services/constants";
-import { DynamoService } from "../../backend/services/dynamodb-service";
+import { truncateTable } from "../lib/table.service";
+import { IMPORT_SERVICE_USER_ID, UNKNOWN_EXTERNAL_USER_ID } from "../lib/constants";
+import { DynamoService } from "../lib/dynamodb-service";
 
 export const totalDbService = new DynamoService<Schema['Total']['type']>(process.env.TOTAL_TABLE!);
 

@@ -12,7 +12,7 @@ jest.mock('../../backend/services/item-services', () => ({
 }));
 
 const s3Mock = mockClient(S3Client);
-import { itemServices } from '../../backend/services/item-services';
+import { itemServices } from '../lib/item-services';
 const { importItem } = itemServices;
 
 describe('handler.process.item', () => {

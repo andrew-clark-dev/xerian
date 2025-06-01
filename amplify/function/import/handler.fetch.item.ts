@@ -1,7 +1,7 @@
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 import { v4 as uuidv4 } from 'uuid';
 import { Logger } from '@aws-lambda-powertools/logger';
-import { fetchPagedItems } from '../../backend/services/http-client-service';
+import { fetchPagedItems } from '../lib/http-client-service';
 
 const s3 = new S3Client({});
 const logger = new Logger();

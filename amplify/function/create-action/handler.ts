@@ -1,7 +1,7 @@
 import type { DynamoDBStreamHandler } from "aws-lambda";
-import { logger } from "../../backend/services/logger";
+import { logger } from "../lib/logger";
 import { v4 as uuid4 } from "uuid";
-import { DynamoService } from "../../backend/services/dynamodb-service";
+import { DynamoService } from "../lib/dynamodb-service";
 
 const TABLE_NAME = process.env.ACTION_TABLE;
 const dynamoService = new DynamoService(TABLE_NAME!);

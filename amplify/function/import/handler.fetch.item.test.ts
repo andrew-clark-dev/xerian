@@ -1,6 +1,6 @@
 import { handler } from './handler.fetch.item';
 import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
-import { fetchPagedItems } from '../../backend/services/http-client-service';
+import { fetchPagedItems } from '../lib/http-client-service';
 import { mockClient } from 'aws-sdk-client-mock';
 import 'aws-sdk-client-mock-jest';
 
