@@ -2,14 +2,10 @@ import { defineBackend } from '@aws-amplify/backend';
 import { auth } from './auth/resource';
 import { data } from './data/resource';
 import { storage } from './storage/resource';
-import { loopStepFunctionStack } from './stacks/loop-stepfunction/stack';
 import { fetchItemFunction, processItemFunction } from './function/import/resource'; // 
-// import { Effect, Policy, PolicyStatement } from 'aws-cdk-lib/aws-iam';
-// import { Stack } from 'aws-cdk-lib';
-// import { EventSourceMapping, StartingPosition } from 'aws-cdk-lib/aws-lambda';
 import { initDataFunction, truncateTableFunction } from './function/utils/resource';
 import { createActionFunction } from './function/create-action/resource';
-import { streamDbToLambdaStack } from './stacks/stream-db-to-lambda/stack';
+import { backendStack } from './backend/backend-stack';
 
 /**
  * @see https://docs.amplify.aws/react/build-a-backend/ to add storage, functions, and more
@@ -39,16 +35,6 @@ cfnUserPool.policies = {
     temporaryPasswordValidityDays: 20,
   },
 };
-
-
-const { tables } = backend.data.resources
-const { bucket } = backend.storage.resources
-
-streamDbToLambdaStack(backend.data.stack, 'accountAction', {
-  lambda: backend.createActionFunction.resources.lambda,
-  sourceTables: [tables.Account, tables.Item, tables.Sale, tables.Transaction, tables.Comment],   // Pass thetablex to be tracked
-  targetTable: tables.Action      // Pass the Action table as a named property
-});
 
 // // const { region } = backend.stack
 // // const stackId = backend.stack.artifactId.split('-').pop();
@@ -112,13 +98,15 @@ streamDbToLambdaStack(backend.data.stack, 'accountAction', {
 // }
 
 
-loopStepFunctionStack(backend.stack, 'ItemImportFunction', {
-  fetchLambda: backend.fetchItemFunction.resources.lambda,
-  processLambda: backend.processItemFunction.resources.lambda,
-  targetTable: tables.Item,
-  bucket: bucket,
+backendStack({
+  stack: backend.stack,
+  dataStack: backend.data.stack,
+  tables: backend.data.resources.tables,
+  bucket: backend.storage.resources.bucket,
+  functions: {
+    createActionFunction: backend.createActionFunction,
+    fetchItemFunction: backend.fetchItemFunction,
+    processItemFunction: backend.processItemFunction,
+  },
 });
-
-
-
 
