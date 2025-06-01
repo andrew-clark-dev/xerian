@@ -1,6 +1,0 @@
-{
-  "scripts": {
-    "build": "tsc",
-    "deploy": "npm run build && npx cdk deploy --require-approval never"
-  }
-}

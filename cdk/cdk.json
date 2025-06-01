@@ -1,9 +1,0 @@
-{
-    "app": "npx tsx bin/xerian-cdk.ts",
-    "context": {
-        "stage": "dev",
-        "region": "eu-central-1",
-        "@aws-cdk/core:newStyleStackSynthesis": true,
-        "aws-cdk:enableDiffNoFail": true
-    }
-}
