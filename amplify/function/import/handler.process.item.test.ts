@@ -5,7 +5,7 @@ import 'aws-sdk-client-mock-jest';
 import { Readable } from 'stream';
 import { SdkStream } from '@smithy/types';
 
-jest.mock('../../backend/services/item-services', () => ({
+jest.mock('../lib/item-services', () => ({
     itemServices: {
         importItem: jest.fn(),
     },
@@ -17,7 +17,7 @@ const { importItem } = itemServices;
 
 describe('handler.process.item', () => {
     const bucket = 'mock-bucket';
-    process.env.TEMP_BUCKET_NAME = bucket;
+    process.env.BUCKET_NAME = bucket;
 
     const mockData = [{ id: 1 }, { id: 2 }];
 

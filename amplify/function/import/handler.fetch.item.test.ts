@@ -4,7 +4,7 @@ import { fetchPagedItems } from '../lib/http-client-service';
 import { mockClient } from 'aws-sdk-client-mock';
 import 'aws-sdk-client-mock-jest';
 
-jest.mock('../../backend/services/http-client-service', () => ({
+jest.mock('../lib/http-client-service', () => ({
     fetchPagedItems: jest.fn(),
 }));
 
@@ -13,7 +13,7 @@ const s3Mock = mockClient(S3Client);
 describe('handler.fetch.item', () => {
     beforeEach(() => {
         s3Mock.reset();
-        process.env.TEMP_BUCKET_NAME = 'test-bucket';
+        process.env.BUCKET_NAME = 'test-bucket';
     });
 
     it('should fetch data and write to S3', async () => {
@@ -34,7 +34,7 @@ describe('handler.fetch.item', () => {
 
         expect(s3Mock).toHaveReceivedCommandWith(PutObjectCommand, {
             Bucket: 'test-bucket',
-            Key: expect.stringMatching(/^fetched\/item\/.*\.json$/),
+            Key: expect.stringMatching(/^import\/fetched\/item\/.*\.json$/),
             Body: JSON.stringify(mockData),
             ContentType: 'application/json',
         });
