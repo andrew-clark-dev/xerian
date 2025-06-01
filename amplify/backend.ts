@@ -2,8 +2,8 @@ import { defineBackend } from '@aws-amplify/backend';
 import { auth } from './auth/resource';
 import { data } from './data/resource';
 import { storage } from './storage/resource';
-// import { loopStepFunctionStack } from './stacks/loop-stepfunction-stack';
-// import { fetchItemFunction, processItemFunction } from './function/import/resource'; // 
+import { loopStepFunctionStack } from './stacks/loop-stepfunction-stack';
+import { fetchItemFunction, processItemFunction } from './function/import/resource'; // 
 // import { Effect, Policy, PolicyStatement } from 'aws-cdk-lib/aws-iam';
 // import { Stack } from 'aws-cdk-lib';
 // import { EventSourceMapping, StartingPosition } from 'aws-cdk-lib/aws-lambda';
@@ -21,8 +21,8 @@ const backend = defineBackend({
   truncateTableFunction,
   initDataFunction,
   createActionFunction,
-  // fetchItemFunction,
-  // processItemFunction,
+  fetchItemFunction,
+  processItemFunction,
 });
 
 
@@ -42,6 +42,7 @@ cfnUserPool.policies = {
 
 
 const { tables } = backend.data.resources
+const { bucket } = backend.storage.resources
 
 streamDbToLambdaStack(backend.data.stack, 'accountAction', {
   lambda: backend.createActionFunction.resources.lambda,
@@ -49,7 +50,6 @@ streamDbToLambdaStack(backend.data.stack, 'accountAction', {
   targetTable: tables.Action      // Pass the Action table as a named property
 });
 
-// // const { bucket } = backend.storage.resources
 // // const { region } = backend.stack
 // // const stackId = backend.stack.artifactId.split('-').pop();
 // // const amplifyBranch = process.env.AMPLIFY_BRANCH ?? 'dev';
@@ -112,12 +112,12 @@ streamDbToLambdaStack(backend.data.stack, 'accountAction', {
 // }
 
 
-
-// // loopStepFunctionStack(backend.stack, 'LoopStepFunction', {
-// //   fetchLambda: backend.fetchItemFunction.resources.lambda,
-// //   processLambda: backend.processItemFunction.resources.lambda,
-// //   targetTable: tables.ImportData,
-// // });
+loopStepFunctionStack(backend.stack, 'ItemImportFunction', {
+  fetchLambda: backend.fetchItemFunction.resources.lambda,
+  processLambda: backend.processItemFunction.resources.lambda,
+  targetTable: tables.Item,
+  bucket: bucket,
+});
 
 
 

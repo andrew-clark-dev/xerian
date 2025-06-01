@@ -8,7 +8,7 @@ const logger = new Logger();
 export const handler = async (event: { key: string }) => {
   logger.info('Processing file from S3', { event });
 
-  const bucket = process.env.TEMP_BUCKET_NAME!;
+  const bucket = process.env.BUCKET_NAME!;
 
   const response = await s3.send(new GetObjectCommand({
     Bucket: bucket,

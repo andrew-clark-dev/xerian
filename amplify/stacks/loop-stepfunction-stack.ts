@@ -1,6 +1,5 @@
 import { Stack, StackProps } from 'aws-cdk-lib';
-import { Bucket } from 'aws-cdk-lib/aws-s3';
-import { RemovalPolicy } from 'aws-cdk-lib';
+import { IBucket } from 'aws-cdk-lib/aws-s3';
 import { Construct } from 'constructs';
 import { Function, IFunction } from 'aws-cdk-lib/aws-lambda';
 import { StateMachine } from 'aws-cdk-lib/aws-stepfunctions';
@@ -18,34 +17,18 @@ export function loopStepFunctionStack(
         fetchLambda: IFunction;
         processLambda: IFunction;
         targetTable: ITable;
+        bucket: IBucket;
     }
 ): StateMachine {
     const stack = new Stack(scope, id, props);
 
-    const fetchLambdaName = Stack.of(stack).resolve(props.fetchLambda.functionName).toString();
-    const bucketName = `${Stack.of(stack).stackName.toLowerCase()}-${fetchLambdaName.toLowerCase()}-temp`
-        .replace(/[^a-z0-9-]/g, '')
-        .substring(0, 63);
-
-    const tempBucket = new Bucket(stack, 'TempStorageBucket', {
-        bucketName,
-        removalPolicy: RemovalPolicy.DESTROY,
-        autoDeleteObjects: true,
-        lifecycleRules: [
-            {
-                prefix: 'archive/',
-                enabled: true,
-            },
-        ],
-    });
-
-    tempBucket.grantReadWrite(props.fetchLambda);
-    tempBucket.grantReadWrite(props.processLambda);
+    props.bucket.grantReadWrite(props.fetchLambda);
+    props.bucket.grantReadWrite(props.processLambda);
 
     props.targetTable.grantWriteData(props.processLambda);
     props.targetTable.grantWriteData(props.processLambda);
-    (props.fetchLambda as Function).addEnvironment('TEMP_BUCKET_NAME', tempBucket.bucketName);
-    (props.processLambda as Function).addEnvironment('TEMP_BUCKET_NAME', tempBucket.bucketName);
+    (props.fetchLambda as Function).addEnvironment('BUCKET_NAME', props.bucket.bucketName);
+    (props.processLambda as Function).addEnvironment('BUCKET_NAME', props.bucket.bucketName);
     (props.processLambda as Function).addEnvironment('TARGET_TABLE_NAME', props.targetTable.tableName);
 
     const definition = DefinitionBody.fromFile(path.join(__dirname, 'loop-stepfunction-stack.asl.json'));

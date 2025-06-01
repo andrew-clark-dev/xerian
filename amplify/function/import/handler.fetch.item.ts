@@ -24,10 +24,10 @@ export const handler = async (event: FetchEvent): Promise<FetchResponse> => {
   const data = result.data;
   const nextCursor = result.next_cursor;
 
-  const key = `fetched/item/${uuidv4()}.json`;
+  const key = `import/fetched/item/item-list-${uuidv4()}.json`;
 
   await s3.send(new PutObjectCommand({
-    Bucket: process.env.TEMP_BUCKET_NAME!,
+    Bucket: process.env.BUCKET_NAME!,
     Key: key,
     Body: JSON.stringify(data),
     ContentType: 'application/json',
