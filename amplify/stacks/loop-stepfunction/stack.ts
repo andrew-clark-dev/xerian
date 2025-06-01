@@ -31,7 +31,7 @@ export function loopStepFunctionStack(
     (props.processLambda as Function).addEnvironment('BUCKET_NAME', props.bucket.bucketName);
     (props.processLambda as Function).addEnvironment('TARGET_TABLE_NAME', props.targetTable.tableName);
 
-    const definition = DefinitionBody.fromFile(path.join(__dirname, 'loop-stepfunction-stack.asl.json'));
+    const definition = DefinitionBody.fromFile(path.join(__dirname, 'stepfunction.asl.json'));
 
     const stateMachine = new StateMachine(stack, 'LoopStepFunction', {
         definitionBody: definition,

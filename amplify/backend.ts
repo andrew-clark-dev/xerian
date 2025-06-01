@@ -2,14 +2,14 @@ import { defineBackend } from '@aws-amplify/backend';
 import { auth } from './auth/resource';
 import { data } from './data/resource';
 import { storage } from './storage/resource';
-import { loopStepFunctionStack } from './stacks/loop-stepfunction-stack';
+import { loopStepFunctionStack } from './stacks/loop-stepfunction/stack';
 import { fetchItemFunction, processItemFunction } from './function/import/resource'; // 
 // import { Effect, Policy, PolicyStatement } from 'aws-cdk-lib/aws-iam';
 // import { Stack } from 'aws-cdk-lib';
 // import { EventSourceMapping, StartingPosition } from 'aws-cdk-lib/aws-lambda';
 import { initDataFunction, truncateTableFunction } from './function/utils/resource';
 import { createActionFunction } from './function/create-action/resource';
-import { streamDbToLambdaStack } from './stacks/stream-db-to-lambda';
+import { streamDbToLambdaStack } from './stacks/stream-db-to-lambda/stack';
 
 /**
  * @see https://docs.amplify.aws/react/build-a-backend/ to add storage, functions, and more
