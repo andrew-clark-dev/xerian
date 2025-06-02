@@ -2,7 +2,7 @@ import boto3
 
 dynamodb = boto3.resource('dynamodb')
 
-def handler(event, context):
+def lambda_handler(event, context):
     table_name = event.get('tableName')
     if not table_name:
         return {

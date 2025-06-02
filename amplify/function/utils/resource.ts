@@ -1,14 +1,6 @@
 import { defineFunction } from "@aws-amplify/backend";
 import { Duration } from "aws-cdk-lib";
 
-export const truncateTableFunction = defineFunction({
-    name: "truncate-table-function",
-    entry: "./handler.truncate.ts",
-    resourceGroupName: "data",
-    timeoutSeconds: Duration.minutes(10).toSeconds(), // 10 minute timeout
-    memoryMB: 1024 // allocate 1024 MB of memory to the function.
-});
-
 export const initDataFunction = defineFunction({
     name: "init-data-function",
     entry: "./handler.init.ts",

@@ -26,6 +26,15 @@ interface AmplifyContructs {
 
 export function backendStack(backend: AmplifyContructs) {
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const truncateLambda = createPythonLambda(backend.stack, 'OnChangePythonLambda', {
+        lambdaId: 'TruncatePythonLambda',
+        entryPath: path.join(__dirname, './src/truncate'),
+        handler: 'handler.lambda_handler',
+        tables: backend.tables,
+    });
+
+
     const onChangeLambda = createPythonLambda(backend.stack, 'OnChangePythonLambda', {
         lambdaId: 'OnChangePythonLambda',
         entryPath: path.join(__dirname, './src/on-change'),

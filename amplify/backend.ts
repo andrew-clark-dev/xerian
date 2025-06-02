@@ -3,7 +3,7 @@ import { auth } from './auth/resource';
 import { data } from './data/resource';
 import { storage } from './storage/resource';
 import { fetchItemFunction, processItemFunction } from './function/import/resource'; // 
-import { initDataFunction, truncateTableFunction } from './function/utils/resource';
+import { initDataFunction } from './function/utils/resource';
 import { backendStack } from './backend/backend-stack';
 
 /**
@@ -13,7 +13,6 @@ const backend = defineBackend({
   auth,
   data,
   storage,
-  truncateTableFunction,
   initDataFunction,
   fetchItemFunction,
   processItemFunction,
