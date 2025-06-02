@@ -1,0 +1,46 @@
+{
+    "Comment": "Simple concurent workflow.",
+    "StartAt": "File Analysis",
+    "States": {
+        "File Analysis": {
+            "Type": "Map",
+            "ItemsPath": "$${DataList}",
+            "ItemProcessor": {
+                "ProcessorConfig": {
+                    "Mode": "INLINE"
+                },
+                "StartAt": "Lambda Invoke",
+                "States": {
+                    "Lambda Invoke": {
+                        "Type": "Task",
+                        "Resource": "arn:aws:states:::lambda:invoke",
+                        "Output": "{% $states.result.Payload %}",
+                        "Arguments": {
+                            "FunctionName": "",
+                            "Payload": {
+                                "value.$": "States.StringToJson($)"
+                            }
+                        },
+                        "Retry": [
+                            {
+                                "ErrorEquals": [
+                                    "Lambda.ServiceException",
+                                    "Lambda.AWSLambdaException",
+                                    "Lambda.SdkClientException",
+                                    "Lambda.TooManyRequestsException"
+                                ],
+                                "IntervalSeconds": 1,
+                                "MaxAttempts": 3,
+                                "BackoffRate": 2,
+                                "JitterStrategy": "FULL"
+                            }
+                        ],
+                        "End": true
+                    }
+                }
+            },
+            "End": true
+        }
+    },
+    "QueryLanguage": "JSONata"
+}

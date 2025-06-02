@@ -4,7 +4,6 @@ import { data } from './data/resource';
 import { storage } from './storage/resource';
 import { fetchItemFunction, processItemFunction } from './function/import/resource'; // 
 import { initDataFunction, truncateTableFunction } from './function/utils/resource';
-import { createActionFunction } from './function/create-action/resource';
 import { backendStack } from './backend/backend-stack';
 
 /**
@@ -16,7 +15,6 @@ const backend = defineBackend({
   storage,
   truncateTableFunction,
   initDataFunction,
-  createActionFunction,
   fetchItemFunction,
   processItemFunction,
 });
@@ -104,7 +102,6 @@ backendStack({
   tables: backend.data.resources.tables,
   bucket: backend.storage.resources.bucket,
   functions: {
-    createActionFunction: backend.createActionFunction,
     fetchItemFunction: backend.fetchItemFunction,
     processItemFunction: backend.processItemFunction,
   },

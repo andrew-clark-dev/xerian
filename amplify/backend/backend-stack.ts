@@ -4,12 +4,16 @@ import { ITable } from "aws-cdk-lib/aws-dynamodb";
 import { IFunction } from "aws-cdk-lib/aws-lambda";
 import { IBucket } from "aws-cdk-lib/aws-s3";
 import { loopStepFunctionStack } from "./stacks/loop-stepfunction/stack";
+import { createPythonLambda } from './stacks/python-service/stack';
+import { fileURLToPath } from 'url';
+import path, { dirname } from 'path';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 interface AmplifyFunction {
     resources: {
         lambda: IFunction;
     };
-
 }
 
 interface AmplifyContructs {
@@ -22,16 +26,25 @@ interface AmplifyContructs {
 
 export function backendStack(backend: AmplifyContructs) {
 
+    const onChangeLambda = createPythonLambda(backend.stack, 'OnChangePythonLambda', {
+        lambdaId: 'OnChangePythonLambda',
+        entryPath: path.join(__dirname, './src/on-change'),
+        handler: 'handler.lambda_handler',
+        tables: {
+            Action: backend.tables.Action,
+            Total: backend.tables.Total,
+        },
+    });
+
     streamDbToLambdaStack(backend.dataStack, 'accountAction', {
-        lambda: backend.functions.createActionFunction.resources.lambda,
+        lambda: onChangeLambda,
         sourceTables: [
             backend.tables.Account,
             backend.tables.Item,
             backend.tables.Sale,
             backend.tables.Transaction,
             backend.tables.Comment
-        ],   // Pass thetablex to be tracked
-        targetTable: backend.tables.Action      // Pass the Action table as a named property
+        ]  // Pass thetablex to be tracked
     });
 
     loopStepFunctionStack(backend.stack, 'ItemImportFunction', {
