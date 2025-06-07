@@ -34,6 +34,7 @@
     "exceljs": "^4.4.0",
     "execa": "^9.5.2",
     "flatpickr": "^4.6.13",
+    "generate-password": "^1.7.1",
     "ky": "^1.8.0",
     "libphonenumber-js": "^1.12.6",
     "lodash": "^4.17.21",
