@@ -1,5 +1,5 @@
 import { a, defineData, type ClientSchema } from '@aws-amplify/backend';
-import { postConfirmation } from '../auth/post-confirmation/resource';
+import { provisionUserFunction } from '../function/handlers/user/resource';
 
 export const schema = a.schema({
 
@@ -56,30 +56,28 @@ export const schema = a.schema({
 
   UserProfile: a
     .model({
-      email: a.string(),
-      profileOwner: a.string(),
-      cognitoName: a.string(), // the cognito name not for display
-      nickname: a.string(), // the display name
+      sub: a.string().required(),
+      userName: a.string().required(),
+      email: a.string().required(),
+      enabled: a.boolean().required(),
       phoneNumber: a.string(),
-      status: a.enum(['Active', 'Inactive', 'Suspended', 'Pending']),
-      role: a.enum(['Admin', 'Manager', 'Employee', 'Service', 'Guest']),
+      status: a.enum(['Active', 'Inactive', 'Suspended']),
+      role: a.enum(['Admin', 'Manager', 'Employee', 'Service']),
       photo: a.url(),
 
       comments: a.hasMany('Comment', 'userId'),
       actions: a.hasMany('Action', 'userId'),
 
       settings: a.json(),
-      deletedAt: a.datetime(),
 
     })
     .secondaryIndexes((index) => [
-      index('cognitoName'),
-      index('nickname'),
       index('email'),
     ])
     .authorization((allow) => [
       allow.ownerDefinedIn('profileOwner'),
-      allow.group('Admin')
+      allow.group('Admin'),
+      allow.group('Manager'),
     ]),
 
   Customer: a
@@ -92,8 +90,8 @@ export const schema = a.schema({
       index('email'),
     ])
     .authorization((allow) => [
-      allow.ownerDefinedIn('profileOwner'),
-      allow.group('Admin')
+      allow.group('Admin'),
+      allow.group('Manager'),
     ]),
 
 
@@ -296,9 +294,21 @@ export const schema = a.schema({
       index('functionName').sortKeys(['createdAt']),
     ]),
 
+
+  provisionUser: a
+    .mutation()
+    .arguments({
+      id: a.id(),
+      username: a.string().required(),
+      email: a.string().required(),
+      temporaryPassword: a.string(),
+    })
+    .returns(a.string())
+    .authorization(allow => [allow.group('admin')])
+    .handler(a.handler.function(provisionUserFunction)),
+
 }).authorization(allow => [
   allow.group('Employee'), // default to employee
-  allow.resource(postConfirmation),
 ]);
 
 // Used for code completion / highlighting when making requests from frontend

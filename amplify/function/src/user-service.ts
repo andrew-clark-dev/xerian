@@ -1,4 +1,6 @@
+import { UserType } from '@aws-sdk/client-cognito-identity-provider';
 import generator from 'generate-password';
+import { DynamoService } from "./dynamodb-service";
 
 import {
     CognitoIdentityProviderClient,
@@ -7,6 +9,12 @@ import {
 } from '@aws-sdk/client-cognito-identity-provider';
 
 const client = new CognitoIdentityProviderClient({});
+
+const DEFAULT_SETTINGS = JSON.stringify({
+    notifications: true,
+    theme: 'light',
+    hasLogin: true,
+})
 
 /**
  * Generates a random password that satisfies Cognito default rules:
@@ -33,8 +41,8 @@ function generateSecurePassword(): string {
 export async function createCognitoUser(
     username: string,
     email: string,
-    temporaryPassword?: string
-): Promise<void> {
+    temporaryPassword?: string | null
+): Promise<UserType> {
     const userPoolId = process.env.USER_POOL_ID;
     if (!userPoolId) {
         throw new Error('USER_POOL_ID environment variable is not set');
@@ -58,6 +66,7 @@ export async function createCognitoUser(
         const command = new AdminCreateUserCommand(input);
         const response = await client.send(command);
         console.log('User created:', response.User?.Username);
+        return response.User!;
     } catch (error) {
         console.error('Failed to create user:', error);
         throw error;
@@ -150,4 +159,70 @@ export async function resetUserPassword(username: string, newPassword: string): 
         console.error('Failed to reset user password:', error);
         throw error;
     }
+}
+
+const tableName = process.env.USERPROFILE_TABLE;
+
+interface MinimalUser {
+    id: string;
+    sub: string;
+    email: string;
+    username: string;
+    enabled: boolean;
+    settings?: string;
+}
+
+/**
+ * Creates a user profile in DynamoDB and returns the created profile object.
+ * @param user The minimal user information.
+ * @returns The created user profile object.
+ */
+export async function createUserProfile(user: MinimalUser): Promise<void> {
+    try {
+        const dynamoService = new DynamoService(tableName!);
+        // Build the profile object with __typename, then remove it before writing/returning
+        const profile = {
+            __typename: 'UserProfile',
+            id: user.id,
+            sub: user.sub,
+            email: user.email,
+            username: user.username,
+            enabled: user.enabled || false,
+            status: user.enabled ? 'Active' : 'Inactive',
+            role: 'Employee',
+            settings: user.settings || DEFAULT_SETTINGS,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+        };
+        await dynamoService.write(profile);
+    }
+    catch (error) {
+        console.error(`Failed to create user for ${user?.username}`, error);
+        throw error;
+    }
+}
+
+export async function provisionUser(
+    id: string,
+    username: string,
+    email: string,
+    temporaryPassword?: string | null,
+): Promise<string> {
+    function getAttr(user: UserType, attrName: string): string | undefined {
+        return user.Attributes?.find(attr => attr.Name === attrName)?.Value;
+    }
+
+    const user = await createCognitoUser(username, email, temporaryPassword);
+
+    const minimalUser: MinimalUser = {
+        id: id,
+        sub: getAttr(user, 'sub')!,
+        email: getAttr(user, 'email')!,
+        username: user.Username || username,
+        enabled: user.Enabled || false,
+        settings: DEFAULT_SETTINGS,
+    };
+
+    await createUserProfile(minimalUser);
+    return minimalUser.sub;
 }

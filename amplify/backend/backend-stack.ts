@@ -35,20 +35,6 @@ interface AmplifyContructs {
 export function backendStack(backend: AmplifyContructs) {
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const newUserLambda = createPythonLambda(backend.stack, 'NewUserPythonLambda', {
-        lambdaId: 'NewUserPythonLambda',
-        entryPath: path.join(__dirname, './src/new-user'),
-        handler: 'handler.lambda_handler',
-        tables: {
-            UserProfile: backend.tables.UserProfile,
-        },
-        environment: {
-            USER_POOL_ID: backend.auth.resources.userPool.userPoolId,
-        }
-    });
-
-
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const truncateLambda = createPythonLambda(backend.stack, 'TruncatePythonLambda', {
         lambdaId: 'TruncatePythonLambda',
         entryPath: path.join(__dirname, './src/truncate'),

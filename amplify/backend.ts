@@ -2,8 +2,9 @@ import { defineBackend } from '@aws-amplify/backend';
 import { auth } from './auth/resource';
 import { data } from './data/resource';
 import { storage } from './storage/resource';
-import { fetchItemFunction, processItemFunction } from './function/handlers/import/resource'; // 
 import { backendStack } from './backend/backend-stack';
+import { fetchItemFunction, processItemFunction } from './function/handlers/import/resource';
+import { provisionUserFunction } from './function/handlers/user/resource';
 
 /**
  * @see https://docs.amplify.aws/react/build-a-backend/ to add storage, functions, and more
@@ -14,6 +15,7 @@ const backend = defineBackend({
   storage,
   fetchItemFunction,
   processItemFunction,
+  provisionUserFunction,
 });
 
 // extract L1 CfnUserPool resources
