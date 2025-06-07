@@ -3,7 +3,6 @@ import { auth } from './auth/resource';
 import { data } from './data/resource';
 import { storage } from './storage/resource';
 import { fetchItemFunction, processItemFunction } from './function/import/resource'; // 
-import { initDataFunction } from './function/utils/resource';
 import { backendStack } from './backend/backend-stack';
 
 /**
@@ -13,11 +12,9 @@ const backend = defineBackend({
   auth,
   data,
   storage,
-  initDataFunction,
   fetchItemFunction,
   processItemFunction,
 });
-
 
 // extract L1 CfnUserPool resources
 const { cfnUserPool } = backend.auth.resources.cfnResources;
@@ -99,6 +96,7 @@ backendStack({
   stack: backend.stack,
   dataStack: backend.data.stack,
   tables: backend.data.resources.tables,
+  auth: backend.auth,
   bucket: backend.storage.resources.bucket,
   functions: {
     fetchItemFunction: backend.fetchItemFunction,
