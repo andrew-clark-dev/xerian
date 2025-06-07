@@ -2,7 +2,7 @@ import { defineBackend } from '@aws-amplify/backend';
 import { auth } from './auth/resource';
 import { data } from './data/resource';
 import { storage } from './storage/resource';
-import { fetchItemFunction, processItemFunction } from './function/import/resource'; // 
+import { fetchItemFunction, processItemFunction } from './function/handlers/import/resource'; // 
 import { backendStack } from './backend/backend-stack';
 
 /**

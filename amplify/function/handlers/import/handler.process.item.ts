@@ -1,6 +1,6 @@
 import { S3Client, GetObjectCommand } from '@aws-sdk/client-s3';
 import { Logger } from '@aws-lambda-powertools/logger';
-import { itemServices } from '../lib/item-services';
+import { itemServices } from '../../src/item-services';
 
 const s3 = new S3Client({});
 const logger = new Logger();
