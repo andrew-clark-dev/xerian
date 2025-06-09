@@ -9,24 +9,14 @@ import boto3
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
-ACTION_TABLE = os.environ.get("ACTION_TABLE")
+ACTION_TABLE = os.environ.get("ACTION_TABLE_NAME")
 dynamodb = boto3.resource("dynamodb")
 table = dynamodb.Table(ACTION_TABLE)
 
 # Add for total table
-TOTAL_TABLE = os.environ.get("TOTAL_TABLE")
+TOTAL_TABLE = os.environ.get("TOTAL_TABLE_NAME")
 total_table = dynamodb.Table(TOTAL_TABLE)
 
-
-class DynamoService:
-    def __init__(self, table_name: str):
-        self.table = dynamodb.Table(table_name)
-
-    def write(self, item: Dict[str, Any]):
-        self.table.put_item(Item=item)
-
-
-dynamo_service = DynamoService(ACTION_TABLE)
 
 def lambda_handler(event, context):
     logger.info("DynamoDBStreamEvent: %s", json.dumps(event))
@@ -39,7 +29,7 @@ def lambda_handler(event, context):
                 model_name = new_image["__typename"]["S"]
                 logger.info("New %s Image: %s", model_name, json.dumps(new_image))
 
-                dynamo_service.write({
+                table.put_item(Item={
                     "__typename": "Action",
                     "id": str(uuid.uuid4()),
                     "type": "Create",
@@ -66,7 +56,7 @@ def lambda_handler(event, context):
                 logger.info("New %s Image: %s", model_name, json.dumps(new_image))
                 logger.info("Old %s Image: %s", model_name, json.dumps(old_image))
 
-                dynamo_service.write({
+                table.put_item(Item={
                     "__typename": "Action",
                     "id": str(uuid.uuid4()),
                     "type": "Update",

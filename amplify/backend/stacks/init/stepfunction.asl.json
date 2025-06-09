@@ -1,0 +1,81 @@
+{
+    "Comment": "Initializes the application",
+    "StartAt": "Create Standard Users",
+    "States": {
+        "Create Standard Users": {
+            "Type": "Task",
+            "Resource": "arn:aws:states:::lambda:invoke",
+            "Output": "{% $states.result.Payload %}",
+            "Arguments": {
+                "FunctionName": "${ProvisionUsersArn}",
+                "Payload": [
+                    {
+                        "username": "Service",
+                        "email": "service@encore-kinderkleiderboerse.com"
+                    }
+                ]
+            },
+            "Retry": [
+                {
+                    "ErrorEquals": [
+                        "Lambda.ServiceException",
+                        "Lambda.AWSLambdaException",
+                        "Lambda.SdkClientException",
+                        "Lambda.TooManyRequestsException"
+                    ],
+                    "IntervalSeconds": 1,
+                    "MaxAttempts": 3,
+                    "BackoffRate": 2,
+                    "JitterStrategy": "FULL"
+                }
+            ],
+            "Next": "Map"
+        },
+        "Map": {
+            "Type": "Map",
+            "ItemProcessor": {
+                "ProcessorConfig": {
+                    "Mode": "DISTRIBUTED",
+                    "ExecutionType": "STANDARD"
+                },
+                "StartAt": "Truncate",
+                "States": {
+                    "Truncate": {
+                        "Type": "Task",
+                        "Resource": "arn:aws:states:::lambda:invoke",
+                        "Output": "{% $states.result.Payload %}",
+                        "Arguments": {
+                            "FunctionName": "${TruncateArn}",
+                            "Payload": "{% $states.input %}"
+                        },
+                        "Retry": [
+                            {
+                                "ErrorEquals": [
+                                    "Lambda.ServiceException",
+                                    "Lambda.AWSLambdaException",
+                                    "Lambda.SdkClientException",
+                                    "Lambda.TooManyRequestsException"
+                                ],
+                                "IntervalSeconds": 1,
+                                "MaxAttempts": 3,
+                                "BackoffRate": 2,
+                                "JitterStrategy": "FULL"
+                            }
+                        ],
+                        "End": true
+                    }
+                }
+            },
+            "End": true,
+            "Label": "Map",
+            "MaxConcurrency": 1000,
+            "Items": [
+                {
+                    "modelName": "Account",
+                    "keyName": "id"
+                }
+            ]
+        }
+    },
+    "QueryLanguage": "JSONata"
+}

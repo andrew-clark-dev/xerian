@@ -6,7 +6,7 @@ export const provisionUserFunction = defineFunction({
     entry: "./handler.provision.ts",
     timeoutSeconds: Duration.minutes(1).toSeconds(),
     environment: {
-        SERVICE_NAME: "provision-user-functionn",
+        SERVICE_NAME: "provision-user-function",
     },
 });
 

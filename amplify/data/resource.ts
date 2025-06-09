@@ -72,7 +72,9 @@ export const schema = a.schema({
 
     })
     .secondaryIndexes((index) => [
+      index('sub'),
       index('email'),
+      index('userName'),
     ])
     .authorization((allow) => [
       allow.ownerDefinedIn('profileOwner'),
@@ -321,4 +323,3 @@ export const data = defineData({
     defaultAuthorizationMode: 'userPool',
   }
 });
-

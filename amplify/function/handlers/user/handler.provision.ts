@@ -1,29 +1,33 @@
 import { provisionUser } from '../../src/user-service';
 import { v4 as uuidv4 } from 'uuid';
 
-interface ProvisionUserEvent {
+interface ProvisionUserData {
     id?: string;
     username: string;
     email: string;
     temporaryPassword?: string | undefined;
 }
 
-// Lambda handler for provisioning a user
-export const handler = async (event: ProvisionUserEvent) => {
+// Lambda handler for provisioning a user or list of users
+export const handler = async (event: ProvisionUserData | ProvisionUserData[]) => {
     try {
-        const { id, username, email, temporaryPassword } = event;
-        if (!username || !email) {
-            return {
-                statusCode: 400,
-                body: JSON.stringify({ error: 'Missing required parameters: username and email' }),
-            };
-        }
+        const inputs = Array.isArray(event) ? event : [event];
 
-        await provisionUser(id ?? uuidv4(), username, email, temporaryPassword);
+        const normalizedInputs = inputs.map((input) => ({
+            ...input,
+            id: input.id ?? uuidv4(),
+        }));
+
+        const result = await provisionUser(normalizedInputs);
 
         return {
             statusCode: 200,
-            body: JSON.stringify({ message: 'User provisioned successfully' }),
+            body: JSON.stringify({
+                message: Array.isArray(event)
+                    ? 'Users provisioned successfully'
+                    : 'User provisioned successfully',
+                result,
+            }),
         };
     } catch (error) {
         let errorMessage = 'Internal server error';

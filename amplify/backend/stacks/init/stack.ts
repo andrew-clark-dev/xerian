@@ -5,16 +5,20 @@ import { StateMachine } from 'aws-cdk-lib/aws-stepfunctions';
 import { DefinitionBody } from 'aws-cdk-lib/aws-stepfunctions';
 import { fileURLToPath } from 'url';
 import path, { dirname } from 'path';
+import { ITable } from 'aws-cdk-lib/aws-dynamodb';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
-export function concurrentFunctionStack(
+interface InitStackProps extends StackProps {
+    provisionUsers: IFunction,
+    truncate: IFunction,
+    tables: Record<string, ITable>
+}
+
+export function createInit(
     scope: Construct,
     id: string,
-    props: StackProps & {
-        processLambda: IFunction;
-        data: object[];
-    }
+    props: InitStackProps,
 ): StateMachine {
     const stack = new Stack(scope, id, props);
 
@@ -23,8 +27,8 @@ export function concurrentFunctionStack(
     const stateMachine = new StateMachine(stack, id, {
         definitionBody: definition,
         definitionSubstitutions: {
-            ProcessFunctionArn: props.processLambda.functionArn,
-            DataList: JSON.stringify(props.data),
+            ProvisionUsersArn: props.provisionUsers.functionArn,
+            TruncateArn: props.truncate.functionArn,
         },
     });
 

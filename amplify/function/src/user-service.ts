@@ -5,7 +5,8 @@ import { DynamoService } from "./dynamodb-service";
 import {
     CognitoIdentityProviderClient,
     AdminCreateUserCommand,
-    AdminCreateUserCommandInput
+    AdminCreateUserCommandInput,
+    AdminGetUserCommand
 } from '@aws-sdk/client-cognito-identity-provider';
 
 const client = new CognitoIdentityProviderClient({});
@@ -161,9 +162,9 @@ export async function resetUserPassword(username: string, newPassword: string): 
     }
 }
 
-const tableName = process.env.USERPROFILE_TABLE;
+const profileTableName = process.env.USERPROFILE_TABLE_NAME!;
 
-interface MinimalUser {
+interface UserProfileDb {
     id: string;
     sub: string;
     email: string;
@@ -177,12 +178,12 @@ interface MinimalUser {
  * @param user The minimal user information.
  * @returns The created user profile object.
  */
-export async function createUserProfile(user: MinimalUser): Promise<void> {
+export async function createUserProfileDb(user: UserProfileDb): Promise<void> {
     try {
-        const dynamoService = new DynamoService(tableName!);
+        const dynamoService = new DynamoService(profileTableName!);
         // Build the profile object with __typename, then remove it before writing/returning
         const profile = {
-            __typename: 'UserProfile',
+            __typename: 'UserProfileDb',
             id: user.id,
             sub: user.sub,
             email: user.email,
@@ -202,27 +203,58 @@ export async function createUserProfile(user: MinimalUser): Promise<void> {
     }
 }
 
-export async function provisionUser(
+export interface ProvisionUserData {
     id: string,
     username: string,
     email: string,
     temporaryPassword?: string | null,
-): Promise<string> {
-    function getAttr(user: UserType, attrName: string): string | undefined {
-        return user.Attributes?.find(attr => attr.Name === attrName)?.Value;
+}
+
+export async function provisionUser(
+    input: ProvisionUserData | ProvisionUserData[]
+): Promise<string | string[]> {
+    const inputs = Array.isArray(input) ? input : [input];
+
+    const results: string[] = [];
+
+    for (const item of inputs) {
+        const userPoolId = process.env.USER_POOL_ID;
+        if (!userPoolId) {
+            throw new Error('USER_POOL_ID environment variable is not set');
+        }
+
+        try {
+            const getUser = new AdminGetUserCommand({
+                UserPoolId: userPoolId,
+                Username: item.username
+            });
+            const existing = await client.send(getUser);
+            const sub = existing.UserAttributes?.find(attr => attr.Name === 'sub')?.Value;
+            results.push(sub!);
+            continue;
+        } catch {
+            // User not found, continue to create
+        }
+
+        const user = await createCognitoUser(item.username, item.email, item.temporaryPassword);
+
+        const sub = user.Attributes?.find(attr => attr.Name === 'sub')?.Value;
+        const email = user.Attributes?.find(attr => attr.Name === 'email')?.Value;
+        const username = user.Username || item.username;
+        const enabled = user.Enabled || false;
+
+        const userProfile: UserProfileDb = {
+            id: item.id,
+            sub: sub!,
+            email: email!,
+            username,
+            enabled,
+            settings: DEFAULT_SETTINGS,
+        };
+
+        await createUserProfileDb(userProfile);
+        results.push(sub!);
     }
 
-    const user = await createCognitoUser(username, email, temporaryPassword);
-
-    const minimalUser: MinimalUser = {
-        id: id,
-        sub: getAttr(user, 'sub')!,
-        email: getAttr(user, 'email')!,
-        username: user.Username || username,
-        enabled: user.Enabled || false,
-        settings: DEFAULT_SETTINGS,
-    };
-
-    await createUserProfile(minimalUser);
-    return minimalUser.sub;
+    return Array.isArray(input) ? results : results[0];
 }

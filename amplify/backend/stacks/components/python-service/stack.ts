@@ -9,7 +9,7 @@ interface PythonLambdaStackProps extends StackProps {
     handler: string;   // e.g., 'app.lambda_handler'
     timeoutSecs?: number;
     environment?: Record<string, string>;
-    tables: Record<string, ITable>
+    tables?: Record<string, ITable>
 }
 
 export function createPythonLambda(scope: Construct, id: string, props: PythonLambdaStackProps): Function {
@@ -20,9 +20,11 @@ export function createPythonLambda(scope: Construct, id: string, props: PythonLa
         timeout: Duration.seconds(props.timeoutSecs ?? 30),
         environment: props.environment,
     });
-    Object.entries(props.tables).forEach(([key, table]) => {
-        table.grantFullAccess(lambda);
-        lambda.addEnvironment(`${key.toUpperCase()}_TABLE_NAME`, table.tableName);
-    });
+    if (props.tables) {
+        Object.entries(props.tables).forEach(([key, table]) => {
+            table.grantFullAccess(lambda);
+            lambda.addEnvironment(`${key.toUpperCase()}_TABLE_NAME`, table.tableName);
+        });
+    }
     return lambda;
 }

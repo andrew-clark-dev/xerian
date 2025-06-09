@@ -9,7 +9,7 @@ interface StreamDbToLambdaProps extends StackProps {
   sourceTables: ITable[];
 }
 
-export function streamDbToLambdaStack(
+export function createStreamDbToLambda(
   scope: Construct,
   id: string,
   props: StreamDbToLambdaProps

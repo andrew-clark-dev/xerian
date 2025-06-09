@@ -32,6 +32,8 @@ cfnUserPool.policies = {
   },
 };
 
+// const { tables } = backend.data.resources;
+
 // // const { region } = backend.stack
 // // const stackId = backend.stack.artifactId.split('-').pop();
 // // const amplifyBranch = process.env.AMPLIFY_BRANCH ?? 'dev';
@@ -103,6 +105,7 @@ backendStack({
   functions: {
     fetchItemFunction: backend.fetchItemFunction,
     processItemFunction: backend.processItemFunction,
+    provisionUserFunction: backend.provisionUserFunction
   },
 });
 

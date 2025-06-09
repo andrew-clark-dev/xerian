@@ -10,7 +10,7 @@ import path, { dirname } from 'path';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
-export function loopStepFunctionStack(
+export function createLoopStepFunction(
     scope: Construct,
     id: string,
     props: StackProps & {
